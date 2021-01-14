@@ -19,52 +19,165 @@
 
 	<body>
 		<div id="app">
-			<pre>{{ $data }}</pre>
+			<header>
+				<nav>
+					<a href="#" @click="switchView('l1')">Less. 1</a>
+					<a href="#" @click="switchView('l2')">Less. 2</a>
+					<a href="#" @click="switchView('l3')">Less. 3</a>
+					<a href="#" @click="switchView('l4')">Less. 4</a>
+				</nav>
+			</header>
 
-			<hr>
+			<component :is="currentView"></component>
 
-			<h1>{{ message }}</h1>
-
-			<input type="text" v-model="message" />
-
-			<hr>
-
-			<ul>
-				<li
-					v-for="bear in bears"
-					v-bind:class="{ 'strike': bear.status }">{{ bear.name }}</li>
-			</ul>
-
-			<hr>
-
-			<input type="text" v-model="message" @keyup.13.prevent="onClick" />
-
-			<form action="">
-				<button type="button" @click.prevent="onClick">пынь</button>
-			</form>
 		</div>
 
+		<template id="raw">
+			<div>
+				<pre><slot></slot></pre>
+			</div>
+		</template>
+
+		<template id="l1">
+			<div>
+				<raw>{{ $data }}</raw>
+				<hr>
+
+				<h1>{{ message }}</h1>
+
+				<input type="text" v-model="message" />
+			</div>
+		</template>
+
+		<template id="l2">
+			<div>
+				<raw>{{ $data }}</raw>
+				<hr>
+				<ul>
+					<li
+						v-for="bear in bearsOrdered"
+						v-bind:class="{ 'strike': bear.status }">{{ bear.name }}, {{ bear.age }}</li>
+				</ul>
+			</div>
+		</template>
+
+		<template id="l3">
+			<div>
+				<raw>{{ $data }}</raw>
+				<hr>
+				<input type="text" v-model="message" @keyup.13.prevent="onClick" />
+
+				<form action="">
+					<button type="button" @click.prevent="onClick">пынь</button>
+				</form>
+			</div>
+		</template>
+
+		<template id="l4">
+			<div>
+				<raw>{{ $data }}</raw>
+				<hr>
+				<form>
+					<span>{{ count }} / 30</span><br>
+					<textarea v-model="text">{{ text }}</textarea><br>
+					<button v-if="count <= 30" type="button">тыдыщщ</button>
+				</form>
+			</div>
+		</template>
 	</body>
 
-	<!-- development version, includes helpful console warnings -->
 
+	<script src="https://cdn.jsdelivr.net/npm/lodash@4/lodash.min.js"></script>
+
+	<!-- development version, includes helpful console warnings -->
 	<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
 
 	<script type="text/javascript">
-		new Vue({
-			el: '#app',
-			data: {
-				message: "Yo!",
-				bears: [
-					{ name: 'Гризли', status: false },
-					{ name: 'Бурый', status: false },
-					{ name: 'Белый', status: false },
-					{ name: 'Панда', status: true }
-				]
+
+		Vue.component('raw', {
+			template: '#raw'
+		});
+
+		Vue.component('l1', {
+			template: '#l1',
+			data: function () {
+				return  {
+					message: "Yo!"
+				}
+			},
+		});
+
+		Vue.component('l2', {
+			template: '#l2',
+			data: function () {
+				return {
+					bears: [
+						{
+							name: 'Гризли',
+							age: 10,
+							status: false
+						},
+						{
+							name: 'Бурый',
+							age: 7,
+							status: false
+						},
+						{
+							name: 'Белый',
+							age: 19,
+							status: false
+						},
+						{
+							name: 'Панда',
+							age: 3,
+							status: true
+						}
+					]
+				}
+			},
+			computed: {
+				bearsOrdered: function () {
+					return _.orderBy(this.bears, 'age', 'name');
+				}
+			}
+		});
+
+		Vue.component('l3', {
+			template: '#l3',
+			data: function () {
+				return {
+					message: 'Hello dear'
+				}
 			},
 			methods: {
 				onClick: function (event) {
 					console.log(this.message, event.target.innerText);
+				}
+			}
+		});
+
+		Vue.component('l4', {
+			template: '#l4',
+			data: function () {
+				return  {
+					text: ''
+				}
+			},
+			computed: {
+				count: function () {
+					return this.text.length;
+				}
+			}
+		});
+
+		new Vue({
+			el: '#app',
+			data: {
+				currentView: 'l2'
+			},
+			methods: {
+				switchView: function (view) {
+					this.currentView = view;
 				}
 			}
 		});
