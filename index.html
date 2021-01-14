@@ -21,14 +21,29 @@
 		<div id="app">
 			<header>
 				<nav>
-					<a href="#" @click="switchView('l1')">Less. 1</a>
-					<a href="#" @click="switchView('l2')">Less. 2</a>
-					<a href="#" @click="switchView('l3')">Less. 3</a>
-					<a href="#" @click="switchView('l4')">Less. 4</a>
+					<ul>
+						<li>
+							<a href="#" @click="switchView('l1')">Less. 1</a>
+						</li>
+						<li>
+							<a href="#" @click="switchView('l2')">Less. 2</a>
+						</li>
+						<li>
+							<a href="#" @click="switchView('l3')">Less. 3</a>
+						</li>
+						<li>
+							<a href="#" @click="switchView('l4')">Less. 4</a>
+						</li>
+						<li>
+							<a href="#" @click="switchView('l9')">Часть 9 - Создание событий</a>
+						</li>
+					</ul>
 				</nav>
 			</header>
 
-			<component :is="currentView"></component>
+			<div>
+				<component :is="currentView" @message-saved="workDone">{{ messages }}</component>
+			</div>
 
 		</div>
 
@@ -82,6 +97,18 @@
 					<textarea v-model="text">{{ text }}</textarea><br>
 					<button v-if="count <= 30" type="button">тыдыщщ</button>
 				</form>
+			</div>
+		</template>
+
+		<template id="l9">
+			<div>
+				<raw>{{ $data }}</raw>
+				<hr>
+				<input type="text" v-model="message" @keyup.enter="saveMessage" />
+				<div>
+					<pre><slot></slot></pre>
+				</div>
+
 			</div>
 		</template>
 	</body>
