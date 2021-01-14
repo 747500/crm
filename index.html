@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+
+<html lang="ru">
+
+	<head>
+
+		<meta charset="utf-8">
+
+
+		<title>Home</title>
+
+
+		<style media="screen">
+			.strike {
+				text-decoration: line-through;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="app">
+			<pre>{{ $data }}</pre>
+
+			<hr>
+
+			<h1>{{ message }}</h1>
+
+			<input type="text" v-model="message" />
+
+			<hr>
+
+			<ul>
+				<li
+					v-for="bear in bears"
+					v-bind:class="{ 'strike': bear.status }">{{ bear.name }}</li>
+			</ul>
+
+			<hr>
+
+			<input type="text" v-model="message" @keyup.13.prevent="onClick" />
+
+			<form action="">
+				<button type="button" @click.prevent="onClick">пынь</button>
+			</form>
+		</div>
+
+	</body>
+
+	<!-- development version, includes helpful console warnings -->
+
+	<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+
+	<script type="text/javascript">
+		new Vue({
+			el: '#app',
+			data: {
+				message: "Yo!",
+				bears: [
+					{ name: 'Гризли', status: false },
+					{ name: 'Бурый', status: false },
+					{ name: 'Белый', status: false },
+					{ name: 'Панда', status: true }
+				]
+			},
+			methods: {
+				onClick: function (event) {
+					console.log(this.message, event.target.innerText);
+				}
+			}
+		});
+	</script>
+</html>
