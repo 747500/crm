@@ -1,0 +1,33 @@
+
+<template id="l9">
+	<div>
+		<raw-view>{{ $data }}</raw-view>
+		<hr>
+		<input type="text" v-model="message" @keyup.enter="saveMessage" />
+		<div>
+			<pre><slot></slot></pre>
+		</div>
+
+	</div>
+</template>
+
+
+<script>
+
+	export default {
+		template: '#l9',
+		data: function () {
+			return {
+				message: ''
+			}
+		},
+		methods: {
+			saveMessage: function (event) {
+				// console.log('saveMessage:', this.message);
+				this.$emit('message-saved', this.message);
+				this.message = '';
+			}
+		}
+	};
+
+</script>

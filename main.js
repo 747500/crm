@@ -1,100 +1,27 @@
 'use strict;'
 
+import './main.css';
 
-Vue.component('raw', {
-	template: '#raw'
-});
+import Vue from 'vue';
 
-Vue.component('l1', {
-	template: '#l1',
-	data: function () {
-		return  {
-			message: "Yo!"
-		}
-	},
-});
+import rawView from './components/raw-view.vue';
+import l1 from './components/l1.vue';
+import l2 from './components/l2.vue';
+import l3 from './components/l3.vue';
+import l4 from './components/l4.vue';
+import l9 from './components/l9.vue';
 
-Vue.component('l2', {
-	template: '#l2',
-	data: function () {
-		return {
-			bears: [
-				{
-					name: 'Гризли',
-					age: 10,
-					status: false
-				},
-				{
-					name: 'Бурый',
-					age: 7,
-					status: false
-				},
-				{
-					name: 'Белый',
-					age: 19,
-					status: false
-				},
-				{
-					name: 'Панда',
-					age: 3,
-					status: true
-				}
-			]
-		}
-	},
-	computed: {
-		bearsOrdered: function () {
-			return _.orderBy(this.bears, 'age', 'name');
-		}
-	}
-});
-
-Vue.component('l3', {
-	template: '#l3',
-	data: function () {
-		return {
-			message: 'Hello dear'
-		}
-	},
-	methods: {
-		onClick: function (event) {
-			console.log(this.message, event.target.innerText);
-		}
-	}
-});
-
-Vue.component('l4', {
-	template: '#l4',
-	data: function () {
-		return  {
-			text: ''
-		}
-	},
-	computed: {
-		count: function () {
-			return this.text.length;
-		}
-	}
-});
-
-Vue.component('l9', {
-	template: '#l9',
-	data: function () {
-		return {
-			message: ''
-		}
-	},
-	methods: {
-		saveMessage: function (event) {
-			// console.log('saveMessage:', this.message);
-			this.$emit('message-saved', this.message);
-			this.message = '';
-		}
-	}
-});
+Vue.component('raw-view', rawView);
 
 new Vue({
-	el: '#app',
+//	el: '#app',
+	components: {
+		l1: l1,
+		l2: l2,
+		l3: l3,
+		l4: l4,
+		l9: l9
+	},
 	data: {
 		currentView: 'l1',
 		messages: []
@@ -113,4 +40,4 @@ new Vue({
 	created () {
 		console.log('Created');
 	}
-});
+}).$mount('#app');

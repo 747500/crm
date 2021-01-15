@@ -6,15 +6,9 @@
 
 		<meta charset="utf-8">
 
-
 		<title>Home</title>
 
-
-		<style media="screen">
-			.strike {
-				text-decoration: line-through;
-			}
-		</style>
+		<link rel="stylesheet" href="public/bundle.css">
 	</head>
 
 	<body>
@@ -47,70 +41,6 @@
 
 		</div>
 
-		<template id="raw">
-			<div>
-				<pre><slot></slot></pre>
-			</div>
-		</template>
-
-		<template id="l1">
-			<div>
-				<raw>{{ $data }}</raw>
-				<hr>
-
-				<h1>{{ message }}</h1>
-
-				<input type="text" v-model="message" />
-			</div>
-		</template>
-
-		<template id="l2">
-			<div>
-				<raw>{{ $data }}</raw>
-				<hr>
-				<ul>
-					<li
-						v-for="bear in bearsOrdered"
-						v-bind:class="{ 'strike': bear.status }">{{ bear.name }}, {{ bear.age }}</li>
-				</ul>
-			</div>
-		</template>
-
-		<template id="l3">
-			<div>
-				<raw>{{ $data }}</raw>
-				<hr>
-				<input type="text" v-model="message" @keyup.13.prevent="onClick" />
-
-				<form action="">
-					<button type="button" @click.prevent="onClick">пынь</button>
-				</form>
-			</div>
-		</template>
-
-		<template id="l4">
-			<div>
-				<raw>{{ $data }}</raw>
-				<hr>
-				<form>
-					<span>{{ count }} / 30</span><br>
-					<textarea v-model="text">{{ text }}</textarea><br>
-					<button v-if="count <= 30" type="button">тыдыщщ</button>
-				</form>
-			</div>
-		</template>
-
-		<template id="l9">
-			<div>
-				<raw>{{ $data }}</raw>
-				<hr>
-				<input type="text" v-model="message" @keyup.enter="saveMessage" />
-				<div>
-					<pre><slot></slot></pre>
-				</div>
-
-			</div>
-		</template>
 	</body>
 
 
@@ -119,5 +49,5 @@
 	<!-- development version, includes helpful console warnings -->
 	<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
 
-	<script src="main.js"></script>
+	<script src="public/main.js"></script>
 </html>
