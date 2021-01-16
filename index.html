@@ -16,27 +16,17 @@
 			<header>
 				<nav>
 					<ul>
-						<li>
-							<a href="#" @click="switchView('l1')">Less. 1</a>
-						</li>
-						<li>
-							<a href="#" @click="switchView('l2')">Less. 2</a>
-						</li>
-						<li>
-							<a href="#" @click="switchView('l3')">Less. 3</a>
-						</li>
-						<li>
-							<a href="#" @click="switchView('l4')">Less. 4</a>
-						</li>
-						<li>
-							<a href="#" @click="switchView('l9')">Часть 9 - Создание событий</a>
+						<li v-for="s in nav">
+							<a href="#" @click="switchView(s.id)">{{ s.title }}</a>
 						</li>
 					</ul>
 				</nav>
 			</header>
 
 			<div>
-				<component :is="currentView" @message-saved="workDone">{{ messages }}</component>
+				<component
+					:is="currentView"
+					@message-saved="workDone">{{ messages }}</component>
 			</div>
 
 		</div>
