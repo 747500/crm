@@ -13,7 +13,7 @@
 
 <script>
 
-	module.exports = {
+	export default {
 		template: '#l1',
 		data: function () {
 			return  {
