@@ -11,6 +11,7 @@ import l3 from './components/l3.vue';
 import l4 from './components/l4.vue';
 import l9 from './components/l9.vue';
 import person from './components/person.vue';
+import person_edit from './components/person_edit.vue';
 
 Vue.component('raw-view', rawView);
 
@@ -22,7 +23,8 @@ new Vue({
 		l3: l3,
 		l4: l4,
 		l9: l9,
-		person: person
+		person: person,
+		person_edit: person_edit
 	},
 	data: {
 		currentView: 'l1',
@@ -51,6 +53,10 @@ new Vue({
 			{
 				id: 'person',
 				title: 'Person'
+			},
+			{
+				id: 'person_edit',
+				title: 'Person edit'
 			}
 		]
 	},
