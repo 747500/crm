@@ -1,5 +1,5 @@
 
-<template id="l3">
+<template>
 	<div>
 		<raw-view>{{ $data }}</raw-view>
 		<hr>
@@ -15,7 +15,6 @@
 <script>
 
 	export default {
-		template: '#l3',
 		data: function () {
 			return {
 				message: 'Hello dear'

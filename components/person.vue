@@ -1,6 +1,6 @@
 
 
-<template id="person">
+<template>
 	<div>
 		<div>Person list</div>
 		<ul>
@@ -19,7 +19,6 @@
 <script>
 
 export default {
-	template: 'person',
 	data: function () {
 		return  {
 			person: [

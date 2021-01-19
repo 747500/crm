@@ -5,7 +5,7 @@
 	}
 </style>
 
-<template id="l2">
+<template>
 	<div>
 		<raw-view>{{ $data }}</raw-view>
 		<hr>
@@ -21,7 +21,6 @@
 <script>
 
 	export default {
-		template: '#l2',
 		data: function () {
 			return {
 				bears: [
