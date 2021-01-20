@@ -9,6 +9,7 @@
   },
   "devDependencies": {
     "@babel/core": "7",
+    "@braid/vue-formulate": "^2.5.0",
     "babel-loader": "8",
     "css-loader": "5",
     "mini-css-extract-plugin": "1",
