@@ -3,11 +3,13 @@
 <template>
 	<div class="panel-body">
 
-		<FormulateForm
-			v-model="model"
-			:schema="schema"
-			@submit="submitHandler"
-			/>
+		<div>
+			<FormulateForm
+				v-model="model"
+				:schema="schema"
+				@submit="submitHandler"
+				/>
+		</div>
 
 	</div>
 </template>
@@ -25,14 +27,20 @@ export default {
 	data: function () {
 	    return {
 			model: {
-				id: 1,
-				lastName: 'Иванов',
-				firstName: 'Иван',
-				middleName: 'Иванович',
+				personId: null,
+				lastName: '',
+				firstName: '',
+				middleName: '',
 				birthDay: '',
 				passport: ''
 			},
 			schema: [
+				{
+					name: 'personId',
+					type: 'text',
+					label: 'ID',
+					readonly: true
+				},
 				{
 					name: 'lastName',
 					type: 'text',
@@ -66,18 +74,45 @@ export default {
 			]
 		}
 	},
+	computed: {
+		person_id () {
+			return this.$route.params.id
+		}
+	},
+	created () {
+		console.log('Created');
+
+		setTimeout(() => {
+
+			//this.model.personId = this.$route.params.id
+
+			this.model = {
+				personId: this.$route.params.id,
+				lastName: 'Иванов',
+				firstName: 'Иван',
+				middleName: 'Иванович',
+				birthDay: '2001-02-03',
+				passport: 'имеется'
+			}
+
+		}, 250);
+	},
+	mounted () {
+		console.log('Mounted');
+	},
 	methods: {
-		submitHandler: function (e) {
+		submitHandler (e) {
 			console.log('submit:', arguments);
 			// this.model contains the valid data according your JSON Schema.
 			// You can submit your model to the server here
 
 			console.log('submit:', this.model);
+		},
+		initForm () {
+			const id = this.person_id;
+			this.model.id = id;
+			console.log(id);
 		}
-	},
-	created: function () {
-
-		console.log('Created');
 	}
 };
 </script>

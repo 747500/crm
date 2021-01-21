@@ -3,11 +3,13 @@
 import './main.css';
 
 import Vue from 'vue';
-import VueRouter from 'vue-router';
 
+import VueRouter from 'vue-router';
 Vue.use(VueRouter);
 
 import rawView from './components/raw-view.vue';
+Vue.component('raw-view', rawView);
+
 import l1 from './components/l1.vue';
 import l2 from './components/l2.vue';
 import l3 from './components/l3.vue';
@@ -16,45 +18,50 @@ import l9 from './components/l9.vue';
 import person from './components/person.vue';
 import person_edit from './components/person_edit.vue';
 
-Vue.component('raw-view', rawView);
 
 const routes = [
 	{
-		name: 'Lesson 1',
+		title: 'Lesson 1',
+		name: 'l1',
 		path: '/l1',
 		component: l1
 	},
 	{
-		name: 'Lesson 2',
+		title: 'Lesson 2',
+		name: 'l2',
 		path: '/l2',
 		component: l2
 	},
 	{
-		name: 'Lesson 3',
+		title: 'Lesson 3',
+		name: 'l3',
 		path: '/l3',
 		component: l3
 	},
 	{
-		name: 'Lesson 4',
+		title: 'Lesson 4',
+		name: 'l4',
 		path: '/l4',
 		component: l4
 	},
 	{
-		name: 'Часть 9 - Создание событий',
+		title: 'Часть 9 - Создание событий',
+		name: 'l9',
 		path: '/l9',
 		component: l9
 	},
 	{
-		name: 'Person',
+		title: 'Person list',
+		name: 'person',
 		path: '/person',
-		component: person
-
-	},
-	{
-		name: 'Person edit',
-		path: '/person_edit',
-		component: person_edit
-
+		component: person,
+		children: [
+			{
+				name: 'person_edit',
+				path: ':id',
+				component: person_edit,
+			}
+		]
 	}
 ];
 
@@ -71,7 +78,7 @@ new Vue({
 		person: person,
 		person_edit: person_edit
 	},*/
-	router,
+	router: router,
 	data: {
 		currentView: 'l1',
 		messages: [],
