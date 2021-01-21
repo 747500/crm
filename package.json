@@ -9,7 +9,7 @@
   },
   "devDependencies": {
     "@babel/core": "7",
-    "@braid/vue-formulate": "^2.5.0",
+    "@braid/vue-formulate": "2",
     "babel-loader": "8",
     "css-loader": "5",
     "mini-css-extract-plugin": "1",
@@ -20,12 +20,12 @@
     "vue-style-loader": "4",
     "vue-template-compiler": "2",
     "webpack": "5",
-    "webpack-cli": "4"
+    "webpack-cli": "4",
+    "vue-router": "3"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "vue-form-generator": "^2.3.4"
   }
 }

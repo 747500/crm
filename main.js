@@ -3,6 +3,9 @@
 import './main.css';
 
 import Vue from 'vue';
+import VueRouter from 'vue-router';
+
+Vue.use(VueRouter);
 
 import rawView from './components/raw-view.vue';
 import l1 from './components/l1.vue';
@@ -15,9 +18,51 @@ import person_edit from './components/person_edit.vue';
 
 Vue.component('raw-view', rawView);
 
+const routes = [
+	{
+		name: 'Lesson 1',
+		path: '/l1',
+		component: l1
+	},
+	{
+		name: 'Lesson 2',
+		path: '/l2',
+		component: l2
+	},
+	{
+		name: 'Lesson 3',
+		path: '/l3',
+		component: l3
+	},
+	{
+		name: 'Lesson 4',
+		path: '/l4',
+		component: l4
+	},
+	{
+		name: 'Часть 9 - Создание событий',
+		path: '/l9',
+		component: l9
+	},
+	{
+		name: 'Person',
+		path: '/person',
+		component: person
+
+	},
+	{
+		name: 'Person edit',
+		path: '/person_edit',
+		component: person_edit
+
+	}
+];
+
+const router = new VueRouter({ routes })
+
 new Vue({
 //	el: '#app',
-	components: {
+	/*components: {
 		l1: l1,
 		l2: l2,
 		l3: l3,
@@ -25,40 +70,12 @@ new Vue({
 		l9: l9,
 		person: person,
 		person_edit: person_edit
-	},
+	},*/
+	router,
 	data: {
 		currentView: 'l1',
 		messages: [],
-		nav: [
-			{
-				id: 'l1',
-				title: 'Lesson 1'
-			},
-			{
-				id: 'l2',
-				title: 'Lesson 2'
-			},
-			{
-				id: 'l3',
-				title: 'Lesson 3'
-			},
-			{
-				id: 'l4',
-				title: 'Lesson 4'
-			},
-			{
-				id: 'l9',
-				title: 'Часть 9 - Создание событий'
-			},
-			{
-				id: 'person',
-				title: 'Person'
-			},
-			{
-				id: 'person_edit',
-				title: 'Person edit'
-			}
-		]
+		routes: routes
 	},
 	methods: {
 		switchView: function (view) {

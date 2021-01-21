@@ -15,18 +15,16 @@
 		<div id="app">
 			<header>
 				<nav>
-					<ul>
-						<li v-for="s in nav">
-							<a href="#" @click="switchView(s.id)">{{ s.title }}</a>
-						</li>
-					</ul>
+					<div v-for="route in routes" :key="route.path">
+						<router-link :to="route.path">{{route.name}}</router-link>
+					</div>
 				</nav>
 			</header>
 
+			<hr noshade style="margin: 3em" />
+
 			<div>
-				<component
-					:is="currentView"
-					@message-saved="workDone">{{ messages }}</component>
+				<router-view></router-view>
 			</div>
 
 		</div>
@@ -37,7 +35,8 @@
 	<script src="https://cdn.jsdelivr.net/npm/lodash@4/lodash.min.js"></script>
 
 	<!-- development version, includes helpful console warnings -->
-	<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+	<!-- script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script -->
+	<!-- script src="https://cdn.jsdelivr.net/npm/vue-router@2/dist/vue-router.js"></script -->
 
 	<script src="https://cdn.jsdelivr.net/npm/@braid/vue-formulate@2.5.0/dist/formulate.min.js"></script>
 

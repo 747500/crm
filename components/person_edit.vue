@@ -5,7 +5,8 @@
 
 		<FormulateForm
 			v-model="model"
-			:schema="person"
+			:schema="schema"
+			@submit="submitHandler"
 			/>
 
 	</div>
@@ -28,14 +29,10 @@ export default {
 				lastName: 'Иванов',
 				firstName: 'Иван',
 				middleName: 'Иванович',
-				password: 'J0hnD03!x4',
-				skills: ['Javascript', 'VueJS'],
-				email: 'john.doe@gmail.com',
-				status: true,
-				comment: '',
-				b: ''
+				birthDay: '',
+				passport: ''
 			},
-			person: [
+			schema: [
 				{
 					name: 'lastName',
 					type: 'text',
@@ -52,20 +49,26 @@ export default {
 					label: 'Отчество'
 				},
 				{
-					name: 'b',
+					name: 'birthDay',
 					type: 'date',
-					label: 'Отчество'
+					label: 'Дата рождения'
 				},
 				{
-					name: 'comment',
+					name: 'passport',
 					type: 'textarea',
-					label: 'Комментарии'
+					label: 'Паспорт'
+				},
+				{
+					name: 'submit',
+					type: 'submit',
+					label: 'Сохранить'
 				}
 			]
 		}
 	},
 	methods: {
-		submit: function (e) {
+		submitHandler: function (e) {
+			console.log('submit:', arguments);
 			// this.model contains the valid data according your JSON Schema.
 			// You can submit your model to the server here
 
