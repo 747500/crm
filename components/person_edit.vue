@@ -113,7 +113,8 @@ export default {
 
 			setTimeout(() => {
 
-				this.$router.push({ name: 'person' });
+				//this.$router.push({ name: 'person' })
+				this.$router.push('.')
 
 			}, 250)
 		}

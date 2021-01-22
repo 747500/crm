@@ -4,11 +4,15 @@ import './main.css'
 
 import Vue from 'vue'
 
-import VueRouter from 'vue-router'
-Vue.use(VueRouter)
+// --------------------------------------------------------------------------
 
 import rawView from './components/raw-view.vue'
 Vue.component('raw-view', rawView)
+
+// --------------------------------------------------------------------------
+
+import VueRouter from 'vue-router'
+Vue.use(VueRouter)
 
 import l1 from './components/l1.vue'
 import l2 from './components/l2.vue'
@@ -50,7 +54,7 @@ const routes = [
 		component: l9
 	},
 	{
-		title: 'Person list',
+		title: 'Люди',
 		name: 'person',
 		path: '/person',
 		component: person,
@@ -66,10 +70,29 @@ const routes = [
 
 const router = new VueRouter({ routes })
 
+// --------------------------------------------------------------------------
+
+import Vuex from 'vuex'
+Vue.use(Vuex)
+
+const store = new Vuex.Store({
+	state: {
+		count: 0
+	},
+	mutations: {
+		increment (state) {
+			state.count++
+		}
+	}
+})
+
+// --------------------------------------------------------------------------
+
 new Vue({
 //	el: '#app',
 	components: {},
 	router,
+	store,
 	data: {
 		currentView: 'l1',
 		messages: [],
