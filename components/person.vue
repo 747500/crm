@@ -24,25 +24,25 @@
 
 <script>
 
-export default {
-	data () {
-		return  {
-			person: [
-			]
+	export default {
+		data () {
+			return  {
+				person: [
+				]
+			}
+		},
+		created () {
+			setTimeout(() => {
+
+				this.person.push({
+					id: 1,
+					firstName: 'Иван',
+					lastName: 'Петров',
+					status: true
+				})
+
+			}, 250)
 		}
-	},
-	created () {
-		setTimeout(() => {
-
-			this.person.push({
-				id: 1,
-				firstName: 'Иван',
-				lastName: 'Петров',
-				status: true
-			})
-
-		}, 250)
-	}
-};
+	};
 
 </script>
