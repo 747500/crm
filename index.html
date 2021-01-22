@@ -15,7 +15,7 @@
 		<div id="app">
 			<header>
 				<nav>
-					<div v-for="route in routes" :key="route.name">
+					<div v-for="route in $router.options.routes" :key="route.name">
 						<router-link
 							v-if="!route.hidden"
 							:to="route.path">{{ route.title }}</router-link>
