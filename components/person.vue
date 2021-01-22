@@ -1,6 +1,10 @@
 
 <template>
 	<div>
+		<router-link :to="{ name: 'person_edit', params: { id: 'create' }}">
+			Новая запись
+		</router-link>
+
 		<ul>
 			<li
 				v-for="p in person"
@@ -37,6 +41,15 @@
 					id: 1,
 					firstName: 'Иван',
 					lastName: 'Петров',
+					passport: 'имеется',
+					status: true
+				})
+				this.person.push({
+					id: 2,
+					firstName: 'Василий',
+					middleName: 'Олегович',
+					lastName: 'Сидоров',
+					passport: 'мятый',
 					status: true
 				})
 

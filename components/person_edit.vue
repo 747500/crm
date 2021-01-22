@@ -78,21 +78,43 @@
 				return this.$route.params.id
 			}
 		},
+		beforeRouteEnter (to, from, next) {
+			next(vm => {
+				//console.log('beforeRouteEnter', vm.$route.params.id)
+				vm.updateModel()
+			})
+		},
+		beforeRouteUpdate (to, from, next) {
+			this.$nextTick(() => {
+				//console.log('beforeRouteUpdate', this.$route.params.id)
+				this.updateModel()
+			})
+			next()
+		},
 		created () {
-			console.log('Created');
+			/*
+			console.log(new Date(), 'Created - person_edit');
 
-			setTimeout(() => {
+			const personId = this.$route.params.id;
 
+			if (personId === 'create') {
 				this.model = {
-					personId: this.$route.params.id,
-					lastName: 'Иванов',
-					firstName: 'Иван',
-					middleName: 'Иванович',
-					birthDay: '2001-02-03',
-					passport: 'имеется'
+					personId: personId,
+					lastName: '',
+					firstName: '',
+					middleName: '',
+					birthDay: '',
+					passport: ''
 				}
-
-			}, 250)
+			}
+			else {
+				this.$http.get('/person/' + personId).then(response => {
+					this.model = Object.assign({}, response.body)
+				}).catch((e) => {
+					console.error(e)
+				});
+			}
+			*/
 		},
 		mounted () {
 
@@ -100,20 +122,53 @@
 
 		},
 		methods: {
-			submitHandler(e) {
+			updateModel (vm) {
 
-				console.log('submit:', arguments)
+				const personId = this.$route.params.id;
 
-				// this.model contains the valid data according your JSON Schema.
-				// You can submit your model to the server here
-				console.log('submit:', this.model)
+				if (personId === 'create') {
+					this.model = {
+						personId: personId,
+						lastName: '',
+						firstName: '',
+						middleName: '',
+						birthDay: '',
+						passport: ''
+					}
+				}
+				else {
+					this.$http.get('/person/' + personId).then(response => {
+						this.model = Object.assign({}, response.body)
+					}).catch((e) => {
+						console.error(e)
+					});
+				}
 
-				setTimeout(() => {
+			},
+			submitHandler(formData) {
+
+				const personId = this.model.personId
+				const method = 'post'
+
+				if (personId === 'create') {
+					method = 'put'
+				}
+
+				console.log('submitHandler:', formData)
+
+				this.$http[method](
+					'/person',
+					formData
+				).then(response => {
+					console.log('submitHandler:', response)
 
 					//this.$router.push({ name: 'person' })
 					this.$router.push('.')
 
-				}, 250)
+				}).catch((err) => {
+					console.error('submitHandler', err)
+				});
+
 			}
 		}
 	}
