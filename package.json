@@ -12,6 +12,7 @@
     "@braid/vue-formulate": "2",
     "babel-loader": "8",
     "css-loader": "5",
+    "html-webpack-plugin": "^4.5.1",
     "mini-css-extract-plugin": "1",
     "postcss": "8",
     "style-loader": "2",
@@ -24,8 +25,12 @@
     "webpack": "^5.16.0",
     "webpack-cli": "^4.4.0"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {}
+  "keywords": [
+    "crm"
+  ],
+  "author": "serge r",
+  "license": "WTFPL",
+  "dependencies": {
+    "express": "4"
+  }
 }
