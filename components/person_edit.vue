@@ -111,6 +111,11 @@ export default {
 			// You can submit your model to the server here
 			console.log('submit:', this.model)
 
+			setTimeout(() => {
+
+				this.$router.push({ name: 'person' });
+
+			}, 250)
 		}
 	}
 }
