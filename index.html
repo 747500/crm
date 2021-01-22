@@ -16,7 +16,9 @@
 			<header>
 				<nav>
 					<div v-for="route in routes" :key="route.name">
-						<router-link v-if="!route.hidden" :to="route.path">{{ route.title }}</router-link>
+						<router-link
+							v-if="!route.hidden"
+							:to="route.path">{{ route.title }}</router-link>
 					</div>
 				</nav>
 			</header>
@@ -24,7 +26,7 @@
 			<hr noshade style="margin: 3em" />
 
 			<div>
-				<router-view></router-view>
+				<router-view @message-saved="haveMessage">{{ this.messages }}</router-view>
 			</div>
 
 		</div>

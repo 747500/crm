@@ -22,7 +22,6 @@
 		},
 		methods: {
 			saveMessage: function (event) {
-				// console.log('saveMessage:', this.message);
 				this.$emit('message-saved', this.message);
 				this.message = '';
 			}

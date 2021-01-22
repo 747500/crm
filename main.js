@@ -1,23 +1,22 @@
-'use strict;'
+'use strict'
 
-import './main.css';
+import './main.css'
 
-import Vue from 'vue';
+import Vue from 'vue'
 
-import VueRouter from 'vue-router';
-Vue.use(VueRouter);
+import VueRouter from 'vue-router'
+Vue.use(VueRouter)
 
-import rawView from './components/raw-view.vue';
-Vue.component('raw-view', rawView);
+import rawView from './components/raw-view.vue'
+Vue.component('raw-view', rawView)
 
-import l1 from './components/l1.vue';
-import l2 from './components/l2.vue';
-import l3 from './components/l3.vue';
-import l4 from './components/l4.vue';
-import l9 from './components/l9.vue';
-import person from './components/person.vue';
-import person_edit from './components/person_edit.vue';
-
+import l1 from './components/l1.vue'
+import l2 from './components/l2.vue'
+import l3 from './components/l3.vue'
+import l4 from './components/l4.vue'
+import l9 from './components/l9.vue'
+import person from './components/person.vue'
+import person_edit from './components/person_edit.vue'
 
 const routes = [
 	{
@@ -63,39 +62,28 @@ const routes = [
 			}
 		]
 	}
-];
+]
 
 const router = new VueRouter({ routes })
 
 new Vue({
 //	el: '#app',
-	/*components: {
-		l1: l1,
-		l2: l2,
-		l3: l3,
-		l4: l4,
-		l9: l9,
-		person: person,
-		person_edit: person_edit
-	},*/
-	router: router,
+	components: {},
+	router,
 	data: {
 		currentView: 'l1',
 		messages: [],
-		routes: routes
+		routes
 	},
 	methods: {
-		switchView: function (view) {
-			this.currentView = view;
-		},
-		workDone: function (message) {
+		haveMessage (message) {
 			this.messages.push({
 				ts: new Date(),
 				text: message
-			});
+			})
 		}
 	},
 	created () {
-		console.log('Created');
+		console.log('Created')
 	}
-}).$mount('#app');
+}).$mount('#app')

@@ -24,7 +24,7 @@ Vue.use(VueFormulate)
 export default {
 	components: {
 	},
-	data: function () {
+	data () {
 	    return {
 			model: {
 				personId: null,
@@ -75,7 +75,7 @@ export default {
 		}
 	},
 	computed: {
-		person_id () {
+		person_id() {
 			return this.$route.params.id
 		}
 	},
@@ -95,24 +95,24 @@ export default {
 				passport: 'имеется'
 			}
 
-		}, 250);
+		}, 250)
 	},
 	mounted () {
-		console.log('Mounted');
+
+		console.log('Mounted')
+
 	},
 	methods: {
-		submitHandler (e) {
-			console.log('submit:', arguments);
+		submitHandler(e) {
+
+			console.log('submit:', arguments)
+
 			// this.model contains the valid data according your JSON Schema.
 			// You can submit your model to the server here
+			console.log('submit:', this.model)
 
-			console.log('submit:', this.model);
-		},
-		initForm () {
-			const id = this.person_id;
-			this.model.id = id;
-			console.log(id);
 		}
 	}
-};
+}
+
 </script>

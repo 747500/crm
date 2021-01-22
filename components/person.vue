@@ -7,9 +7,11 @@
 				v-for="p in person"
 				v-bind:class="{ 'strike': !p.status }"
 				v-bind:key="p.id">
-				<div>{{ p.lastName }}</div>
-				<div>{{ p.firstName }}</div>
-				<router-link :to="{ name: 'person_edit', params: { id: p.id }}">тык</router-link>
+				<router-link :to="{ name: 'person_edit', params: { id: p.id }}">
+					<div>{{ p.lastName }}</div>
+					<div>{{ p.firstName }}</div>
+					<div v-if="p.middleName">{{ p.middleName }}</div>
+				</router-link>
 			</li>
 		</ul>
 
@@ -39,7 +41,7 @@ export default {
 				status: true
 			})
 
-		}, 250);
+		}, 250)
 	}
 };
 
