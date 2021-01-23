@@ -8,9 +8,9 @@
 		<ul>
 			<li
 				v-for="p in person"
-				v-bind:class="{ 'strike': !p.status }"
-				v-bind:key="p.id">
-				<router-link :to="{ name: 'person_edit', params: { id: p.id }}">
+				v-bind:class="{ 'strike': p.status }"
+				v-bind:key="p._id">
+				<router-link :to="{ name: 'person_edit', params: { id: p._id }}">
 					<div>{{ p.lastName }}</div>
 					<div>{{ p.firstName }}</div>
 					<div v-if="p.middleName">{{ p.middleName }}</div>
@@ -34,26 +34,27 @@
 				]
 			}
 		},
+		beforeRouteEnter (to, from, next) {
+			next(vm => {
+				vm.updateModel()
+			})
+		},
+		beforeRouteUpdate (to, from, next) {
+			this.$nextTick(() => {
+				this.updateModel()
+			})
+			next()
+		},
 		created () {
-			setTimeout(() => {
-
-				this.person.push({
-					id: 1,
-					firstName: 'Иван',
-					lastName: 'Петров',
-					passport: 'имеется',
-					status: true
+		},
+		methods: {
+			updateModel () {
+				this.$http.get('/person').then((response) => {
+					this.person = Object.assign({}, response.body)
+				}).catch((err) => {
+					console.error(err)
 				})
-				this.person.push({
-					id: 2,
-					firstName: 'Василий',
-					middleName: 'Олегович',
-					lastName: 'Сидоров',
-					passport: 'мятый',
-					status: true
-				})
-
-			}, 250)
+			}
 		}
 	};
 
