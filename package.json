@@ -33,6 +33,7 @@
   "license": "WTFPL",
   "dependencies": {
     "express": "4",
+    "mongodb": "3",
     "morgan": "1"
   }
 }
