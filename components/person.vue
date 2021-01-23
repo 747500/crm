@@ -1,11 +1,13 @@
 
 <template>
 	<div>
-		<router-link :to="{ name: 'person_edit', params: { id: 'create' }}">
-			Новая запись
-		</router-link>
 
 		<ul>
+			<lh>
+				<router-link :to="{ name: 'person_edit', params: { id: 'create' }}">
+					<div>Новая запись</div>
+				</router-link>
+			</lh>
 			<li
 				v-for="p in person"
 				v-bind:class="{ 'strike': p.status }"
