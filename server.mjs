@@ -15,13 +15,18 @@ app.use(express.json())
 
 
 
-const uri = "mongodb://127.0.0.1:27017?retryWrites=true&writeConcern=majority";
+const uri = "mongodb://127.0.0.1:27017?retryWrites=true&writeConcern=majority"
 
-mongodb.MongoClient.connect(uri, { useUnifiedTopology: true }).then((connection) => {
+mongodb.MongoClient.connect(
+	uri,
+	{
+		useUnifiedTopology: true
+	}
+).then((connection) => {
 	return connection.db('crm')
 }).then((db) => {
 
-	console.log('DB connected');
+	console.log('DB connected')
 
 	/*
 	app.get('/', (req, res) => {
@@ -29,12 +34,12 @@ mongodb.MongoClient.connect(uri, { useUnifiedTopology: true }).then((connection)
 	})
 	*/
 
+	// TODO validation
 	app.get('/person', (req, res, next) => {
 
 		let cursor;
 
 		cursor = db.collection('docs').find()
-
 
 		cursor.count().then((result) => {
 			return cursor.toArray()
@@ -44,22 +49,29 @@ mongodb.MongoClient.connect(uri, { useUnifiedTopology: true }).then((connection)
 	})
 
 
+	// TODO validation
 	app.get('/person/:id', (req, res,next) => {
 
-		let o_id = mongodb.ObjectID(req.params.id)
+		const o_id = mongodb.ObjectID(req.params.id)
 
-		db.collection('docs').findOne({ _id: o_id}).then((data) => {
-			console.log(data);
+		db.collection('docs').findOne(
+			{
+				_id: o_id
+			}
+		).then((data) => {
+			console.log(data)
 			res.send(data)
 		}).catch(next)
 
 	})
 
+	// TODO validation
 	app.post('/person', (req, res, next) => {
 
-		let o_id = mongodb.ObjectID(req.body._id)
+		const o_id = mongodb.ObjectID(req.body._id)
+
 		delete req.body._id
-	
+
 		db.collection('docs').findOneAndUpdate(
 			{
 				_id: o_id
@@ -68,27 +80,26 @@ mongodb.MongoClient.connect(uri, { useUnifiedTopology: true }).then((connection)
 				$set: req.body
 			}
 		).then((data) => {
-			console.log(data);
+			console.log(data)
 			res.send(data)
 		}).catch(next)
 
-		//console.log('POST', req.body);
-		//res.send({ status: 'ok' })
 	})
 
+	// TODO validation
 	app.put('/person', (req, res, next) => {
 
-		console.log('PUT', req.body);
+		console.log('PUT', req.body)
+
+		delete req.body._id
 
 		db.collection('docs').insertOne(req.body).then((result) => {
-			res.send({
-				status: 'ok',
-				personId: result.insertedId }
-			)
+			req.body._id = result.insertedId
+			res.send(req.body)
 		}).catch(next)
 	})
 
-	app.use(express.static('public'));
+	app.use(express.static('public'))
 
 	app.listen(port, () => {
 	  console.log(`Example app listening at http://localhost:${port}`)
@@ -96,5 +107,5 @@ mongodb.MongoClient.connect(uri, { useUnifiedTopology: true }).then((connection)
 
 
 }).catch((err) => {
-	console.error(err);
+	console.error(err)
 })
