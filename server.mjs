@@ -35,6 +35,42 @@ mongodb.MongoClient.connect(
 	*/
 
 	// TODO validation
+	app.get('/calendar/events', (req, res, next) => {
+
+		res.send([
+			{
+				name: 'test',
+				start: '2020-04-05 10:00:00',
+				end: '2020-04-05 11:30:00',
+				color: 'cyan',
+			},
+			{
+				name: 'test',
+				start: '2020-04-05 07:00:00',
+				end: '2020-04-05 07:25:00',
+				color: 'green',
+			},
+			{
+				name: 'test',
+				start: '2020-04-05 08:00:00',
+				end: '2020-04-05 08:15:00',
+				color: 'red',
+			},
+		])
+
+		let cursor;
+
+		cursor = db.collection('docs').find()
+
+		cursor.count().then((result) => {
+			return cursor.toArray()
+		}).then((data) => {
+			res.send(data)
+		}).catch(next)
+	})
+
+
+	// TODO validation
 	app.get('/person', (req, res, next) => {
 
 		let cursor;

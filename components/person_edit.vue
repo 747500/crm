@@ -1,14 +1,18 @@
 
 <template>
-	<div class="panel-body">
+	<div class="">
 
-		<div>
+		<div class="">
 			<FormulateForm
 				v-model="model"
 				:schema="schema"
 				@submit="submitHandler"
 				@close="closeHandler"
 				/>
+		</div>
+
+		<div class="">
+
 		</div>
 
 	</div>
