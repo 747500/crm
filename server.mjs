@@ -10,7 +10,7 @@ import mongodb from 'mongodb'
 
 const app = express()
 const port = 3000
-app.use(morgan('combined'))
+app.use(morgan('dev'))
 app.use(express.json())
 
 
