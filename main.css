@@ -10,3 +10,7 @@ body {
 li {
 	margin-top: 1em;
 }
+
+li.create {
+	list-style-type: circle;
+}

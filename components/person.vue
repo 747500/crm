@@ -3,7 +3,7 @@
 	<div>
 
 		<ul>
-			<li>
+			<li class="create">
 				<router-link :to="{ name: 'person_edit', params: { id: 'create' }}">
 					<div>Новая запись</div>
 				</router-link>
@@ -13,9 +13,7 @@
 				v-bind:class="{ 'strike': p.status }"
 				v-bind:key="p._id">
 				<router-link :to="{ name: 'person_edit', params: { id: p._id }}">
-					<div>{{ p.lastName }}</div>
-					<div>{{ p.firstName }}</div>
-					<div v-if="p.middleName">{{ p.middleName }}</div>
+					<div>{{ p.lastName }} {{ p.firstName }} {{ p.middleName }}</div>
 				</router-link>
 			</li>
 		</ul>
