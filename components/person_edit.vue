@@ -110,17 +110,16 @@
 			updateModel (vm) {
 				const personId = this.$route.params.id;
 
-				if (personId === 'create') {
-					this.model = {
-						_id: personId,
-						lastName: '',
-						firstName: '',
-						middleName: '',
-						birthDay: '',
-						passport: ''
-					}
+				this.model = {
+					_id: null,
+					lastName: '',
+					firstName: '',
+					middleName: '',
+					birthDay: '',
+					passport: ''
 				}
-				else {
+
+				if ('new' !== personId) {
 					this.$http.get('/person/' + personId).then(response => {
 						this.model = Object.assign({}, response.body)
 						this.model.birthDay = moment(response.body.birthDay).format('YYYY-MM-DD')
@@ -132,19 +131,13 @@
 			},
 			submitHandler(formData) {
 
-				const personId = this.model._id
-				var method = 'post'
+				var method = this.model._id ? 'post' : 'put'
 
-				if (personId === 'create') {
-					method = 'put'
-				}
+				this.$http[method]('/person', formData).then(response => {
 
-				this.$http[method](
-					'/person',
-					formData
-				).then(response => {
 					//this.$router.push({ name: 'person' })
 					this.$router.push('.')
+
 				}).catch((err) => {
 					console.error('submitHandler', err)
 				});

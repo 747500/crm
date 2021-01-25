@@ -4,7 +4,7 @@
 
 		<ul>
 			<li class="create">
-				<router-link :to="{ name: 'person_edit', params: { id: 'create' }}">
+				<router-link :to="{ name: 'person_edit', params: { id: 'new' }}">
 					<div>Новая запись</div>
 				</router-link>
 			</li>
