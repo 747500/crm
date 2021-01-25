@@ -37,7 +37,20 @@ const Person = Doc.discriminator(
 			lastName: String,
 			middleName: String,
 			birthDay: Date,
-			passport: String
+			passport: String,
+			files: [ mongoose.Types.ObjectId ]
+		},
+		docSchemaOptions
+	)
+)
+
+const Property = Doc.discriminator(
+	'property',
+	new mongoose.Schema(
+		{
+			address: String,
+			description: String,
+			files: [ mongoose.Types.ObjectId ]
 		},
 		docSchemaOptions
 	)
