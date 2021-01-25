@@ -20,6 +20,8 @@
 
 <script>
 
+	import moment from 'moment'
+
 	import Vue from 'vue'
 
 	import VueFormulate from '@braid/vue-formulate'
@@ -121,6 +123,7 @@
 				else {
 					this.$http.get('/person/' + personId).then(response => {
 						this.model = Object.assign({}, response.body)
+						this.model.birthDay = moment(response.body.birthDay).format('YYYY-MM-DD')
 					}).catch((e) => {
 						console.error(e)
 					});

@@ -65,14 +65,14 @@
 			updateModel () {
 				console.log("updateModel")
 				this.$http.get(
-					'/calendar/events',
+					'/person/events',
 					{
 						params: {
 							yearmonth: this.focus
 						}
 					}
 				).then((response) => {
-					this.events = Object.assign({}, response.body)
+					this.events = response.data
 				}).catch((err) => {
 					console.error(err)
 				})

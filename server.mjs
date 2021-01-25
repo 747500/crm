@@ -4,10 +4,10 @@ import moment from 'moment'
 
 import express from 'express'
 import morgan from 'morgan'
-
 //import bodyParser from 'body-parser'
-import mongodb from 'mongodb'
 
+import mongodb from 'mongodb'
+import mongoose from 'mongoose'
 
 
 const app = express()
@@ -16,60 +16,61 @@ app.use(morgan('dev'))
 app.use(express.json())
 
 
+const docSchemaOptions = {
+	discriminatorKey: 'kind'
+}
 
-const uri = "mongodb://127.0.0.1:27017?retryWrites=true&writeConcern=majority"
-
-mongodb.MongoClient.connect(
-	uri,
+const docSchema = new mongoose.Schema(
 	{
+		time: Date
+	},
+	docSchemaOptions
+);
+
+const Doc = mongoose.model('Doc', docSchema)
+
+const Person = Doc.discriminator(
+	'person',
+	new mongoose.Schema(
+		{
+			firstName: String,
+			lastName: String,
+			middleName: String,
+			birthDay: Date,
+			passport: String
+		},
+		docSchemaOptions
+	)
+)
+
+mongoose.connect(
+	'mongodb://127.0.0.1:27017/crm',
+	{
+		useNewUrlParser: true,
 		useUnifiedTopology: true
 	}
-).then((connection) => {
-	return connection.db('crm')
-}).then((db) => {
+).then((result)=> {
+	const db = result.connection
 
 	console.log('DB connected')
 
-	/*
-	app.get('/', (req, res) => {
-	  res.send('Hello World!')
+	// TODO validation
+	app.get('/person', (req, res, next) => {
+
+		Person.find().then(result => {
+			res.send(result)
+		}).catch(next)
+
 	})
-	*/
 
 	// TODO validation
-	app.get('/calendar/events', (req, res, next) => {
-		/*
-		res.send([
-			{
-				name: 'test',
-				start: '2020-04-05 10:00:00',
-				end: '2020-04-05 11:30:00',
-				color: 'cyan',
-			},
-			{
-				name: 'test',
-				start: '2020-04-05 07:00:00',
-				end: '2020-04-05 07:25:00',
-				color: 'green',
-			},
-			{
-				name: 'test',
-				start: '2020-04-05 08:00:00',
-				end: '2020-04-05 08:15:00',
-				color: 'red',
-			},
-		])
-		*/
+	app.get('/person/events', (req, res, next) => {
 
 		console.log(req.query)
 
-		const mm = parseInt(moment(req.query.yearmonth).format('MM'))
+		const month = parseInt(moment(req.query.yearmonth).format('MM'))
 
-		console.log('mm', mm)
-
-		let cursor;
-
-		cursor = db.collection('docs').aggregate(
+		Person.aggregate(
 			[
 				{
 					$project: {
@@ -84,51 +85,32 @@ mongodb.MongoClient.connect(
 				},
 				{
 					$match: {
-						month: mm
+						month: month
 					}
 				}
 			]
-		)
+		).then(result => {
+			res.send(result.map(i => {
 
-		cursor.toArray().then((data) => {
-			console.log(data)
-			res.send(data.map((item) => {
-				item.birthDay = moment(item.birthDay).format('YYYY-MM-DD')
-				return item
+				const birthDate = moment(i.birthDay).format('DD-MM-YYYY')
+				const day = moment(i.birthDay).format('DD')
+				const eventDate = `${req.query.yearmonth}-${day}`
+				const age = 1 + moment(eventDate).diff(i.birthDay, 'years');
+
+				return {
+					eventAt: eventDate,
+					eventTitle: `${birthDate} ${i.lastName} ${i.firstName} ${i.middleName} ${age}`
+				}
 			}))
 		}).catch(next)
 	})
-
-
-	// TODO validation
-	app.get('/person', (req, res, next) => {
-
-		let cursor;
-
-		cursor = db.collection('docs').find()
-
-		cursor.toArray().then((data) => {
-			res.send(data.map((item) => {
-				item.birthDay = moment(item.birthDay).format('YYYY-MM-DD')
-				return item
-			}))
-		}).catch(next)
-	})
-
 
 	// TODO validation
 	app.get('/person/:id', (req, res,next) => {
 
-		const o_id = mongodb.ObjectID(req.params.id)
-
-		db.collection('docs').findOne(
-			{
-				_id: o_id
-			}
-		).then((item) => {
-			console.log(item)
-			item.birthDay = moment(item.birthDay).format('YYYY-MM-DD')
-			res.send(item)
+		Person.findById(req.params.id).then(result => {
+			console.log('findById:', result)
+			res.send(result.toObject())
 		}).catch(next)
 
 	})
@@ -136,22 +118,9 @@ mongodb.MongoClient.connect(
 	// TODO validation
 	app.post('/person', (req, res, next) => {
 
-		const o_id = mongodb.ObjectID(req.body._id)
-
-		delete req.body._id
-
-		req.body.birthDay = new Date(req.body.birthDay)
-
-		db.collection('docs').findOneAndUpdate(
-			{
-				_id: o_id
-			},
-			{
-				$set: req.body
-			}
-		).then((data) => {
-			console.log(data)
-			res.send(data)
+		Person.findByIdAndUpdate(req.body._id, req.body).then(result => {
+			console.log('findByIdAndUpdate:', result)
+			res.send(result.toObject())
 		}).catch(next)
 
 	})
@@ -159,23 +128,20 @@ mongodb.MongoClient.connect(
 	// TODO validation
 	app.put('/person', (req, res, next) => {
 
-		console.log('PUT', req.body)
-
 		delete req.body._id
-		req.body.birthDay = new Date(req.body.birthDay)
 
-		db.collection('docs').insertOne(req.body).then((result) => {
-			req.body._id = result.insertedId
-			res.send(req.body)
+		const person = new Person(req.body)
+
+		person.save().then(result => {
+			res.send(result.toObject())
 		}).catch(next)
 	})
 
-/*
-	app.post('/person/:id/upload', upload.array('photos', 12), function (req, res, next) {
+
+	//app.post('/person/:id/upload', upload.array('photos', 12), function (req, res, next) {
 	  // req.files is array of `photos` files
 	  // req.body will contain the text fields, if there were any
-	})
-*/
+	//})
 
 	app.use(express.static('public'))
 
@@ -184,6 +150,6 @@ mongodb.MongoClient.connect(
 	})
 
 
-}).catch((err) => {
+}).catch(err => {
 	console.error(err)
 })
