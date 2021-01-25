@@ -1,5 +1,7 @@
 'use strict'
 
+import moment from 'moment'
+
 import express from 'express'
 import morgan from 'morgan'
 
@@ -36,7 +38,7 @@ mongodb.MongoClient.connect(
 
 	// TODO validation
 	app.get('/calendar/events', (req, res, next) => {
-
+		/*
 		res.send([
 			{
 				name: 'test',
@@ -57,15 +59,43 @@ mongodb.MongoClient.connect(
 				color: 'red',
 			},
 		])
+		*/
+
+		console.log(req.query)
+
+		const mm = parseInt(moment(req.query.yearmonth).format('MM'))
+
+		console.log('mm', mm)
 
 		let cursor;
 
-		cursor = db.collection('docs').find()
+		cursor = db.collection('docs').aggregate(
+			[
+				{
+					$project: {
+						firstName: 1,
+						middleName: 1,
+						lastName: 1,
+						birthDay: 1,
+						month: {
+							$month: '$birthDay'
+						}
+					}
+				},
+				{
+					$match: {
+						month: mm
+					}
+				}
+			]
+		)
 
-		cursor.count().then((result) => {
-			return cursor.toArray()
-		}).then((data) => {
-			res.send(data)
+		cursor.toArray().then((data) => {
+			console.log(data)
+			res.send(data.map((item) => {
+				item.birthDay = moment(item.birthDay).format('YYYY-MM-DD')
+				return item
+			}))
 		}).catch(next)
 	})
 
@@ -77,10 +107,11 @@ mongodb.MongoClient.connect(
 
 		cursor = db.collection('docs').find()
 
-		cursor.count().then((result) => {
-			return cursor.toArray()
-		}).then((data) => {
-			res.send(data)
+		cursor.toArray().then((data) => {
+			res.send(data.map((item) => {
+				item.birthDay = moment(item.birthDay).format('YYYY-MM-DD')
+				return item
+			}))
 		}).catch(next)
 	})
 
@@ -94,9 +125,10 @@ mongodb.MongoClient.connect(
 			{
 				_id: o_id
 			}
-		).then((data) => {
-			console.log(data)
-			res.send(data)
+		).then((item) => {
+			console.log(item)
+			item.birthDay = moment(item.birthDay).format('YYYY-MM-DD')
+			res.send(item)
 		}).catch(next)
 
 	})
@@ -107,6 +139,8 @@ mongodb.MongoClient.connect(
 		const o_id = mongodb.ObjectID(req.body._id)
 
 		delete req.body._id
+
+		req.body.birthDay = new Date(req.body.birthDay)
 
 		db.collection('docs').findOneAndUpdate(
 			{
@@ -128,12 +162,20 @@ mongodb.MongoClient.connect(
 		console.log('PUT', req.body)
 
 		delete req.body._id
+		req.body.birthDay = new Date(req.body.birthDay)
 
 		db.collection('docs').insertOne(req.body).then((result) => {
 			req.body._id = result.insertedId
 			res.send(req.body)
 		}).catch(next)
 	})
+
+/*
+	app.post('/person/:id/upload', upload.array('photos', 12), function (req, res, next) {
+	  // req.files is array of `photos` files
+	  // req.body will contain the text fields, if there were any
+	})
+*/
 
 	app.use(express.static('public'))
 
