@@ -25,7 +25,7 @@ Vue.use(VueRouter)
 
 const routes = [
 	{
-		title: 'Lesson 2',
+		title: 'Lesson 1-2',
 		name: 'l2',
 		path: '/l2',
 		component: l2
