@@ -11,6 +11,7 @@
   "devDependencies": {
     "@babel/core": "7",
     "@braid/vue-formulate": "2",
+    "async": "3",
     "babel-loader": "8",
     "css-loader": "5",
     "html-webpack-plugin": "4",
