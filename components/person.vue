@@ -20,7 +20,7 @@
 			</ul>
 		</div>
 
-		<div class="person-edit">
+		<div class="person-data">
 			<router-view></router-view>
 		</div>
 
@@ -41,7 +41,7 @@
 	border: 1px dotted gray;
 }
 
-.person-edit {
+.person-data {
 	flex: 20;
 	padding: 1em;
 	border: 1px dotted gray;

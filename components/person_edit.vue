@@ -1,8 +1,8 @@
 
 <template>
-	<div class="">
+	<div class="person-edit">
 
-		<div class="">
+		<div class="person-edit-form">
 			<FormulateForm
 				v-model="model"
 				:schema="schema"
@@ -11,7 +11,7 @@
 				/>
 		</div>
 
-		<div class="">
+		<div class="person-edit-upload">
 			<input
 				type="file"
 				name="upload"
@@ -41,6 +41,19 @@
 
 <style>
 
+.person-edit {
+	display: flex;
+	margin: 0;
+	padding: 0;
+}
+
+.person-edit-form {
+	flex: 10;
+}
+
+.person-edit-upload {
+	flex: 20;
+}
 .uimg {
   object-fit: cover;
   width: 120px;

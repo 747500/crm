@@ -1,6 +1,21 @@
 
 body {
-	padding: 50px;
+	padding: 2em;
+}
+
+nav {
+	display: flex;
+}
+
+nav > div {
+	flex: auto;
+	padding: 0.5em;
+	text-align: center;
+}
+
+nav > div:hover {
+	background-color: #ddd;
+	border-radius: 0.5em;
 }
 
 .router-link-active {
