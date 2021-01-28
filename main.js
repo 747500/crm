@@ -42,8 +42,6 @@ new Vue({
 	router,
 	store,
 	data: {
-		currentView: 'l1',
-		messages: []
 	},
 	methods: {
 		haveMessage (message) {

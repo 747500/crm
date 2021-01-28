@@ -25,30 +25,6 @@ Vue.use(VueRouter)
 
 const routes = [
 	{
-		title: 'Lesson 1-2',
-		name: 'l2',
-		path: '/l2',
-		component: l2
-	},
-	{
-		title: 'Lesson 3',
-		name: 'l3',
-		path: '/l3',
-		component: l3
-	},
-	{
-		title: 'Lesson 4',
-		name: 'l4',
-		path: '/l4',
-		component: l4
-	},
-	{
-		title: 'Часть 9 - Создание событий',
-		name: 'l9',
-		path: '/l9',
-		component: l9
-	},
-	{
 		title: 'Календарь',
 		name: 'calendar',
 		path: '/calendar',
