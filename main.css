@@ -5,27 +5,24 @@ body {
 
 nav {
 	display: flex;
+	border-bottom: 1px solid gray;
 }
 
 nav > div {
 	flex: auto;
-	padding: 0.5em;
 	text-align: center;
 }
 
-nav > div:hover {
+nav a {
+	padding: 0.33em;
+	display: block
+}
+
+nav a:hover {
 	background-color: #ddd;
-	border-radius: 0.5em;
+	border-radius: 0.5em 0.5em 0 0;
 }
 
 .router-link-active {
 	font-weight: bold;
-}
-
-li {
-	margin-top: 1em;
-}
-
-li.create {
-	list-style-type: circle;
 }

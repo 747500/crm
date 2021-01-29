@@ -11,6 +11,9 @@ import calendar from './components/calendar.vue'
 import person from './components/person.vue'
 import person_edit from './components/person_edit.vue'
 
+import property from './components/property.vue'
+import property_edit from './components/property_edit.vue'
+
 // --------------------------------------------------------------------------
 
 Vue.use(VueRouter)
@@ -32,6 +35,19 @@ const routes = [
 				name: 'person_edit',
 				path: ':id',
 				component: person_edit,
+			}
+		]
+	},
+	{
+		title: 'Собственность',
+		name: 'property',
+		path: '/property',
+		component: property,
+		children: [
+			{
+				name: 'property_edit',
+				path: ':id',
+				component: property_edit,
 			}
 		]
 	}

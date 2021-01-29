@@ -1,6 +1,6 @@
 
 <template>
-	<div class="person-edit">
+	<div class="property-edit">
 
 		<header>
 			<FormulateInput
@@ -12,7 +12,7 @@
 			<hr/>
 		</header>
 
-		<div class="person">
+		<div class="property">
 			<div class="edit-form">
 				<FormulateForm
 					v-model="model"
@@ -88,60 +88,60 @@ img {
 	display: block;
 }
 
-.person-edit > header {
+.property-edit > header {
 }
 
-.person-edit .button-close {
+.property-edit .button-close {
 
 }
 
-.person-edit {
+.property-edit {
 	padding: 0.5em;
 	border-left: 1px solid gray;
 }
 
-.person-edit .person {
+.property-edit .property {
 	display: flex;
 	margin: 0;
 	padding: 0;
 	width: 100%;
 }
 
-.person-edit .person > div {
+.property-edit .property > div {
 	padding: 0.5em;
 }
 
-.person-edit .person .edit-form {
+.property-edit .property .edit-form {
 	flex: 10;
 }
 
-.person-edit .person .edit-upload {
+.property-edit .property .edit-upload {
 	flex: 20;
 }
 
-.person-edit .queue {
+.property-edit .queue {
 }
 
-.person .edit-upload {
+.property .edit-upload {
 	flex: 1;
 }
 
-.person-edit .list .item {
+.property-edit .list .item {
 	padding: 0.25em;
 	background-color: #eee;
 
 	display: flex;
 }
 
-.person-edit .list .img {
+.property-edit .list .img {
 
 }
 
-.person-edit .list .text {
+.property-edit .list .text {
 	padding: 0.25em;
 }
 
-.person-edit .list .text > div {
+.property-edit .list .text > div {
 	padding: 0.25em;
 	flex: 1;
 }
@@ -149,7 +149,7 @@ img {
 .list .tools {
 }
 
-.person-edit .list .item img {
+.property-edit .list .item img {
   object-fit: cover;
   width: 9em;
   height: 9em;
@@ -161,19 +161,43 @@ img {
 
 <script>
 
-	import personSchema from './person_edit_schema.mjs'
+	import propertySchema from './property_edit_schema.mjs'
 
 	import moment from 'moment'
 	import async from 'async'
 
 	import Vue from 'vue'
 
-	import iimg from './iimg.vue'
-
 	import VueFormulate from '@braid/vue-formulate'
 	Vue.use(VueFormulate)
 
-	Vue.component('iimg', iimg)
+	Vue.component('iimg', {
+		name: 'iimg',
+		render(createElement) {
+
+			const img = createElement('img', {
+				attrs: {
+					alt: ''
+				}
+			});
+
+			if (this.$props.src) {
+				this.$nextTick(() => {
+					img.elm.src = URL.createObjectURL(this.$props.src);
+					img.elm.alt = this.$props.src.name;
+				});
+			}
+
+			return img;
+		},
+		props: {
+	  	    src: {
+	        	type: [ File ],
+				required: false,
+	  	    },
+  		}
+	})
+
 
 	Vue.component('fileInfo', {
 		name: 'fileInfo',
@@ -279,19 +303,16 @@ img {
 				queue: [],
 				model: {
 					_id: null,
-					lastName: '',
-					firstName: '',
-					middleName: '',
-					birthDay: '',
-					passport: '',
+					address: '',
+					description: '',
 					files: []
 				},
 				files: [],
-				schema: personSchema
+				schema: propertySchema
 			}
 		},
 		computed: {
-			person_id() {
+			property_id() {
 				return this.$route.params.id
 			}
 		},
@@ -318,19 +339,16 @@ img {
 			},
 			updateModel (vm) {
 				// console.log('* updateModel', this, vm);
-				const personId = this.$route.params.id;
+				const propertyId = this.$route.params.id;
 
 				this.model = {
 					_id: null,
-					lastName: '',
-					firstName: '',
-					middleName: '',
-					birthDay: '',
-					passport: ''
+					address: '',
+					description: ''
 				}
 
-				if ('new' !== personId) {
-					this.$http.get('/person/' + personId).then(response => {
+				if ('new' !== propertyId) {
+					this.$http.get('/property/' + propertyId).then(response => {
 						this.model = Object.assign({}, response.body)
 						this.model.birthDay = moment(response.body.birthDay).format('YYYY-MM-DD')
 					}).catch((e) => {
@@ -343,9 +361,9 @@ img {
 
 				var method = this.model._id ? 'post' : 'put'
 
-				this.$http[method]('/person', formData).then(response => {
+				this.$http[method]('/property', formData).then(response => {
 
-					//this.$router.push({ name: 'person' })
+					//this.$router.push({ name: 'property' })
 					this.$router.push('.')
 
 				}).catch((err) => {
@@ -354,7 +372,7 @@ img {
 
 			},
 			closeHandler () {
-				//this.$router.push({ name: 'person' })
+				//this.$router.push({ name: 'property' })
 				this.$router.push('.')
 			},
 			updateQueue (event) {
@@ -386,7 +404,7 @@ img {
 			},
 			upload () {
 				const queue = this.queue;
-				const personId = this.model._id;
+				const propertyId = this.model._id;
 
 				var q = async.queue((task, callback) => {
 
@@ -399,7 +417,7 @@ img {
 
 					xhr.open(
 						'POST',
-						'/person/' + personId + '/upload/' + task.file.name,
+						'/property/' + propertyId + '/upload/' + task.file.name,
 						true
 					);
 

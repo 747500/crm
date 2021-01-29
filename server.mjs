@@ -73,11 +73,11 @@ mongoose.connect(
 
 	console.log('DB connected')
 
-	const personAsResult = (req, res, next) => {
-		var person = res.locals.Person
+	const docAsResult = (req, res, next) => {
+		var doc = res.locals.Doc
 
 //		if ('function' typeof person)
-		res.locals.Result = person.toObject()
+		res.locals.Result = doc.toObject()
 		next()
 	}
 
@@ -86,9 +86,9 @@ mongoose.connect(
 	}
 
 	// TODO validation
-	const personList = (req, res, next) => {
+	const docList = (req, res, next) => {
 
-		Person.find().then(
+		res.locals.Schema.find().then(
 			result => {
 				res.locals.Result = result
 				next()
@@ -98,13 +98,13 @@ mongoose.connect(
 	}
 
 	// TODO validation
-	const personEvents = (req, res, next) => {
+	const docEvents = (req, res, next) => {
 
 		console.log(req.query)
 
 		const month = parseInt(moment(req.query.yearmonth).format('MM'))
 
-		Person.aggregate([
+		res.locals.Doc.aggregate([
 			{
 				$project: {
 					firstName: 1,
@@ -142,14 +142,31 @@ mongoose.connect(
 
 
 	// TODO validation
-	const personLoad = (req, res, next) => {
+	const schemaResolve = (req, res, next) => {
 
-		Person
+		const sel = {
+			'person': Person,
+			'property': Property
+		}
+
+		const sName = req.params.schema
+		res.locals.Schema = sel[sName]
+
+		next()
+	}
+
+
+	// TODO validation
+	const docLoad = (req, res, next) => {
+
+		console.log('>>>', res.locals.Schema);
+
+		res.locals.Schema
 			.findById(req.params.id)
 			.then(
 				result => {
-					console.log('* personLoad:', result.toObject())
-					res.locals.Person = result
+					console.log('* docLoad:', result.toObject())
+					res.locals.Doc = result
 					next()
 				}
 			).catch(next)
@@ -157,11 +174,11 @@ mongoose.connect(
 	}
 
 	// TODO validation
-	const personFindByIdAndUpdate = (req, res, next) => {
+	const docFindByIdAndUpdate = (req, res, next) => {
 
 		delete req.body.files
 
-		Person
+		res.locals.Doc
 			.findByIdAndUpdate(
 				req.body._id,
 				{
@@ -170,19 +187,19 @@ mongoose.connect(
 			).then(
 				result => {
 					console.log('* findByIdAndUpdate:', result.toObject())
-					res.locals.Person = result
+					Doc = result
 					next()
 				}
 			).catch(next)
 
 	}
 
-	const personNew = (req, res, next) => {
+	const docNew = (req, res, next) => {
 
 		delete req.body._id
 
 		try {
-			res.locals.Person = new Person(req.body)
+			res.locals.Doc = new res.locals.Schema(req.body)
 		}
 		catch (err) {
 			next(err)
@@ -191,22 +208,22 @@ mongoose.connect(
 		next()
 	}
 
-	const personSave = (req, res, next) => {
+	const docSave = (req, res, next) => {
 
-		const person = res.locals.Person
+		const doc = res.locals.Doc
 
-		person.save().then(
+		doc.save().then(
 			() => next(),
 			err => next(err)
 		)
 
-		console.log('* personSave', person.toObject())
+		console.log('* docSave', doc.toObject())
 
 	}
 
-	const personUploadFile = (req, res, next) => {
+	const docUploadFile = (req, res, next) => {
 
-		const person = res.locals.Person
+		const doc = res.locals.Doc
 		const filename = req.params.filename
 		const mimetype = req.headers['content-type']
 
@@ -229,9 +246,9 @@ mongoose.connect(
 
 		stream.once('error', next)
 
-		person.files.push(stream.id)
+		doc.files.push(stream.id)
 
-		console.log('* after personUploadFile:', person);
+		console.log('* after docUploadFile:', doc);
 
 		req.pipe(stream)
 
@@ -281,44 +298,48 @@ mongoose.connect(
 
 // --------------------------------------------------------------------------
 
+	app.get('/f/:id',
+		getFile
+	)
+
+	app.get('/:schema/list',
+		schemaResolve,
+		docList,
+		sendResultJSON
+	)
+
 	app.get('/person/events',
-		personEvents,
+		docEvents,
 		sendResultJSON
 	)
 
-	app.get('/person/list',
-		personList,
-		sendResultJSON
-	)
-
-	app.get('/person/:id',
-		personLoad,
-		personAsResult,
+	app.get('/:schema/:id',
+		schemaResolve,
+		docLoad,
+		docAsResult,
 		sendResultJSON
 	)
 
 	app.post('/person',
-		personFindByIdAndUpdate,
-		personAsResult,
+		docFindByIdAndUpdate,
+		docAsResult,
 		sendResultJSON
 	)
 
-	app.put('/person',
-		personNew,
-		personSave,
-		personAsResult,
+	app.put('/:schema',
+		schemaResolve,
+		docNew,
+		docSave,
+		docAsResult,
 		sendResultJSON
 	)
 
-	app.post('/person/:id/upload/:filename',
-		personLoad,
-		personUploadFile,
-		personSave,
+	app.post('/:schema/:id/upload/:filename',
+		schemaResolve,
+		docLoad,
+		docUploadFile,
+		docSave,
 		sendResultJSON
-	)
-
-	app.get('/f/:id',
-		getFile
 	)
 
 

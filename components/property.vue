@@ -1,26 +1,26 @@
 
 <template>
-	<div class="person">
+	<div class="property">
 
-		<div class="person-list">
+		<div class="property-list">
 			<ul>
 				<li class="create">
-					<router-link :to="{ name: 'person_edit', params: { id: 'new' }}">
+					<router-link :to="{ name: 'property_edit', params: { id: 'new' }}">
 						<div>Новая запись</div>
 					</router-link>
 				</li>
 				<li
-					v-for="p in person"
+					v-for="p in property"
 					v-bind:class="{ 'strike': p.status }"
 					v-bind:key="p._id">
-					<router-link :to="{ name: 'person_edit', params: { id: p._id }}">
-						<div>{{ p.lastName }} {{ p.firstName }} {{ p.middleName }}</div>
+					<router-link :to="{ name: 'property_edit', params: { id: p._id }}">
+						<div>{{ p.address }}</div>
 					</router-link>
 				</li>
 			</ul>
 		</div>
 
-		<div class="person-data">
+		<div class="property-data">
 			<router-view></router-view>
 		</div>
 
@@ -29,22 +29,22 @@
 
 <style>
 
-.person {
+.property {
 	display: flex;
 	margin: 0;
 	padding: 0;
 }
 
-.person-data {
+.property-data {
 	flex: 20;
 	border: left 1px solid gray;
 }
 
-.person-list {
+.property-list {
 	flex: 10;
 }
 
-.person-list ul {
+.property-list ul {
 	border-left : 1px solid gray;
 	margin-top: 0;
 	margin-bottom: 0;
@@ -52,12 +52,12 @@
 	padding-bottom: 0.33em;
 }
 
-.person-list li {
+.property-list li {
 	padding-top: .33em;
 	padding-bottom: .33em;
 }
 
-.person-list li.create {
+.property-list li.create {
 	list-style-type: circle;
 }
 
@@ -68,7 +68,7 @@
 	export default {
 		data () {
 			return  {
-				person: [
+				property: [
 				]
 			}
 		},
@@ -87,8 +87,9 @@
 		},
 		methods: {
 			updateModel () {
-				this.$http.get('/person/list').then((response) => {
-					this.person = Object.assign({}, response.body)
+				this.$http.get('/property/list').then((response) => {
+					console.log(response.body)
+					this.property = Object.assign({}, response.body)
 				}).catch((err) => {
 					console.error(err)
 				})
