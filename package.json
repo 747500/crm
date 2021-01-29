@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "./node_modules/.bin/webpack --mode development --entry /home/native/src/crm/app/main.js -o ./public",
-    "serve": "node server.mjs"
+    "serve": "node server/server.mjs"
   },
   "devDependencies": {
     "@babel/core": "7",
