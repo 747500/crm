@@ -54,7 +54,7 @@ module.exports = {
 			filename: 'bundle.css'
 		}),
 		new HtmlWebpackPlugin({
-			template: './index.html',
+			template: 'app/index.html',
 		})
 	],
 	resolve: {

@@ -30,6 +30,25 @@ const docSchema = new mongoose.Schema(
 	docSchemaOptions
 );
 
+class Text extends mongoose.SchemaType {
+  constructor(key, options) {
+    super(key, options, 'Text');
+  }
+
+  // `cast()` takes a parameter that can be anything. You need to
+  // validate the provided `val` and throw a `CastError` if you
+  // can't convert it.
+  cast(val) {
+    let _val = String(val);
+    return _val;
+  }
+}
+
+// Don't forget to add `Int8` to the type registry
+mongoose.Schema.Types.Text = Text;
+
+// --------------------------------------------------------------------------
+
 const Doc = mongoose.model('Doc', docSchema)
 
 const Person = Doc.discriminator(
@@ -40,7 +59,7 @@ const Person = Doc.discriminator(
 			lastName: String,
 			middleName: String,
 			birthDay: Date,
-			passport: String,
+			passport: Text,
 			files: [ mongoose.Types.ObjectId ]
 		},
 		docSchemaOptions
@@ -52,7 +71,7 @@ const Property = Doc.discriminator(
 	new mongoose.Schema(
 		{
 			address: String,
-			description: String,
+			description: Text,
 			files: [ mongoose.Types.ObjectId ]
 		},
 		docSchemaOptions
@@ -104,7 +123,7 @@ mongoose.connect(
 
 		const month = parseInt(moment(req.query.yearmonth).format('MM'))
 
-		res.locals.Doc.aggregate([
+		res.locals.Schema.aggregate([
 			{
 				$project: {
 					firstName: 1,
@@ -150,7 +169,7 @@ mongoose.connect(
 		}
 
 		const sName = req.params.schema
-		res.locals.Schema = sel[sName]
+		res.locals.Schema = sel[sName] || Doc
 
 		next()
 	}
@@ -178,7 +197,7 @@ mongoose.connect(
 
 		delete req.body.files
 
-		res.locals.Doc
+		res.locals.Schema
 			.findByIdAndUpdate(
 				req.body._id,
 				{
@@ -187,7 +206,7 @@ mongoose.connect(
 			).then(
 				result => {
 					console.log('* findByIdAndUpdate:', result.toObject())
-					Doc = result
+					res.locals.Doc = result
 					next()
 				}
 			).catch(next)
@@ -308,7 +327,7 @@ mongoose.connect(
 		sendResultJSON
 	)
 
-	app.get('/person/events',
+	app.get('/:schema/events',
 		schemaResolve,
 		docEvents,
 		sendResultJSON
@@ -331,8 +350,8 @@ mongoose.connect(
 	app.put('/:schema',
 		schemaResolve,
 		docNew,
-		docSave,
 		docAsResult,
+		docSave,
 		sendResultJSON
 	)
 
