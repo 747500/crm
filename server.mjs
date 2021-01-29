@@ -309,6 +309,7 @@ mongoose.connect(
 	)
 
 	app.get('/person/events',
+		schemaResolve,
 		docEvents,
 		sendResultJSON
 	)
@@ -320,7 +321,8 @@ mongoose.connect(
 		sendResultJSON
 	)
 
-	app.post('/person',
+	app.post('/:schema',
+		schemaResolve,
 		docFindByIdAndUpdate,
 		docAsResult,
 		sendResultJSON
