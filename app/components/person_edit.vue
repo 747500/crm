@@ -50,7 +50,7 @@
 					>Загрузить</button>
 
 				<div v-if="queue.length > 0" class="queue list" style="margin: 1em;">
-					<div class="item" v-for="(task, n) in queue" :key="n">
+					<div class="item" v-for="(task, n) in queue" :key="task.key">
 						<div class="img">
 							<iimg :src="task.file" />
 						</div>
@@ -416,9 +416,10 @@ img {
 			},
 			updateQueue (event) {
 				const input = event.target
-
+				const ts = Date.now().toString()
 				for (let i = 0; i < input.files.length; i ++) {
 					this.queue.push({
+						key: ts + '_' + i,
 						file: input.files[i],
 						p: null
 					});
@@ -430,16 +431,8 @@ img {
 			queueRemove (n) {
 				const q = [];
 				var oid, i, e;
-
 				this.queue[n] = false;
-
-				e = this.queue.length;
-				for (i = 0; i < e; i ++) {
-					oid = this.queue.shift();
-					if (oid) {
-						this.queue.push(oid);
-					}
-				}
+				this.queue = this.queue.filter(v => { return v });
 			},
 			upload () {
 				const queue = this.queue;
