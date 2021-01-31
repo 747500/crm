@@ -49,7 +49,14 @@
 					:disabled="!queue.length"
 					>Загрузить</button>
 
-				<div v-if="queue.length > 0" class="queue list" style="margin: 1em;">
+				<fileUploadQueue
+					class="queue list"
+					v-if="queue.length > 0"
+					:queue="queue"
+					@removeEl="queueRemoveEl"
+					/>
+
+				<!-- div v-if="queue.length > 0" class="queue list">
 					<div class="item" v-for="(task, n) in queue" :key="task.key">
 						<div class="img">
 							<iimg :src="task.file" />
@@ -65,7 +72,7 @@
 							</div>
 						</div>
 					</div>
-				</div>
+				</div -->
 
 				<hr>
 
@@ -90,6 +97,7 @@
 								@submit="() => saveCaption(file.oid)"
 								v-model="file.caption"
 								label="." />
+
 							<div class="tools">
 								<a href="" @click.prevent="() => { fileRemove(file.oid) }">Удалить</a>
 							</div>
@@ -194,13 +202,18 @@ img {
 	Vue.use(VueFormulate)
 
 	import iimg from './iimg.vue'
-	Vue.component('iimg', iimg)
+	//Vue.component('iimg', iimg)
 
 	import inplaceTextEdit from './inplaceTextEdit.vue'
-	Vue.component('inplaceTextEdit', inplaceTextEdit)
+	//Vue.component('inplaceTextEdit', inplaceTextEdit)
+
+	import fileUploadQueue from './file_upload_queue.vue'
 
 	export default {
 		components: {
+			iimg,
+			inplaceTextEdit,
+			fileUploadQueue
 		},
 		data () {
 		    return {
@@ -428,12 +441,6 @@ img {
 				input.value = null;
 
 			},
-			queueRemove (n) {
-				const q = [];
-				var oid, i, e;
-				this.queue[n] = false;
-				this.queue = this.queue.filter(v => { return v });
-			},
 			upload () {
 				const queue = this.queue;
 				const personId = this.model._id;
@@ -517,7 +524,13 @@ img {
 
 				q.push(queue);
 
-			}
+			},
+
+			queueRemoveEl (n) {
+				this.queue[n] = false;
+				this.queue = this.queue.filter(v => { return v });
+			},
+
 		}
 	}
 
