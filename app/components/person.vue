@@ -21,7 +21,7 @@
 		</div>
 
 		<div class="person-data">
-			<router-view></router-view>
+			<router-view key="person-data"></router-view>
 		</div>
 
 	</div>
@@ -85,10 +85,12 @@
 		},
 		created () {
 		},
+		mounted () {
+		},
 		methods: {
 			updateModel () {
 				this.$http.get('/person/list').then((response) => {
-					this.person = Object.assign({}, response.body)
+					this.person = Object.assign({}, this.person, response.body)
 				}).catch((err) => {
 					console.error(err)
 				})

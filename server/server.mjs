@@ -6,7 +6,7 @@ import moment from 'moment'
 
 import express from 'express'
 import morgan from 'morgan'
-//import bodyParser from 'body-parser'
+import bodyParser from 'body-parser'
 
 import mongoose from 'mongoose'
 
@@ -16,6 +16,8 @@ const app = express()
 const port = 3000
 app.use(morgan('dev'))
 app.use(express.json())
+app.use(bodyParser.text())
+app.use(bodyParser.json())
 
 // --------------------------------------------------------------------------
 
@@ -77,6 +79,19 @@ const Property = Doc.discriminator(
 		docSchemaOptions
 	)
 )
+
+const Contract = Doc.discriminator(
+	'contract',
+	new mongoose.Schema(
+		{
+			property: mongoose.Types.ObjectId,
+			person: [ mongoose.Types.ObjectId ],
+			files: [ mongoose.Types.ObjectId ]
+		},
+		docSchemaOptions
+	)
+)
+
 
 // --------------------------------------------------------------------------
 
@@ -245,13 +260,15 @@ mongoose.connect(
 		const doc = res.locals.Doc
 		const filename = req.params.filename
 		const mimetype = req.headers['content-type']
+		const caption = req.headers['x-meta-caption']
 
 		var stream = bucket.openUploadStream(
 			filename,
 			{
 				contentType: mimetype,
 				metadata: {
-					lastModified: new Date(req.headers['last-modified'])
+					lastModified: new Date(req.headers['last-modified']),
+					caption: querystring.unescape(caption)
 				}
 			}
 		);
@@ -293,6 +310,9 @@ mongoose.connect(
 					fileinfo.metadata.lastModified :
 					fileinfo.uploadDate
 
+			const caption =
+					querystring.escape(fileinfo.metadata.caption || '')
+
 			const contentDisposition =
 					'inline;' + // or 'attachment' for downloads
 					'filename=' +
@@ -303,7 +323,8 @@ mongoose.connect(
 				'Content-Type': fileinfo.contentType,
 				'Last-Modified': lastModified.toISOString(),
 				'Content-Disposition': contentDisposition,
-				'ETag': 'W/' + oid.toString()
+				//'ETag': 'W/' + oid.toString(),
+				'X-Meta-Caption': caption
 			})
 
 			const stream = bucket.openDownloadStream(oid)
@@ -315,10 +336,76 @@ mongoose.connect(
 		}).catch(next)
 	}
 
+	const docDeleteFile = (req, res, next) => {
+		const foid = mongoose.Types.ObjectId(req.params.foid)
+
+		res.locals.Doc.files = res.locals.Doc.files.filter(arg => {
+			return arg.toString() !== foid.toString()
+		})
+
+		bucket.delete(foid, next)
+	}
+
+	const postFileMeta = (req, res, next) => {
+
+		const oid = mongoose.Types.ObjectId(req.params.id)
+		const fieldName = 'caption' //req.params.field
+
+		const allowed = {
+			'caption': String
+		}
+
+
+		const contentType = req.headers['content-type']
+
+		if ('application/json' !== contentType) {
+			next(TypeError(`Invalid 'Content-Type': ${contentType}`))
+			return;
+		}
+
+		for (const [k, v] of Object.entries(req.body)) {
+			if (!allowed[k]) {
+				next(RangeError(`Field '${k}' is not allowed`))
+				return;
+			}
+		}
+
+		req.body['lastModified'] = new Date()
+
+		console.log('metadata', req.body);
+
+		db.collection('fs.files')
+		.updateOne(
+			{
+				_id: oid
+			},
+			{
+				$set: {
+					metadata: req.body
+				}
+			}
+		).then(result => {
+
+			if (null === result) { // 404
+				next()
+				return;
+			}
+
+			console.log('modifiedCount', result.modifiedCount)
+
+			res.send('ok')
+
+		}).catch(next)
+	}
+
 // --------------------------------------------------------------------------
 
 	app.get('/f/:id',
 		getFile
+	)
+
+	app.post('/f/:id',
+		postFileMeta
 	)
 
 	app.get('/:schema/list',
@@ -363,6 +450,13 @@ mongoose.connect(
 		sendResultJSON
 	)
 
+	app.delete('/:schema/:id/file/:foid',
+		schemaResolve,
+		docLoad,
+		docDeleteFile,
+		docSave,
+		sendResultJSON
+	)
 
 	app.use(express.static('public'))
 

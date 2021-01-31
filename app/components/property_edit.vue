@@ -68,6 +68,7 @@
 
 				<hr>
 
+			<!--
 				<div class="files list" style="margin: 1em;">
 					<fileInfo
 						class="item"
@@ -76,6 +77,7 @@
 						:key="oid"
 						/>
 				</div>
+			-->
 			</div>
 
 		</div>
@@ -170,130 +172,6 @@ img {
 
 	import VueFormulate from '@braid/vue-formulate'
 	Vue.use(VueFormulate)
-
-	Vue.component('iimg', {
-		name: 'iimg',
-		render(createElement) {
-
-			const img = createElement('img', {
-				attrs: {
-					alt: ''
-				}
-			});
-
-			if (this.$props.src) {
-				this.$nextTick(() => {
-					img.elm.src = URL.createObjectURL(this.$props.src);
-					img.elm.alt = this.$props.src.name;
-				});
-			}
-
-			return img;
-		},
-		props: {
-	  	    src: {
-	        	type: [ File ],
-				required: false,
-	  	    },
-  		}
-	})
-
-
-	Vue.component('fileInfo', {
-		name: 'fileInfo',
-		render(createElement) {
-
-			const img = createElement('iimg');
-
-			const itemImg = createElement('div',
-				{
-					attrs: {
-						class: 'img',
-					}
-				},
-				[
-					img
-				]
-			);
-
-			const caption = createElement('div',
-				{
-					attrs: {
-						class: 'caption'
-					}
-				}
-			);
-
-			const filename = createElement('div',
-				{
-					attrs: {
-						class: 'filename'
-					}
-				}
-			);
-
-			const size = createElement('div',
-				{
-					attrs: {
-						class: 'size'
-					}
-				}
-			);
-
-			const itemText = createElement('div',
-				{
-					attrs: {
-						class: 'text'
-					}
-				},
-				[
-					filename,
-					size,
-					caption
-				]
-			);
-
-			const item = createElement('div', [
-				itemImg,
-				itemText
-			]);
-
-			var xhr = new XMLHttpRequest();
-
-			xhr.responseType = 'blob';
-			xhr.open('get', this.$props.src, true);
-
-			//xhr.onerror(err => {
-			//	console.error(err);
-			//});
-
-        	xhr.onreadystatechange = e => {
-				if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
-					const contentType = xhr.getResponseHeader('content-type');
-					const fileName = xhr.getResponseHeader('content-disposition').split(';')[1];
-
-	                img.elm.src = URL.createObjectURL(xhr.response);
-					img.elm.alt = fileName;
-	                img.elm.onload = () => {
-	                    URL.revokeObjectURL(img.elm.src);
-	                }
-					filename.elm.innerText = decodeURIComponent(fileName.slice(9));
-					size.elm.innerText = xhr.response.size;
-					caption.elm.innerText = '-';
-	            }
-	        };
-
-	        xhr.send();
-
-			return item;
-		},
-		props: {
-	  	    src: {
-	        	type: String,
-				required: true,
-	  	    },
-  		}
-	})
 
 	export default {
 		components: {

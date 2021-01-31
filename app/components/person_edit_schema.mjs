@@ -4,7 +4,8 @@ export default [
         name: '_id',
         type: 'text',
         label: 'ID',
-        readonly: true
+        readonly: true,
+        class: 'oid'
     },
     {
         name: 'lastName',

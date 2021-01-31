@@ -11,8 +11,8 @@ import calendar from './components/calendar.vue'
 import person from './components/person.vue'
 import person_edit from './components/person_edit.vue'
 
-import property from './components/property.vue'
-import property_edit from './components/property_edit.vue'
+//import property from './components/property.vue'
+//import property_edit from './components/property_edit.vue'
 
 // --------------------------------------------------------------------------
 
@@ -38,7 +38,7 @@ const routes = [
 			}
 		]
 	},
-	{
+/*	{
 		title: 'Собственность',
 		name: 'property',
 		path: '/property',
@@ -50,7 +50,7 @@ const routes = [
 				component: property_edit,
 			}
 		]
-	}
+	}*/
 ]
 
 export default new VueRouter({ routes })

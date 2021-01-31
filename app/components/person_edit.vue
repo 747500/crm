@@ -49,7 +49,7 @@
 					:disabled="!queue.length"
 					>Загрузить</button>
 
-				<div class="queue list" style="margin: 1em;">
+				<div v-if="queue.length > 0" class="queue list" style="margin: 1em;">
 					<div class="item" v-for="(task, n) in queue" :key="n">
 						<div class="img">
 							<iimg :src="task.file" />
@@ -59,6 +59,7 @@
 							<div>{{ task.file.size }}</div>
 							<div v-if="task.file_id">{{ task.file_id }}</div>
 							<div v-if="task.p">{{ task.p }}</div>
+							<div><input type="text" v-model="task.caption"/></div>
 							<div class="tools">
 								<a href="" @click.prevent="() => { queueRemove(n) }">Убрать...</a>
 							</div>
@@ -68,13 +69,33 @@
 
 				<hr>
 
-				<div class="files list" style="margin: 1em;">
-					<fileInfo
-						class="item"
-						v-for="(oid, n) in (model.files || []).slice().reverse()"
-						:src="'/f/' + oid"
-						:key="oid"
-						/>
+				<!-- filesList class="files list" style="margin: 1em;" v-model=""/ -->
+
+				<div v-if="queue.length == 0" class="files list">
+
+
+					<div class="item" v-for="(file, n) in files.slice().reverse()" :key="file.key">
+
+						<div class="img">
+							<iimg :src="file.blob"/>
+						</div>
+
+						<div class="text">
+							<div class="oid">{{ file.oid }}</div>
+							<div>{{ file.name }}</div>
+							<div>{{ file.lastModified }}</div>
+							<div>{{ file.size }}</div>
+
+							<inplaceTextEdit
+								@submit="() => saveCaption(file.oid)"
+								v-model="file.caption"
+								label="." />
+							<div class="tools">
+								<a href="" @click.prevent="() => { fileRemove(file.oid) }">Удалить</a>
+							</div>
+
+						</div>
+					</div>
 				</div>
 			</div>
 
@@ -144,6 +165,7 @@ img {
 .person-edit .list .text > div {
 	padding: 0.25em;
 	flex: 1;
+	font-size: smaller;
 }
 
 .list .tools {
@@ -168,108 +190,14 @@ img {
 
 	import Vue from 'vue'
 
-	import iimg from './iimg.vue'
-
 	import VueFormulate from '@braid/vue-formulate'
 	Vue.use(VueFormulate)
 
+	import iimg from './iimg.vue'
 	Vue.component('iimg', iimg)
 
-	Vue.component('fileInfo', {
-		name: 'fileInfo',
-		render(createElement) {
-
-			const img = createElement('iimg');
-
-			const itemImg = createElement('div',
-				{
-					attrs: {
-						class: 'img',
-					}
-				},
-				[
-					img
-				]
-			);
-
-			const caption = createElement('div',
-				{
-					attrs: {
-						class: 'caption'
-					}
-				}
-			);
-
-			const filename = createElement('div',
-				{
-					attrs: {
-						class: 'filename'
-					}
-				}
-			);
-
-			const size = createElement('div',
-				{
-					attrs: {
-						class: 'size'
-					}
-				}
-			);
-
-			const itemText = createElement('div',
-				{
-					attrs: {
-						class: 'text'
-					}
-				},
-				[
-					filename,
-					size,
-					caption
-				]
-			);
-
-			const item = createElement('div', [
-				itemImg,
-				itemText
-			]);
-
-			var xhr = new XMLHttpRequest();
-
-			xhr.responseType = 'blob';
-			xhr.open('get', this.$props.src, true);
-
-			//xhr.onerror(err => {
-			//	console.error(err);
-			//});
-
-        	xhr.onreadystatechange = e => {
-				if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
-					const contentType = xhr.getResponseHeader('content-type');
-					const fileName = xhr.getResponseHeader('content-disposition').split(';')[1];
-
-	                img.elm.src = URL.createObjectURL(xhr.response);
-					img.elm.alt = fileName;
-	                img.elm.onload = () => {
-	                    URL.revokeObjectURL(img.elm.src);
-	                }
-					filename.elm.innerText = decodeURIComponent(fileName.slice(9));
-					size.elm.innerText = xhr.response.size;
-					caption.elm.innerText = '-';
-	            }
-	        };
-
-	        xhr.send();
-
-			return item;
-		},
-		props: {
-	  	    src: {
-	        	type: String,
-				required: true,
-	  	    },
-  		}
-	})
+	import inplaceTextEdit from './inplaceTextEdit.vue'
+	Vue.component('inplaceTextEdit', inplaceTextEdit)
 
 	export default {
 		components: {
@@ -277,6 +205,8 @@ img {
 		data () {
 		    return {
 				queue: [],
+				files: [],
+				filesdb: {},
 				model: {
 					_id: null,
 					lastName: '',
@@ -286,7 +216,6 @@ img {
 					passport: '',
 					files: []
 				},
-				files: [],
 				schema: personSchema
 			}
 		},
@@ -311,9 +240,55 @@ img {
 		mounted () {
 		},
 		methods: {
+			fileRemove (oid) {
+
+				this.$http.delete(
+					`/person/${this.model._id}/file/${oid}`
+				).then(result => {
+
+					this.model.files = this.model.files.filter(arg => {
+						return arg !== oid
+					})
+
+					this.files = this.model.files.map((oid, n) => {
+						return this.filesdb[oid]
+					})
+
+					delete this.filesdb[oid]
+
+				})
+
+
+			},
+			saveCaption (oid) {
+				const file = this.filesdb[oid]
+
+				file.key += '.'
+
+				this.$http.post(
+					`/f/${file.oid}`,
+					{
+						caption: file.caption
+					},
+					{
+						headers: {
+							'Content-Type': 'application/json'
+						}
+					}
+				).then(result => {
+					//console.log('saveCaption', result)
+
+				}).catch(console.error)
+
+			},
 			selectFiles (event) {
 				this.$nextTick(() => {
 					this.$refs.addFile.click(event);
+				})
+			},
+			getFiles () {
+				this.files = this.model.files.map((oid, n) => {
+					return this.filesdb[oid]
 				})
 			},
 			updateModel (vm) {
@@ -326,20 +301,102 @@ img {
 					firstName: '',
 					middleName: '',
 					birthDay: '',
-					passport: ''
+					passport: '',
+					files: []
 				}
 
-				if ('new' !== personId) {
-					this.$http.get('/person/' + personId).then(response => {
-						this.model = Object.assign({}, response.body)
-						this.model.birthDay = moment(response.body.birthDay).format('YYYY-MM-DD')
-					}).catch((e) => {
-						console.error(e)
-					});
+				this.queue = []
+				this.filesdb = {}
+				this.files = []
+
+				if ('new' === personId) {
+					return
 				}
 
+				this.$http.get('/person/' + personId).then(response => {
+
+					this.model = Object.assign({}, response.body)
+					this.model.birthDay = moment(response.body.birthDay).format('YYYY-MM-DD')
+
+					return this.model.files.map((oid, n) => {
+
+							this.filesdb[oid] = {
+								oid: oid,
+								key: oid,
+								docId: this.model._id,
+								blob: null,
+								caption: '',
+								size: 0,
+								lastModified: '',
+								caption: ''
+							}
+						})
+
+				}).then(() => {
+
+					this.files = this.model.files.map((oid, n) => {
+						return this.filesdb[oid]
+					})
+
+
+					return this.model.files.map((oid, n) => {
+						return this.$http.get('/f/' + oid, {
+							responseType: 'blob'
+						}).then(response => {
+
+							var filename = response.headers.get('content-disposition') || ''
+							filename = decodeURIComponent(
+								filename.replace(
+									/^[a-z]+;filename=/,
+									''
+								)
+							)
+
+							var caption = response.headers.get('x-meta-caption') || ''
+
+
+							this.filesdb[oid].blob = response.body
+
+							//file.name = response.headers.get('content-disposition')
+							this.filesdb[oid].key += '+'
+							this.filesdb[oid].size = response.body.size
+							this.filesdb[oid].type = response.headers.get('content-type')
+
+							this.filesdb[oid].lastModified =
+									new Date(response.headers.get('last-modified'))
+
+							this.filesdb[oid].name =
+									decodeURIComponent(filename)
+
+							this.filesdb[oid].caption =
+									decodeURIComponent(caption)
+
+							//console.log(this.filesdb[oid])
+
+							this.files = this.model.files.map((oid, n) => {
+								return this.filesdb[oid]
+							})
+
+
+						}).catch(err => {
+							console.error(err)
+						})
+
+					})
+
+				}).then(list => {
+
+					//this.$forceUpdate()
+
+					return Promise.allSettled(list)
+
+				}).then(list => {
+
+				}).catch(err => {
+						console.error(err)
+				})
 			},
-			submitHandler(formData) {
+			submitHandler (formData) {
 
 				var method = this.model._id ? 'post' : 'put'
 
@@ -404,6 +461,7 @@ img {
 					);
 
 					xhr.setRequestHeader('Last-Modified', task.file.lastModifiedDate)
+					xhr.setRequestHeader('X-Meta-Caption', encodeURIComponent(task.caption || ''))
 
 					xhr.upload.onerror = err => {
 						callback(err);
@@ -425,13 +483,28 @@ img {
 							//updateProgress();
 							console.log(xhr.response)
 							const res = JSON.parse(xhr.responseText)
-							const file_id = res.file_id
+							const oid = res.file_id
 
 							queue.shift();
 
-							this.model.files.push(file_id)
-							task.file_id = file_id
+							const file = {
+								name: task.file.name,
+								oid: oid,
+								key: oid,
+								docId: this.model._id,
+								lastModified: new Date(task.file.lastModifiedDate),
+								size: task.file.size,
+								caption: task.caption,
+								blob: task.file
+							}
+
+							this.filesdb[oid] = file
+							this.model.files.push(oid)
+							this.files.push(file)
+
+							task.file_id = oid
 							task.p = ''
+
 							callback();
 						}
 					}
