@@ -18,46 +18,10 @@
 					/>
 			</div>
 
-			<div class="edit-upload">
-				<span>Файлы:</span>
-
-				<input
-					ref="addFile"
-					name="addFile"
-					type="file"
-					multiple
-					@change="updateQueue"
-					style="display: none;"
-					:disabled="!docId"
-					/>
-
-				<button
-					type="file"
-					name="upload"
-					multiple
-					@click="(event) => this.$refs.addFile.click(event)"
-					:disabled="!docId"
-					>Выбрать</button>
-
-				<button
-					@click="upload"
-					:disabled="!queue.length"
-					>Загрузить</button>
-
-				<fileUploadQueue
-					class="queue list"
-					v-if="queue.length > 0"
-					:queue="queue"
-					@removeEl="queueRemoveEl"
-					/>
-
-				<hr>
-				<filesList
-					class="files list"
-					v-if="queue.length == 0"
+			<div class="files">
+				<personFiles
 					:oid="docId"
 					/>
-
 			</div>
 
 		</div>
@@ -128,36 +92,27 @@ img {
 <script>
 
 	import personSchema from './person_edit_schema.mjs'
-null
-	import moment from 'moment'
-	import async from 'async'
 
 	import Vue from 'vue'
 
-	import iimg from './iimg.vue'
+	//import iimg from './iimg.vue'
 	//Vue.component('iimg', iimg)
 
-	import inplaceTextEdit from './inplaceTextEdit.vue'
+	//import inplaceTextEdit from './inplaceTextEdit.vue'
 	//Vue.component('inplaceTextEdit', inplaceTextEdit)
 
-	import fileUploadQueue from './files_upload_queue.vue'
-	import filesList from './files_list.vue'
-
 	import personEditForm from './person_edit_form.vue'
+	import personFiles from './person_files.vue'
 
 	export default {
 		name: 'personEdit',
 		components: {
-			iimg,
-			inplaceTextEdit,
 			personEditForm,
-			fileUploadQueue,
-			filesList
+			personFiles
 		},
 		data () {
 		    return {
-				docId: null,
-				queue: []
+				docId: null
 			}
 		},
 		params: {
@@ -202,77 +157,7 @@ null
 			closeHandler () {
 				//this.$router.push({ name: 'person' })
 				this.$router.push('.')
-			},
-			updateQueue (event) {
-				const input = event.target
-				const ts = Date.now().toString()
-				for (let i = 0; i < input.files.length; i ++) {
-					this.queue.push({
-						key: ts + '_' + i,
-						file: input.files[i],
-						p: null
-					});
-				}
-
-				input.value = null;
-
-			},
-			upload () {
-				const queue = this.queue;
-				const docId = this.docId;
-
-				var q = async.queue((task, callback) => {
-
-					if (!task) {
-						callback();
-						return;
-					}
-
-					console.log(task)
-
-					this.$http.post(
-						`/f/${docId}/upload/${task.file.name}`,
-						task.file,
-						{
-							headers: {
-								'Last-Modified': task.file.lastModifiedDate.toString(),
-								'X-Meta-Caption': encodeURIComponent(task.caption || ''),
-								'X-Meta-Filename': encodeURIComponent(task.file.name),
-								'X-Meta-Doc-Id': docId,
-								'Content-Type': task.file.type
-							},
-							progress (e) {
-								if (e.lengthComputable) {
-									task.p = parseInt(e.loaded / e.total * 100, 10)
-								}
-							}
-						}
-					)
-					.then(result => {
-						callback()
-					})
-					.catch(console.error)
-
-				}, 1);
-
-				q.error((err, task) => {
-				    console.error(task, err);
-				});
-
-				q.drain(() => {
-					console.log('queue is empty')
-					this.queue = []
-				})
-
-				q.push(queue);
-
-			},
-
-			queueRemoveEl (n) {
-				this.queue[n] = false;
-				this.queue = this.queue.filter(v => { return v });
-			},
-
+			}
 		}
 	}
 
