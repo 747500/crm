@@ -14,15 +14,13 @@
 			<header>
 				<nav>
 					<div v-for="route in $router.options.routes" :key="route.name">
-						<router-link
-							v-if="!route.hidden"
-							:to="route.path">{{ route.title }}</router-link>
+						<router-link :to="route.path">{{ route.title }}</router-link>
 					</div>
 				</nav>
 			</header>
 
 			<div>
-				<router-view @message-saved="haveMessage">{{ this.messages }}</router-view>
+				<router-view></router-view>
 			</div>
 
 		</div>
