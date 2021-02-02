@@ -1,15 +1,16 @@
 <script>
 
 export default {
+	name: 'inplaceTextEdit',
 	model: {
 		prop: 'text',
-		event: 'submit'
+		event: 'savetext'
 	},
 	props: {
 		text: String,
 		label: String
 	},
-	data: () => {
+	data () {
 		return {
 			saved: ''
 		}
@@ -27,7 +28,7 @@ export default {
 			},
 			on: {
 				click: (event) => {
-					this.$emit('submit', this.saved)
+					this.$emit('savetext', this.saved)
 				}
 			}
 		})

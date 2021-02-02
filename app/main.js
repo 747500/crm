@@ -15,6 +15,10 @@ import VueResource from 'vue-resource';
 Vue.use(VueResource);
 
 // --------------------------------------------------------------------------
+import VueFormulate from '@braid/vue-formulate'
+Vue.use(VueFormulate)
+
+// --------------------------------------------------------------------------
 
 import router from './router.js'
 

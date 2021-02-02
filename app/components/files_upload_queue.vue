@@ -26,6 +26,7 @@
 import iimg from './iimg.vue'
 
 export default {
+	name: 'fileUploadQueue',
 	components: {
 		iimg
 	},

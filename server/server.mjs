@@ -8,9 +8,11 @@ import express from 'express'
 import morgan from 'morgan'
 import bodyParser from 'body-parser'
 
-import mongoose from 'mongoose'
 
+import mongoose from 'mongoose'
 mongoose.Promise = global.Promise
+import models from './db_schema.mjs'
+
 
 const app = express()
 const port = 3000
@@ -18,79 +20,6 @@ app.use(morgan('dev'))
 app.use(express.json())
 app.use(bodyParser.text())
 app.use(bodyParser.json())
-
-// --------------------------------------------------------------------------
-
-const docSchemaOptions = {
-	discriminatorKey: 'kind'
-}
-
-const docSchema = new mongoose.Schema(
-	{
-		time: Date
-	},
-	docSchemaOptions
-);
-
-class Text extends mongoose.SchemaType {
-  constructor(key, options) {
-    super(key, options, 'Text');
-  }
-
-  // `cast()` takes a parameter that can be anything. You need to
-  // validate the provided `val` and throw a `CastError` if you
-  // can't convert it.
-  cast(val) {
-    let _val = String(val);
-    return _val;
-  }
-}
-
-// Don't forget to add `Int8` to the type registry
-mongoose.Schema.Types.Text = Text;
-
-// --------------------------------------------------------------------------
-
-const Doc = mongoose.model('Doc', docSchema)
-
-const Person = Doc.discriminator(
-	'person',
-	new mongoose.Schema(
-		{
-			firstName: String,
-			lastName: String,
-			middleName: String,
-			birthDay: Date,
-			passport: Text,
-			files: [ mongoose.Types.ObjectId ]
-		},
-		docSchemaOptions
-	)
-)
-
-const Property = Doc.discriminator(
-	'property',
-	new mongoose.Schema(
-		{
-			address: String,
-			description: Text,
-			files: [ mongoose.Types.ObjectId ]
-		},
-		docSchemaOptions
-	)
-)
-
-const Contract = Doc.discriminator(
-	'contract',
-	new mongoose.Schema(
-		{
-			property: mongoose.Types.ObjectId,
-			person: [ mongoose.Types.ObjectId ],
-			files: [ mongoose.Types.ObjectId ]
-		},
-		docSchemaOptions
-	)
-)
 
 
 // --------------------------------------------------------------------------
@@ -101,7 +30,12 @@ mongoose.connect(
 		useNewUrlParser: true,
 		useUnifiedTopology: true
 	}
-).then((result)=> {
+).then(result => {
+	return result.connection
+			.collection('fs.files')
+			.ensureIndex('metadata.docId')
+			.then(() => { return result })
+}).then(result => {
 	const db = result.connection
 	var bucket = new mongoose.mongo.GridFSBucket(result.connection.db)
 
@@ -110,8 +44,10 @@ mongoose.connect(
 	const docAsResult = (req, res, next) => {
 		var doc = res.locals.Doc
 
-//		if ('function' typeof person)
 		res.locals.Result = doc.toObject()
+
+		delete res.locals.Result.__v
+
 		next()
 	}
 
@@ -176,67 +112,74 @@ mongoose.connect(
 
 
 	// TODO validation
-	const schemaResolve = (req, res, next) => {
+	const docLoad = (req, res, next) => {
 
-		const sel = {
-			'person': Person,
-			'property': Property
+		models.Doc
+			.findById(req.params.id)
+			.then(
+				result => {
+					console.log('* docLoad:\n', result.toObject())
+					res.locals.Doc = result
+					next()
+				}
+			)
+			.catch(next)
+
+	}
+
+	// TODO validation
+	const docUpdate = (req, res, next) => {
+
+		const skip = {
+			'_id': true,
+			'__v': true,
+			'kind': true,
+			'time': true,
+			'id': true,
+			'kind': true
 		}
 
-		const sName = req.params.schema
-		res.locals.Schema = sel[sName] || Doc
+		Object.keys(res.locals.Doc.schema.tree).forEach(k => {
+
+			if (skip[k]) {
+				return
+			}
+
+			res.locals.Doc[k] = req.body[k]
+		})
+
+		console.log(res.locals.Doc)
 
 		next()
 	}
 
+	const schemaResolve = (req, res, next) => {
 
-	// TODO validation
-	const docLoad = (req, res, next) => {
+		const sName = req.params.schema || req.body.kind
 
-		console.log('>>>', res.locals.Schema);
+		const sel = {
+			'person': models.Person,
+			'property': models.Property,
+			'contract': models.Contract
+		}
 
-		res.locals.Schema
-			.findById(req.params.id)
-			.then(
-				result => {
-					console.log('* docLoad:', result.toObject())
-					res.locals.Doc = result
-					next()
-				}
-			).catch(next)
+		res.locals.Schema = sel[sName]
+		if (! res.locals.Schema ) {
+			next(Error(`Undefined Schema: ${sName}`))
+			return
+		}
 
-	}
-
-	// TODO validation
-	const docFindByIdAndUpdate = (req, res, next) => {
-
-		delete req.body.files
-
-		res.locals.Schema
-			.findByIdAndUpdate(
-				req.body._id,
-				{
-					$set: req.body
-				}
-			).then(
-				result => {
-					console.log('* findByIdAndUpdate:', result.toObject())
-					res.locals.Doc = result
-					next()
-				}
-			).catch(next)
-
+		next()
 	}
 
 	const docNew = (req, res, next) => {
 
-		delete req.body._id
-
 		try {
-			res.locals.Doc = new res.locals.Schema(req.body)
+			res.locals.Doc = new res.locals.Schema()
 		}
 		catch (err) {
 			next(err)
+			return
 		}
 
 		next()
@@ -255,7 +198,7 @@ mongoose.connect(
 
 	}
 
-	const docUploadFile = (req, res, next) => {
+	const fileUpload = (req, res, next) => {
 
 		const doc = res.locals.Doc
 		const filename = req.params.filename
@@ -267,6 +210,7 @@ mongoose.connect(
 			{
 				contentType: mimetype,
 				metadata: {
+					docId: mongoose.Types.ObjectId(doc.id),
 					lastModified: new Date(req.headers['last-modified']),
 					caption: querystring.unescape(caption)
 				}
@@ -282,9 +226,7 @@ mongoose.connect(
 
 		stream.once('error', next)
 
-		doc.files.push(stream.id)
-
-		console.log('* after docUploadFile:', doc);
+//		console.log('* after docUploadFile:', doc);
 
 		req.pipe(stream)
 
@@ -337,13 +279,10 @@ mongoose.connect(
 	}
 
 	const docDeleteFile = (req, res, next) => {
-		const foid = mongoose.Types.ObjectId(req.params.foid)
+		const file_id = mongoose.Types.ObjectId(req.params.id)
 
-		res.locals.Doc.files = res.locals.Doc.files.filter(arg => {
-			return arg.toString() !== foid.toString()
-		})
+		bucket.delete(file_id, next)
 
-		bucket.delete(foid, next)
 	}
 
 	const postFileMeta = (req, res, next) => {
@@ -354,7 +293,6 @@ mongoose.connect(
 		const allowed = {
 			'caption': String
 		}
-
 
 		const contentType = req.headers['content-type']
 
@@ -372,7 +310,12 @@ mongoose.connect(
 
 		req.body['lastModified'] = new Date()
 
-		console.log('metadata', req.body);
+		console.log('metadata::', req.body);
+
+		const set = {}
+		for (let [k, v] of Object.entries(req.body)) {
+			set[`metadata.${k}`] = v
+		}
 
 		db.collection('fs.files')
 		.updateOne(
@@ -380,9 +323,7 @@ mongoose.connect(
 				_id: oid
 			},
 			{
-				$set: {
-					metadata: req.body
-				}
+				$set: set
 			}
 		).then(result => {
 
@@ -398,6 +339,26 @@ mongoose.connect(
 		}).catch(next)
 	}
 
+	const getFilesList = (req, res, next) => {
+
+		db.collection('fs.files').find(
+			{
+				'metadata.docId': res.locals.Doc._id
+			}
+		)
+		.toArray()
+		.then(
+			result => {
+
+				res.locals.Result =
+						result.map(el => { return el._id })
+
+				next()
+			}
+		).catch(next)
+
+	}
+
 // --------------------------------------------------------------------------
 
 	app.get('/f/:id',
@@ -408,52 +369,58 @@ mongoose.connect(
 		postFileMeta
 	)
 
-	app.get('/:schema/list',
+	app.delete('/f/:id',
+		docDeleteFile,
+		sendResultJSON
+	)
+
+	// FIXME change POST to PUT, :filename to header
+	app.post('/f/:id/upload/:filename',
+		docLoad,
+		fileUpload,
+		sendResultJSON
+	)
+
+	// --------------------------------------------------------------------------
+
+	app.get('/person/events',
+		docEvents,
+		sendResultJSON
+	)
+
+	// --------------------------------------------------------------------------
+
+	app.get('/list/:schema',
 		schemaResolve,
 		docList,
 		sendResultJSON
 	)
 
-	app.get('/:schema/events',
-		schemaResolve,
-		docEvents,
-		sendResultJSON
-	)
-
-	app.get('/:schema/:id',
-		schemaResolve,
+	app.get('/doc/:id',
 		docLoad,
 		docAsResult,
 		sendResultJSON
 	)
 
-	app.post('/:schema',
-		schemaResolve,
-		docFindByIdAndUpdate,
-		docAsResult,
+	app.get('/doc/:id/files',
+		docLoad,
+		getFilesList,
 		sendResultJSON
 	)
 
-	app.put('/:schema',
+	app.post('/doc/:id',
+		docLoad,
+		docUpdate,
+		docAsResult,
+		docSave,
+		sendResultJSON
+	)
+
+	app.put('/doc',
 		schemaResolve,
 		docNew,
+		docUpdate,
 		docAsResult,
-		docSave,
-		sendResultJSON
-	)
-
-	app.post('/:schema/:id/upload/:filename',
-		schemaResolve,
-		docLoad,
-		docUploadFile,
-		docSave,
-		sendResultJSON
-	)
-
-	app.delete('/:schema/:id/file/:foid',
-		schemaResolve,
-		docLoad,
-		docDeleteFile,
 		docSave,
 		sendResultJSON
 	)

@@ -13,7 +13,7 @@
 					v-for="p in person"
 					v-bind:class="{ 'strike': p.status }"
 					v-bind:key="p._id">
-					<router-link :to="{ name: 'person_edit', params: { id: p._id }}">
+					<router-link :to="{ name: 'person_edit', params: { id: p._id}}">
 						<div>{{ p.lastName }} {{ p.firstName }} {{ p.middleName }}</div>
 					</router-link>
 				</li>
@@ -21,7 +21,7 @@
 		</div>
 
 		<div class="person-data">
-			<router-view key="person-data"></router-view>
+			<router-view :key="$route.fullPath"></router-view>
 		</div>
 
 	</div>
@@ -66,6 +66,7 @@
 <script>
 
 	export default {
+		name: 'person',
 		data () {
 			return  {
 				person: [
@@ -89,7 +90,7 @@
 		},
 		methods: {
 			updateModel () {
-				this.$http.get('/person/list').then((response) => {
+				this.$http.get('/list/person').then((response) => {
 					this.person = Object.assign({}, this.person, response.body)
 				}).catch((err) => {
 					console.error(err)
