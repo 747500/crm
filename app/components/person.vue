@@ -1,48 +1,25 @@
 
 <template>
-	<div class="person">
-
-		<div class="person-list">
-			<ul>
-				<li class="create">
-					<router-link :to="{ name: 'person_edit', params: { id: 'new' }}">
-						<div>Новая запись</div>
-					</router-link>
-				</li>
-				<li
-					v-for="p in person"
-					v-bind:class="{ 'strike': p.status }"
-					v-bind:key="p._id">
-					<router-link :to="{ name: 'person_edit', params: { id: p._id}}">
-						<div>{{ p.lastName }} {{ p.firstName }} {{ p.middleName }}</div>
-					</router-link>
-				</li>
-			</ul>
-		</div>
-
-		<div class="person-data">
-			<router-view :key="$route.fullPath"></router-view>
-		</div>
-
+	<div class="person-list">
+		<ul>
+			<li class="create">
+				<router-link :to="{ name: 'person_edit', params: { id: 'new' }}">
+					<div>Новая запись</div>
+				</router-link>
+			</li>
+			<li
+				v-for="p in list"
+				v-bind:class="{ 'strike': p.status }"
+				v-bind:key="p._id">
+				<router-link :to="{ name: 'person_edit', params: { id: p._id}}">
+					<div>{{ p.lastName }} {{ p.firstName }} {{ p.middleName }}</div>
+				</router-link>
+			</li>
+		</ul>
 	</div>
 </template>
 
 <style>
-
-.person {
-	display: flex;
-	margin: 0;
-	padding: 0;
-}
-
-.person-data {
-	flex: 20;
-	border: left 1px solid gray;
-}
-
-.person-list {
-	flex: 10;
-}
 
 .person-list ul {
 	border-left : 1px solid gray;
@@ -67,35 +44,11 @@
 
 	export default {
 		name: 'person',
-		data () {
-			return  {
-				person: [
-				]
-			}
+		model: {
+			prop: 'list'
 		},
-		beforeRouteEnter (to, from, next) {
-			next(vm => {
-				vm.updateModel()
-			})
-		},
-		beforeRouteUpdate (to, from, next) {
-			this.$nextTick(() => {
-				this.updateModel()
-			})
-			next()
-		},
-		created () {
-		},
-		mounted () {
-		},
-		methods: {
-			updateModel () {
-				this.$http.get('/list/person').then((response) => {
-					this.person = Object.assign({}, this.person, response.body)
-				}).catch((err) => {
-					console.error(err)
-				})
-			}
+		props: {
+			list: Array
 		}
 	};
 

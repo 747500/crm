@@ -8,7 +8,8 @@ import VueRouter from 'vue-router'
 
 import calendar from './components/calendar.vue'
 
-import person from './components/person.vue'
+import doc from './components/doc.vue'
+
 import person_edit from './components/person_edit.vue'
 
 //import property from './components/property.vue'
@@ -29,7 +30,7 @@ const routes = [
 		title: 'Люди',
 		name: 'person',
 		path: '/person',
-		component: person,
+		component: doc,
 		children: [
 			{
 				name: 'person_edit',
@@ -38,7 +39,8 @@ const routes = [
 			}
 		]
 	},
-/*	{
+	/*
+	{
 		title: 'Собственность',
 		name: 'property',
 		path: '/property',
@@ -50,7 +52,8 @@ const routes = [
 				component: property_edit,
 			}
 		]
-	}*/
+	}
+	*/
 ]
 
 export default new VueRouter({ routes })

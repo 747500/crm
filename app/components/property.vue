@@ -87,7 +87,7 @@
 		},
 		methods: {
 			updateModel () {
-				this.$http.get('/property/list').then((response) => {
+				this.$http.get('/list/property').then((response) => {
 					console.log(response.body)
 					this.property = Object.assign({}, response.body)
 				}).catch((err) => {
