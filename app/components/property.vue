@@ -25,7 +25,6 @@
 <style>
 
 .property-list ul {
-	border-left : 1px solid gray;
 	margin-top: 0;
 	margin-bottom: 0;
 	padding-top: 0.33em;

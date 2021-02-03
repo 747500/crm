@@ -42,7 +42,7 @@ const Person = Doc.discriminator(
 			lastName: String,
 			middleName: String,
 			birthDay: Date,
-			passport: Text,
+			passport: Text
 		},
 		docSchemaOptions
 	)
@@ -69,6 +69,8 @@ const Contract = Doc.discriminator(
 		docSchemaOptions
 	)
 )
+
+//console.log(mongoose.modelSchemas)
 
 export default {
 	Doc,

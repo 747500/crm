@@ -24,12 +24,6 @@ img {
 	display: block;
 }
 
-.person-edit {
-	padding: 0.5em;
-	border-left: 1px solid gray;
-	display: flex;
-}
-
 .person-edit .edit-form {
 	flex: 10;
 }

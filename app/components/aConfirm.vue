@@ -1,5 +1,5 @@
 <template>
-	<span>
+	<span class="confirm" :class="{ active: null !== confirm }">
 		<a v-if="confirm" href="" @click.prevent="onCancel">{{ $props.message || 'Cancel' }}</a>
 		<a href="" @click.prevent="onClick"><slot></slot></a>
 	</span>
@@ -15,7 +15,7 @@ export default {
 			required: true
 		},
 		message: {
-			type: String
+			type: String,
 			required: false
 		}
 	},

@@ -26,6 +26,7 @@ const routes = [
 		title: 'Люди',
 		name: 'person',
 		path: '/person',
+		props: true,
 		component: doc,
 		children: [
 			{
@@ -39,6 +40,7 @@ const routes = [
 		title: 'Собственность',
 		name: 'property',
 		path: '/property',
+		props: true,
 		component: doc,
 		children: [
 			{

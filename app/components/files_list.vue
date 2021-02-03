@@ -4,7 +4,11 @@
 	<div>
 
 
-		<div class="item" v-for="(file) in files.slice().reverse()" :key="file.key">
+		<div v-for="(file) in files.slice().reverse()"
+			:key="file.key"
+			:class="{ busy: true == file.busy }"
+			class="item"
+			>
 
 			<div class="img">
 				<iimg :src="file.blob"/>
@@ -22,7 +26,9 @@
 					label="." />
 
 				<div class="tools">
-					<a href="" @click.prevent="() => removeFile(file._id)">Удалить</a>
+					<aConfirm
+						message="Отмена"
+						:onconfirm="() => { removeFile(file) }">Удалить</aConfirm>
 				</div>
 
 			</div>
@@ -32,16 +38,25 @@
 
 </template>
 
+<style>
+
+.busy {
+	outline: 1px dotted red;
+}
+
+</style>
 <script>
 
 import iimg from './iimg.vue'
 import inplaceTextEdit from './inplaceTextEdit.vue'
+import aConfirm from './aConfirm.vue'
 
 export default {
 	name: 'filesList',
 	components: {
 		iimg,
-		inplaceTextEdit
+		inplaceTextEdit,
+		aConfirm
 	},
 	model: {
 		prop: 'oid'
@@ -74,18 +89,22 @@ export default {
 
 
 		},
-		removeFile (fileId) {
-			const docId = this.$props.oid
+		removeFile (file) {
 
-			this.$http.delete(
-				`/f/${fileId}`
-			).then(result => {
+			file.busy = true
 
-				this.files = this.files.filter(file => {
-					return file._id !== fileId
+			this.$http.delete(`/f/${file._id}`)
+			.then(() => {
+
+				this.files = this.files.filter(item => {
+					return file._id !== item._id
 				})
 
-			}).catch(console.error)
+			})
+			.catch(console.error)
+			.finally(() => {
+				file.busy = false
+			})
 
 		}
 	},

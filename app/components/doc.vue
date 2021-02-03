@@ -29,16 +29,16 @@
 .doc {
 	display: flex;
 	margin: 0;
-	padding: 0;
 }
 
 .doc-list {
 	flex: 10;
+	border-left: 1px solid gray;
 }
 
 .doc-view {
 	flex: 20;
-	border: left 1px solid gray;
+	border-left: 1px solid gray;
 }
 
 </style>
