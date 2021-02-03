@@ -3,9 +3,22 @@
 
 	<div class="doc">
 
-		<component class="doc-list" :is="kind" v-model="list"></component>
+		<div class="doc-list">
+			<component :is="kind" v-model="list"></component>
+		</div>
 
-		<router-view class="doc-view" :key="$route.fullPath"></router-view>
+		<div class="doc-view">
+			<header>
+				<header>
+					<button class="button-close" @click="closeHandler">
+						&lt;&lt;
+					</button>
+					<hr/>
+				</header>
+			</header>
+
+			<router-view :key="$route.fullPath"></router-view>
+		</div>
 
 	</div>
 
@@ -33,12 +46,14 @@
 <script>
 
 import person from './person.vue'
+import property from './property.vue'
 
 export default {
 	name: 'doc',
 
 	components: {
-		person
+		person,
+		property
 	},
 
 	data () {
@@ -64,14 +79,22 @@ export default {
 	},
 	methods: {
 		updateModel () {
+			// magic
+			this.kind = this.$route.path.split('/')[1]
 
-			this.$http.get(`/list/${this.kind}`).then((response) => {
+			this.$http.get(`/list/${this.kind}`)
+			.then(response => {
 				console.log('<doc> response', response.body)
 				this.list = response.body
-			}).catch((err) => {
+			})
+			.catch(err => {
 				console.error(err)
 			})
 
+		},
+		closeHandler () {
+			//this.$router.push({ name: 'person' })
+			this.$router.push('.')
 		}
 	}
 }

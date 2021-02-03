@@ -10,8 +10,7 @@
 					</router-link>
 				</li>
 				<li
-					v-for="p in property"
-					v-bind:class="{ 'strike': p.status }"
+					v-for="p in list"
 					v-bind:key="p._id">
 					<router-link :to="{ name: 'property_edit', params: { id: p._id }}">
 						<div>{{ p.address }}</div>
@@ -20,29 +19,10 @@
 			</ul>
 		</div>
 
-		<div class="property-data">
-			<router-view></router-view>
-		</div>
-
 	</div>
 </template>
 
 <style>
-
-.property {
-	display: flex;
-	margin: 0;
-	padding: 0;
-}
-
-.property-data {
-	flex: 20;
-	border: left 1px solid gray;
-}
-
-.property-list {
-	flex: 10;
-}
 
 .property-list ul {
 	border-left : 1px solid gray;
@@ -66,34 +46,12 @@
 <script>
 
 	export default {
-		data () {
-			return  {
-				property: [
-				]
-			}
+		name: 'property',
+		model: {
+			prop: 'list'
 		},
-		beforeRouteEnter (to, from, next) {
-			next(vm => {
-				vm.updateModel()
-			})
-		},
-		beforeRouteUpdate (to, from, next) {
-			this.$nextTick(() => {
-				this.updateModel()
-			})
-			next()
-		},
-		created () {
-		},
-		methods: {
-			updateModel () {
-				this.$http.get('/list/property').then((response) => {
-					console.log(response.body)
-					this.property = Object.assign({}, response.body)
-				}).catch((err) => {
-					console.error(err)
-				})
-			}
+		props: {
+			list: Array
 		}
 	};
 

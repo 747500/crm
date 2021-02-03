@@ -1,19 +1,9 @@
 <template>
 	<div class="person-edit">
 
-		<header>
-			<input
-		        type="button"
-		        label="&lt;&lt;"
-		        class="button-close"
-		        @click="closeHandler"
-		    	/>
-			<hr/>
-		</header>
-
 		<div class="person">
 			<div class="edit-form">
-				<personEditForm
+				<docEditForm
 					:oid="docId"
 					/>
 			</div>
@@ -37,6 +27,15 @@ img {
 .person-edit {
 	padding: 0.5em;
 	border-left: 1px solid gray;
+	display: flex;
+}
+
+.person-edit .edit-form {
+	flex: 10;
+}
+
+.person-edit .files {
+	flex: 20;
 }
 
 .person-edit .person {
@@ -91,23 +90,13 @@ img {
 
 <script>
 
-	import personSchema from './person_edit_schema.mjs'
-
-	import Vue from 'vue'
-
-	//import iimg from './iimg.vue'
-	//Vue.component('iimg', iimg)
-
-	//import inplaceTextEdit from './inplaceTextEdit.vue'
-	//Vue.component('inplaceTextEdit', inplaceTextEdit)
-
-	import personEditForm from './person_edit_form.vue'
+	import docEditForm from './doc_edit_form.vue'
 	import personFiles from './person_files.vue'
 
 	export default {
 		name: 'personEdit',
 		components: {
-			personEditForm,
+			docEditForm,
 			personFiles
 		},
 		data () {
@@ -125,12 +114,12 @@ img {
 		},
 		beforeRouteEnter (to, from, next) {
 			next(vm => {
-				vm.updateModel(vm)
+				vm.updateModel()
 			})
 		},
 		beforeRouteUpdate (to, from, next) {
 			this.$nextTick(() => {
-				this.updateModel(this)
+				this.updateModel()
 			})
 			next()
 		},
@@ -146,18 +135,11 @@ img {
 		},
 		mounted () {
 
-//			this.$nextTick(() => {
-//			})
-
 		},
 		methods: {
-			updateModel (vm) {
+			updateModel () {
 //				console.log('<person_edit> updateModel', this.$route.params.id)
 			},
-			closeHandler () {
-				//this.$router.push({ name: 'person' })
-				this.$router.push('.')
-			}
 		}
 	}
 

@@ -37,7 +37,7 @@
 					<div v-if="task.p">{{ task.p }}</div>
 					<div><input type="text" v-model="task.caption"/></div>
 					<div class="tools">
-						<a href="" @click.prevent="() => { removeEl(n) }">Убрать...</a>
+						<a href="" @click.prevent="() => { queueRemove(n) }">Убрать...</a>
 					</div>
 				</div>
 			</div>

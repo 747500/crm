@@ -9,11 +9,7 @@ import VueRouter from 'vue-router'
 import calendar from './components/calendar.vue'
 
 import doc from './components/doc.vue'
-
-import person_edit from './components/person_edit.vue'
-
-//import property from './components/property.vue'
-//import property_edit from './components/property_edit.vue'
+import doc_edit from './components/doc_edit.vue'
 
 // --------------------------------------------------------------------------
 
@@ -35,25 +31,23 @@ const routes = [
 			{
 				name: 'person_edit',
 				path: ':id',
-				component: person_edit,
+				component: doc_edit,
 			}
 		]
 	},
-	/*
 	{
 		title: 'Собственность',
 		name: 'property',
 		path: '/property',
-		component: property,
+		component: doc,
 		children: [
 			{
 				name: 'property_edit',
 				path: ':id',
-				component: property_edit,
+				component: doc_edit,
 			}
 		]
 	}
-	*/
 ]
 
 export default new VueRouter({ routes })

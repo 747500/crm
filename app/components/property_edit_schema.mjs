@@ -1,6 +1,7 @@
 
 export default [
     {
+        class: "oid",
         name: '_id',
         type: 'text',
         label: 'ID',
