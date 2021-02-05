@@ -47,13 +47,15 @@
 
 import person from './person.vue'
 import property from './property.vue'
+import contract from './contract.vue'
 
 export default {
 	name: 'doc',
 
 	components: {
 		person,
-		property
+		property,
+		contract
 	},
 
 	data () {
@@ -62,14 +64,21 @@ export default {
 			list: []
 		}
 	},
+
+	on: {
+		listChange (event) {
+			console.log('<doc.vue> on listChange', event)
+		}
+	},
+
 	beforeRouteEnter (to, from, next) {
 		next(vm => {
-			vm.updateModel()
+			vm.updateModel(to, from)
 		})
 	},
 	beforeRouteUpdate (to, from, next) {
 		this.$nextTick(() => {
-			this.updateModel()
+			this.updateModel(to, from)
 		})
 		next()
 	},

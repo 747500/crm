@@ -8,19 +8,20 @@
 			/>
 	</div>
 
-
 </template>
 
 <script>
 
 import moment from 'moment'
 
-import personSchema from './person_edit_schema.mjs'
-import propertySchema from './property_edit_schema.mjs'
+import personSchema from './schema/person.js'
+import propertySchema from './schema/property.js'
+import contractSchema from './schema/contract.js'
 
 const docSchema = {
 	person: personSchema,
-	property: propertySchema
+	property: propertySchema,
+	contract: contractSchema
 }
 
 export default {
@@ -48,19 +49,7 @@ export default {
 			        class: 'oid'
 			    }
 			]
-
 		}
-	},
-	beforeRouteEnter (to, from, next) {
-		next(vm => {
-			vm.updateModel()
-		})
-	},
-	beforeRouteUpdate (to, from, next) {
-		this.$nextTick(() => {
-			this.updateModel()
-		})
-		next()
 	},
 	methods: {
 		submitHandler (formData) {
@@ -83,13 +72,14 @@ export default {
 				console.error('<doc_edit_form> submitHandler', err)
 			})
 
-		},
-		updateModel() {
-		//	console.log('<doc_edit_form> updateModel', this.$props.oid)
 		}
 	},
 	created () {
 		//console.log('<doc_edit_form> created', this.$props.oid)
+
+		const kind = this.$route.path.split('/')[1]
+		this.model.kind = kind
+		this.schema = docSchema[kind]
 
 		const docId = this.$props.oid
 
@@ -100,16 +90,12 @@ export default {
 
 				const doc = Object.assign({}, response.body)
 
+				// FIXME - dirty schemaless hack
 				if (response.body.birthDay) {
 					doc.birthDay = moment(response.body.birthDay).format('YYYY-MM-DD')
 				}
 
 				this.model = doc
-
-				this.$nextTick(() => {
-					this.schema = docSchema[doc.kind]
-				})
-
 
 				console.log('<doc_edit_form> updateModel', this.model)
 			})
@@ -118,7 +104,6 @@ export default {
 			})
 
 		}
-
 	}
 }
 

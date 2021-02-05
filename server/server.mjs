@@ -13,33 +13,148 @@ import mongoose from 'mongoose'
 mongoose.Promise = global.Promise
 import models from './db_schema.mjs'
 
+import SphinxClient from 'sphinxapi'
 
 const app = express()
 const port = 3000
 app.use(morgan('dev'))
-app.use(express.json())
 app.use(bodyParser.text())
+app.use(express.json())
 app.use(bodyParser.json())
 
+// ==========================================================================
+
+const SubSystems = [
+
+	// --------------------------------------------------------------------------
+
+	{
+		name: 'docs',
+		init () {
+			return mongoose.connect(
+					'mongodb://127.0.0.1:27017/crm',
+					{
+						useNewUrlParser: true,
+						useUnifiedTopology: true
+					}
+				)
+		}
+
+	},
+
+	// ----------------------------------------------------------------------
+
+	{
+		name: 'files',
+		init () {
+			return new Promise((resolve, reject) => {
+					const connection = this.docs.connection
+
+					const collection = connection.collection('fs.files')
+					const bucket = new mongoose.mongo.GridFSBucket(connection.db)
+
+					const ok = collection.ensureIndex('metadata.docId')
+						.then(() => {
+							return { collection, bucket }
+						})
+
+					resolve(ok)
+				})
+		}
+	},
+
+	// ----------------------------------------------------------------------
+
+	{
+		name: 'sphinx',
+		init () {
+			return new Promise((resolve, reject) => {
+
+					var cl = new SphinxClient()
+
+					cl.SetServer('127.0.0.1', 9312)
+
+					cl.Status((err, result) => {
+						if (err) {
+							reject(err)
+							return
+						}
+						resolve(cl)
+					})
+				})
+		}
+	}
+
+	// ----------------------------------------------------------------------
+
+]
 
 // --------------------------------------------------------------------------
 
-mongoose.connect(
-	'mongodb://127.0.0.1:27017/crm',
-	{
-		useNewUrlParser: true,
-		useUnifiedTopology: true
-	}
-).then(result => {
-	return result.connection
-			.collection('fs.files')
-			.ensureIndex('metadata.docId')
-			.then(() => { return result })
-}).then(result => {
-	const db = result.connection
-	var bucket = new mongoose.mongo.GridFSBucket(result.connection.db)
+function runService (service) {
 
-	console.log('DB connected')
+	console.log('sss start:', service.name);
+
+	return service.init.bind(this)().then(
+		result => {
+			console.log(`sss "${service.name}" init ok`);
+			service.endpoint = result
+			return result
+		}
+	)
+}
+
+function sssInit () {
+	const sss = {}
+
+	return SubSystems.reduce(
+		(ok, s) => ok.then(() => {
+			return runService.bind(sss)(s).then(() => {
+				sss[s.name] = s.endpoint
+			})
+		}),
+		Promise.resolve()
+	)
+	.then(result => {
+		console.log('sss init ok:', Object.keys(sss))
+		return sss;
+	})
+}
+
+sssInit().then(sss => {
+
+// ==========================================================================
+
+	const search = (req, res, next) => {
+
+		console.log('<search>', req.body)
+
+		const searchString = req.body.q
+
+		models.Person
+		.find({
+			$text: {
+				$search: searchString,
+				$language: 'ru'
+			}
+		})
+    	//.skip(20)
+		.limit(10)
+		.exec(function(err, result) {
+			if (err) {
+				next(err)
+				return
+			}
+
+			console.log('<search> result', result)
+
+			res.send(result)
+
+		});
+
+	}
+
+// --------------------------------------------------------------------------
 
 	const docAsResult = (req, res, next) => {
 		var doc = res.locals.Doc
@@ -135,8 +250,7 @@ mongoose.connect(
 			'__v': true,
 			'kind': true,
 			'time': true,
-			'id': true,
-			'kind': true
+			'id': true
 		}
 
 		Object.keys(res.locals.Doc.schema.tree).forEach(k => {
@@ -205,7 +319,7 @@ mongoose.connect(
 		const mimetype = req.headers['content-type']
 		const caption = req.headers['x-meta-caption']
 
-		var stream = bucket.openUploadStream(
+		var stream = sss.files.bucket.openUploadStream(
 			filename,
 			{
 				contentType: mimetype,
@@ -236,7 +350,7 @@ mongoose.connect(
 
 		const oid = mongoose.Types.ObjectId(req.params.id)
 
-		db.collection('fs.files').findOne({ _id: oid }).then(fileinfo => {
+		sss.files.collection.findOne({ _id: oid }).then(fileinfo => {
 
 			if (null === fileinfo) { // 404
 				next()
@@ -269,7 +383,7 @@ mongoose.connect(
 				'X-Meta-Caption': caption
 			})
 
-			const stream = bucket.openDownloadStream(oid)
+			const stream = sss.files.bucket.openDownloadStream(oid)
 
 			stream.once('error', next)
 
@@ -281,7 +395,7 @@ mongoose.connect(
 	const docDeleteFile = (req, res, next) => {
 		const file_id = mongoose.Types.ObjectId(req.params.id)
 
-		bucket.delete(file_id, next)
+		sss.files.bucket.delete(file_id, next)
 
 	}
 
@@ -317,8 +431,7 @@ mongoose.connect(
 			set[`metadata.${k}`] = v
 		}
 
-		db.collection('fs.files')
-		.updateOne(
+		sss.files.collection.updateOne(
 			{
 				_id: oid
 			},
@@ -341,7 +454,7 @@ mongoose.connect(
 
 	const getFilesList = (req, res, next) => {
 
-		db.collection('fs.files').find(
+		sss.files.collection.find(
 			{
 				'metadata.docId': res.locals.Doc._id
 			}
@@ -358,6 +471,12 @@ mongoose.connect(
 		).catch(next)
 
 	}
+
+// ==========================================================================
+
+	app.post('/s',
+		search
+	)
 
 // --------------------------------------------------------------------------
 
@@ -427,12 +546,13 @@ mongoose.connect(
 
 	app.use(express.static('public'))
 
+// ==========================================================================
+
 	app.listen(port, () => {
 	  console.log(`Example app listening at http://localhost:${port}`)
 	})
 
 // --------------------------------------------------------------------------
-
 
 }).catch(err => {
 	console.error(err)

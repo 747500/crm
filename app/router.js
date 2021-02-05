@@ -6,6 +6,7 @@ import VueRouter from 'vue-router'
 
 // --------------------------------------------------------------------------
 
+import browser from './components/browser.vue'
 import calendar from './components/calendar.vue'
 
 import doc from './components/doc.vue'
@@ -16,6 +17,12 @@ import doc_edit from './components/doc_edit.vue'
 Vue.use(VueRouter)
 
 const routes = [
+	{
+		title: 'Поиск',
+		name: 'browse',
+		path: '/browse',
+		component: browser
+	},
 	{
 		title: 'Календарь',
 		name: 'calendar',
@@ -45,6 +52,20 @@ const routes = [
 		children: [
 			{
 				name: 'property_edit',
+				path: ':id',
+				component: doc_edit,
+			}
+		]
+	},
+	{
+		title: 'Сделки',
+		name: 'contract',
+		path: '/contract',
+		props: true,
+		component: doc,
+		children: [
+			{
+				name: 'contract_edit',
 				path: ':id',
 				component: doc_edit,
 			}

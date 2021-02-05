@@ -2,19 +2,13 @@
 	<div class="person-edit">
 
 		<div class="person">
-			<div class="edit-form">
-				<docEditForm
-					:oid="docId"
-					/>
-			</div>
 
-			<div class="files">
-				<personFiles
-					:oid="docId"
-					/>
-			</div>
+			<docEditForm :oid="docId" class="edit-form" />
+
+			<filesPanel v-if="docId" :oid="docId" class="files" />
 
 		</div>
+
 	</div>
 </template>
 
@@ -39,15 +33,15 @@ img {
 	width: 100%;
 }
 
-.person-edit .person > div {
+.person > div {
 	padding: 0.5em;
 }
 
-.person-edit .person .edit-form {
+.person .edit-form {
 	flex: 10;
 }
 
-.person-edit .person .edit-upload {
+.person .edit-upload {
 	flex: 20;
 }
 
@@ -55,24 +49,33 @@ img {
 	flex: 1;
 }
 
-.person-edit .list .item {
-	padding: 0.25em;
-	background-color: #eee;
+.files .list {
+	margin-top: 1em;
+}
 
+.files .list .item {
+	margin: 0.5em 0;
+	padding: 0.5em;
+	background-color: #faebd7;
+	border-radius: 1em;
 	display: flex;
 }
 
-.person-edit .list .text {
+.files .queue .list .item {
+	background-color: #c0ffee;
+}
+
+.files .list .text {
 	padding: 0.25em;
 }
 
-.person-edit .list .text > div {
+.files .list .text > div {
 	padding: 0.25em;
 	flex: 1;
 	font-size: smaller;
 }
 
-.person-edit .list .item img {
+.files .list .item img {
   object-fit: cover;
   width: 9em;
   height: 9em;
@@ -85,13 +88,13 @@ img {
 <script>
 
 	import docEditForm from './doc_edit_form.vue'
-	import personFiles from './person_files.vue'
+	import filesPanel from './files_panel.vue'
 
 	export default {
 		name: 'personEdit',
 		components: {
 			docEditForm,
-			personFiles
+			filesPanel
 		},
 		data () {
 		    return {
@@ -106,19 +109,8 @@ img {
 		},
 		computed: {
 		},
-		beforeRouteEnter (to, from, next) {
-			next(vm => {
-				vm.updateModel()
-			})
-		},
-		beforeRouteUpdate (to, from, next) {
-			this.$nextTick(() => {
-				this.updateModel()
-			})
-			next()
-		},
 		created () {
-			console.log('<person_edit> created', this.$route.params.id)
+			//console.log('<doc_edit> created', this.$props.id)
 
 			this.docId = this.$route.params.id;
 
@@ -131,9 +123,6 @@ img {
 
 		},
 		methods: {
-			updateModel () {
-//				console.log('<person_edit> updateModel', this.$route.params.id)
-			},
 		}
 	}
 

@@ -25,7 +25,7 @@
 				>Загрузить</button>
 		</div>
 
-		<div v-if="queue.length > 0" class="queue list" style="margin: 1em;">
+		<div v-if="queue.length > 0" class="list">
 			<div class="item" v-for="(task, n) in queue" :key="task.key">
 				<div class="img">
 					<iimg :src="task.file" />
@@ -53,7 +53,7 @@ import async from 'async'
 import iimg from './iimg.vue'
 
 export default {
-	name: 'fileUploadQueue',
+	name: 'filesUpload',
 	components: {
 		iimg
 	},
@@ -78,6 +78,11 @@ export default {
 		queueRemove (n) {
 			this.queue[n] = false;
 			this.queue = this.queue.filter(v => { return v })
+
+			if (0 === this.queue.length) {
+				this.$emit('active', false)
+			}
+
 		},
 
 		updateQueue (event) {

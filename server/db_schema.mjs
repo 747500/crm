@@ -25,50 +25,86 @@ const docSchemaOptions = {
 	discriminatorKey: 'kind'
 }
 
-const docSchema = new mongoose.Schema(
+const DocSchema = new mongoose.Schema(
 	{
 		time: Date
 	},
 	docSchemaOptions
 );
 
-const Doc = mongoose.model('Doc', docSchema)
+DocSchema.index(
+    {
+        'firstName': 'text',
+        'lastName': 'text',
+        'middleName': 'text',
+        'description': 'text',
+        'address': 'text'
+
+    }, {
+        name: 'doc_text'
+    }
+)
+
+const Doc = mongoose.model('Doc', DocSchema)
+
+// --------------------------------------------------------------------------
+
+const PersonSchema = new mongoose.Schema(
+    {
+        firstName: String,
+        lastName: String,
+        middleName: String,
+        birthDay: Date,
+        passport: Text
+    },
+    docSchemaOptions
+)
+
+PersonSchema.index({ '$**': 'text' }, { name: 'person_text' })
 
 const Person = Doc.discriminator(
 	'person',
-	new mongoose.Schema(
-		{
-			firstName: String,
-			lastName: String,
-			middleName: String,
-			birthDay: Date,
-			passport: Text
-		},
-		docSchemaOptions
-	)
+    PersonSchema
 )
+
+// --------------------------------------------------------------------------
+
+const PropertySchema = 	new mongoose.Schema(
+	{
+		address: String,
+		description: Text,
+	},
+	docSchemaOptions
+)
+
+PropertySchema.index({'$**': 'text'}, { name: 'property_text' })
 
 const Property = Doc.discriminator(
 	'property',
-	new mongoose.Schema(
-		{
-			address: String,
-			description: Text,
-		},
-		docSchemaOptions
-	)
+    PropertySchema
 )
+
+// --------------------------------------------------------------------------
+
+const ContractSchema = new mongoose.Schema(
+    {
+        title: String,
+        description: Text,
+        property: mongoose.Types.ObjectId,
+        person: [ mongoose.Types.ObjectId ],
+    },
+    docSchemaOptions
+)
+
+ContractSchema.index({'$**': 'text'}, { name: 'contract_text' })
 
 const Contract = Doc.discriminator(
 	'contract',
-	new mongoose.Schema(
-		{
-			property: mongoose.Types.ObjectId,
-			person: [ mongoose.Types.ObjectId ],
-		},
-		docSchemaOptions
-	)
+    ContractSchema
 )
+
+
+// --------------------------------------------------------------------------
 
 //console.log(mongoose.modelSchemas)
 

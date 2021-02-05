@@ -124,7 +124,9 @@ export default {
 		return this.$http
 			.get(`/doc/${docId}/files`)
 			.then(response => {
-console.log('<files_list> created:', response)
+
+				//console.log('<files_list> created:', response)
+
 				this.files = response.body.map(oid => {
 					return {
 						_id: oid,
