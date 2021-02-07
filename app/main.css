@@ -40,3 +40,16 @@ pre {
 	border: none;
 	color: gray;
 }
+
+a {
+	color: #194b4f;
+	/*
+	#926aa6;
+	#064a89;
+	*/
+}
+
+a:visited {
+	color: #234f53;
+
+}

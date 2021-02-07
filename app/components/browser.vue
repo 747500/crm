@@ -3,19 +3,42 @@
 	<div class="browser">
 
 		<div class="query">
-			<input
-				ref="search"
-				v-model="search"
-				type="text"
-				@keyup.enter="searchInput"
-				/>
-				<!-- @input="searchInput" -->
+			<div>
+				<input
+					ref="search"
+					v-model="search"
+					type="text"
+					@keyup.enter="searchInput"
+					@input="searchInput"
+					/><input type="button" value="🔍" @click="searchInput"/>
+			</div>
+
+			<div>
+				<label>
+					Люди
+					<input v-model="kinds" type="checkbox" name="kind" value="person" checked />
+				</label>
+
+				<label>
+					Собственность
+					<input v-model="kinds" type="checkbox" name="kind" value="property" checked />
+				</label>
+
+				<label>
+					Сделки
+					<input v-model="kinds" type="checkbox" name="kind" value="contract" checked />
+				</label>
+			</div>
+
+			<div>
+				<span>{{ result.length }} results found</span>
+			</div>
 		</div>
 
-		<div class="list">
-			<browserList v-model="result" v-slot:default="sp">
+		<div class="result">
+			<browserList class="list" v-model="result" v-slot:default="props">
 				<div class="item">
-					<pre>{{ sp }}</pre>
+					<doc :oid="props.item.attrs.oid" />
 				</div>
 			</browserList>
 		</div>
@@ -44,26 +67,41 @@
 
 import browserList from './browser_list.vue'
 
+import doc from './M/doc.vue'
+
 export default {
 	name: 'browser',
 	components: {
-		browserList
+		browserList,
+		doc
 	},
 	data () {
 		return {
+			kinds: [],
 			search: '',
-			result: []
+			result: [],
+			slotProps: { a: 'b' }
 		}
+	},
+	created () {
+		this.searchInput()
 	},
 	methods: {
 
-		searchInput (event) {
-			console.log(this.search, event)
+		searchInput () {
+			this.result = []
 
-			this.$http.post('/s', { q: this.search })
+			this.$http.post('/s',
+				{
+					q: this.search,
+					kind: this.kinds
+				}
+			)
 			.then(response => {
+
+				console.log('+++++', response)
+
 				this.result = response.body
-				console.log('+++++', this.result.length)
 			})
 			.catch(err => {
 				console.error(err)

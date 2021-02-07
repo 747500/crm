@@ -66,7 +66,14 @@ export default {
 			}
 
 			ok.then(response => {
+				//this.key = `${response.body._id}-${response.body.__v}`
 				this.model = response.body
+
+				// FIXME - dirty schemaless hack
+				if (response.body.birthDay) {
+					this.model.birthDay = moment(response.body.birthDay).format('YYYY-MM-DD')
+				}
+
 				console.log('<doc_edit_form> submitHandler', response)
 			}).catch((err) => {
 				console.error('<doc_edit_form> submitHandler', err)

@@ -3,17 +3,17 @@ import mongoose from 'mongoose'
 // --------------------------------------------------------------------------
 
 class Text extends mongoose.SchemaType {
-  constructor(key, options) {
-    super(key, options, 'Text');
-  }
+    constructor(key, options) {
+        super(key, options, 'Text');
+    }
 
-  // `cast()` takes a parameter that can be anything. You need to
-  // validate the provided `val` and throw a `CastError` if you
-  // can't convert it.
-  cast(val) {
-    let _val = String(val);
-    return _val;
-  }
+    // `cast()` takes a parameter that can be anything. You need to
+    // validate the provided `val` and throw a `CastError` if you
+    // can't convert it.
+    cast(val) {
+        let _val = String(val);
+        return _val;
+    }
 }
 
 // Don't forget to add `Int8` to the type registry
@@ -22,7 +22,11 @@ mongoose.Schema.Types.Text = Text;
 // --------------------------------------------------------------------------
 
 const docSchemaOptions = {
-	discriminatorKey: 'kind'
+	discriminatorKey: 'kind',
+    timestamps: {
+        createdAt: 'ctime',
+        updatedAt: 'mtime'
+    }
 }
 
 const DocSchema = new mongoose.Schema(
@@ -32,18 +36,24 @@ const DocSchema = new mongoose.Schema(
 	docSchemaOptions
 );
 
-DocSchema.index(
-    {
-        'firstName': 'text',
-        'lastName': 'text',
-        'middleName': 'text',
-        'description': 'text',
-        'address': 'text'
+DocSchema.virtual('fts').get(function (a) {
+    const fts = []
 
-    }, {
-        name: 'doc_text'
-    }
-)
+//    console.log('doc>', this)
+
+    Object.keys(this._doc).map(k => {
+        if ('kind' === k)
+            return
+
+        if ('string' === typeof this[k]) {
+            fts.push(this._doc[k])
+        }
+    })
+
+//    console.log('\t', fts)
+
+    return fts.join(' ')
+})
 
 const Doc = mongoose.model('Doc', DocSchema)
 
@@ -55,12 +65,10 @@ const PersonSchema = new mongoose.Schema(
         lastName: String,
         middleName: String,
         birthDay: Date,
-        passport: Text
+        passport: String
     },
     docSchemaOptions
 )
-
-PersonSchema.index({ '$**': 'text' }, { name: 'person_text' })
 
 const Person = Doc.discriminator(
 	'person',
@@ -72,12 +80,10 @@ const Person = Doc.discriminator(
 const PropertySchema = 	new mongoose.Schema(
 	{
 		address: String,
-		description: Text,
+		description: String,
 	},
 	docSchemaOptions
 )
-
-PropertySchema.index({'$**': 'text'}, { name: 'property_text' })
 
 const Property = Doc.discriminator(
 	'property',
@@ -89,14 +95,12 @@ const Property = Doc.discriminator(
 const ContractSchema = new mongoose.Schema(
     {
         title: String,
-        description: Text,
+        description: String,
         property: mongoose.Types.ObjectId,
         person: [ mongoose.Types.ObjectId ],
     },
     docSchemaOptions
 )
-
-ContractSchema.index({'$**': 'text'}, { name: 'contract_text' })
 
 const Contract = Doc.discriminator(
 	'contract',

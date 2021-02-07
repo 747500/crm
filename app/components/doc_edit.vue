@@ -62,7 +62,7 @@ img {
 }
 
 .files .queue .list .item {
-	background-color: #c0ffee;
+	background-color: #b9c97b; /* #c0ffee; */
 }
 
 .files .list .text {

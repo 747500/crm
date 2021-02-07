@@ -6,7 +6,7 @@ import moment from 'moment'
 
 import mongoose from 'mongoose'
 mongoose.Promise = global.Promise
-import models from './server/db_schema.mjs'
+import models from './db_schema.mjs'
 
 mongoose.connect(
 	'mongodb://127.0.0.1:27017/crm',
@@ -33,6 +33,7 @@ mongoose.connect(
 		.then(file => {
 
 			if (null === file) {
+				result.disconnect()
 				return { text: 'Not found' }
 			}
 

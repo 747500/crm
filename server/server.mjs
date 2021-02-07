@@ -15,51 +15,32 @@ import models from './db_schema.mjs'
 
 import SphinxClient from 'sphinxapi'
 
-const app = express()
-const port = 3000
-app.use(morgan('dev'))
-app.use(bodyParser.text())
-app.use(express.json())
-app.use(bodyParser.json())
+import mysql from 'mysql'
 
 // ==========================================================================
 
 const SubSystems = [
 
-	// --------------------------------------------------------------------------
-
 	{
-		name: 'docs',
-		init () {
-			return mongoose.connect(
-					'mongodb://127.0.0.1:27017/crm',
-					{
-						useNewUrlParser: true,
-						useUnifiedTopology: true
-					}
-				)
-		}
-
-	},
-
-	// ----------------------------------------------------------------------
-
-	{
-		name: 'files',
+		name: 'sphinxql',
 		init () {
 			return new Promise((resolve, reject) => {
-					const connection = this.docs.connection
 
-					const collection = connection.collection('fs.files')
-					const bucket = new mongoose.mongo.GridFSBucket(connection.db)
+				var connection = mysql.createConnection(
+				    {
+				      localAddress      : '127.0.0.1',
+				      port		: '9306'
+				    }
+				);
 
-					const ok = collection.ensureIndex('metadata.docId')
-						.then(() => {
-							return { collection, bucket }
-						})
-
-					resolve(ok)
+				connection.connect(err => {
+					if (err)
+						reject(err)
+					else
+						resolve(connection)
 				})
+
+			})
 		}
 	},
 
@@ -70,20 +51,80 @@ const SubSystems = [
 		init () {
 			return new Promise((resolve, reject) => {
 
-					var cl = new SphinxClient()
+				var cl = new SphinxClient()
 
-					cl.SetServer('127.0.0.1', 9312)
+				cl.SetServer('127.0.0.1', 9312)
 
-					cl.Status((err, result) => {
-						if (err) {
-							reject(err)
-							return
-						}
-						resolve(cl)
-					})
+				cl.Status((err, result) => {
+					if (err) {
+						reject(err)
+						return
+					}
+					resolve(cl)
 				})
+			})
 		}
-	}
+	},
+
+	// --------------------------------------------------------------------------
+
+	{
+		name: 'web',
+		init () {
+			return new Promise((resolve, reject) => {
+				const app = express()
+				const port = 3000
+				app.use(morgan('dev'))
+				app.use(bodyParser.text())
+				app.use(express.json())
+				app.use(bodyParser.json())
+
+				app
+				.listen(port, () => {
+					resolve(app)
+					console.log(`\tlistening at http://localhost:${port}`)
+				})
+				.on('error', reject)
+
+			})
+		}
+	},
+	// --------------------------------------------------------------------------
+
+	{
+		name: 'docs',
+		init () {
+			return mongoose.connect(
+				'mongodb://127.0.0.1:27017/crm',
+				{
+					useNewUrlParser: true,
+					useUnifiedTopology: true
+				}
+			)
+		}
+
+	},
+
+	// ----------------------------------------------------------------------
+
+	{
+		name: 'files',
+		init () {
+			return new Promise((resolve, reject) => {
+				const connection = this.docs.connection
+
+				const collection = connection.collection('fs.files')
+				const bucket = new mongoose.mongo.GridFSBucket(connection.db)
+
+				const ok = collection.createIndex('metadata.docId')
+					.then(() => {
+						return { collection, bucket }
+					})
+
+				resolve(ok)
+			})
+		}
+	},
 
 	// ----------------------------------------------------------------------
 
@@ -104,10 +145,10 @@ function runService (service) {
 	)
 }
 
-function sssInit () {
+function sssInit (arg) {
 	const sss = {}
 
-	return SubSystems.reduce(
+	return arg.reduce(
 		(ok, s) => ok.then(() => {
 			return runService.bind(sss)(s).then(() => {
 				sss[s.name] = s.endpoint
@@ -121,7 +162,9 @@ function sssInit () {
 	})
 }
 
-sssInit().then(sss => {
+// ==========================================================================
+
+sssInit(SubSystems).then(sss => {
 
 // ==========================================================================
 
@@ -131,6 +174,42 @@ sssInit().then(sss => {
 
 		const searchString = req.body.q
 
+		/*
+		sss.sphinxql.query(
+			'SELECT * FROM testrt WHERE MATCH(?)'
+			[
+				//req.body.kinds,
+				req.body.q
+				//doc.ctime.getTime()
+			],
+			(err, row, fields) => {
+
+				if (err) {
+					console.error(err)
+					return
+				}
+
+				console.log('SELECT', row)
+			}
+		)
+		*/
+		sss.sphinx.SetMatchMode(SphinxClient.SPH_MATCH_EXTENDED)
+
+		sss.sphinx.Query(
+			req.body.q,
+			(err, rows, fields) => {
+				if (err) {
+					next(err)
+					return
+				}
+
+				console.log(rows);
+
+				res.send(rows.matches)
+			}
+		)
+
+/*
 		models.Person
 		.find({
 			$text: {
@@ -151,7 +230,7 @@ sssInit().then(sss => {
 			res.send(result)
 
 		});
-
+*/
 	}
 
 // --------------------------------------------------------------------------
@@ -249,7 +328,6 @@ sssInit().then(sss => {
 			'_id': true,
 			'__v': true,
 			'kind': true,
-			'time': true,
 			'id': true
 		}
 
@@ -474,27 +552,27 @@ sssInit().then(sss => {
 
 // ==========================================================================
 
-	app.post('/s',
+	sss.web.post('/s',
 		search
 	)
 
 // --------------------------------------------------------------------------
 
-	app.get('/f/:id',
+	sss.web.get('/f/:id',
 		getFile
 	)
 
-	app.post('/f/:id',
+	sss.web.post('/f/:id',
 		postFileMeta
 	)
 
-	app.delete('/f/:id',
+	sss.web.delete('/f/:id',
 		docDeleteFile,
 		sendResultJSON
 	)
 
 	// FIXME change POST to PUT, :filename to header
-	app.post('/f/:id/upload/:filename',
+	sss.web.post('/f/:id/upload/:filename',
 		docLoad,
 		fileUpload,
 		sendResultJSON
@@ -502,32 +580,32 @@ sssInit().then(sss => {
 
 	// --------------------------------------------------------------------------
 
-	app.get('/person/events',
+	sss.web.get('/person/events',
 		docEvents,
 		sendResultJSON
 	)
 
 	// --------------------------------------------------------------------------
 
-	app.get('/list/:schema',
+	sss.web.get('/list/:schema',
 		schemaResolve,
 		docList,
 		sendResultJSON
 	)
 
-	app.get('/doc/:id',
+	sss.web.get('/doc/:id',
 		docLoad,
 		docAsResult,
 		sendResultJSON
 	)
 
-	app.get('/doc/:id/files',
+	sss.web.get('/doc/:id/files',
 		docLoad,
 		getFilesList,
 		sendResultJSON
 	)
 
-	app.post('/doc/:id',
+	sss.web.post('/doc/:id',
 		docLoad,
 		docUpdate,
 		docAsResult,
@@ -535,7 +613,7 @@ sssInit().then(sss => {
 		sendResultJSON
 	)
 
-	app.put('/doc',
+	sss.web.put('/doc',
 		schemaResolve,
 		docNew,
 		docUpdate,
@@ -544,16 +622,10 @@ sssInit().then(sss => {
 		sendResultJSON
 	)
 
-	app.use(express.static('public'))
+	sss.web.use(express.static('public'))
 
 // ==========================================================================
 
-	app.listen(port, () => {
-	  console.log(`Example app listening at http://localhost:${port}`)
-	})
-
-// --------------------------------------------------------------------------
-
 }).catch(err => {
-	console.error(err)
+	console.error('FATAL:', err)
 })
