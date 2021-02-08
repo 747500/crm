@@ -1,7 +1,11 @@
 <template>
-	<router-link :to="{ name: model.kind + '_edit', params: { id: model._id }}">
+	<div>
+		<div>{{ model.kind }}</div>
 		<pre>{{ model }}</pre>
-	</router-link>
+		<router-link v-if="model.kind" :to="{ name: model.kind + '_edit', params: { id: model._id }}">
+			Открыть
+		</router-link>
+	</div>
 </template>
 
 <script>

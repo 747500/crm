@@ -26,20 +26,14 @@ const SubSystems = [
 		init () {
 			return new Promise((resolve, reject) => {
 
-				var connection = mysql.createConnection(
-				    {
-				      localAddress      : '127.0.0.1',
-				      port		: '9306'
-				    }
-				);
+				var pool = mysql.createPool({
+					connectionLimit: 1,
+			    	localAddress: '127.0.0.1',
+			    	port: '9306',
+					//timeout: 60 * 60 * 1000
+			    })
 
-				connection.connect(err => {
-					if (err)
-						reject(err)
-					else
-						resolve(connection)
-				})
-
+				resolve(pool)
 			})
 		}
 	},
@@ -134,11 +128,11 @@ const SubSystems = [
 
 function runService (service) {
 
-	console.log('sss start:', service.name);
+	console.log(`sss init "${service.name}"`)
 
 	return service.init.bind(this)().then(
 		result => {
-			console.log(`sss "${service.name}" init ok`);
+			console.log('\tok')
 			service.endpoint = result
 			return result
 		}

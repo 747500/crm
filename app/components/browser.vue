@@ -13,7 +13,7 @@
 					/><input type="button" value="🔍" @click="searchInput"/>
 			</div>
 
-			<div>
+			<!-- div>
 				<label>
 					Люди
 					<input v-model="kinds" type="checkbox" name="kind" value="person" checked />
@@ -28,7 +28,7 @@
 					Сделки
 					<input v-model="kinds" type="checkbox" name="kind" value="contract" checked />
 				</label>
-			</div>
+			</div -->
 
 			<div>
 				<span>{{ result.length }} results found</span>
@@ -54,7 +54,7 @@
 	text-align: center;
 }
 
-.browser .list .item pre {
+.browser .list .item {
 	margin: 1em 0;
 	padding: 1em;
 	border: 1px solid gray;

@@ -4,7 +4,13 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
+	entry: 'app/main.js',
 	mode: 'development',
+	//output: {
+	//	path: path.resolve(__dirname, './public'),
+	//	publicPath: '/public/',
+	//	filename: 'main.js'
+	//},
 	module: {
 		rules: [
 			{
@@ -25,6 +31,7 @@ module.exports = {
 							publicPath: 'public',
 						},
 					},
+					//'style-loader',
 					'css-loader'
 				],
 			}

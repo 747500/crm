@@ -7,10 +7,13 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 		<title>Home</title>
+		<link rel="stylesheet" href="/element-ui.css">
 	</head>
+
 
 	<body>
 		<div id="app">
+
 			<header>
 				<nav>
 					<div v-for="route in $router.options.routes" :key="route.name">
@@ -22,7 +25,6 @@
 			<div>
 				<router-view></router-view>
 			</div>
-
 		</div>
 
 	</body>

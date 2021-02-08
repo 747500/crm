@@ -2,6 +2,10 @@
   "name": "crm",
   "version": "1.0.0",
   "description": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/747500/crm.git"
+  },
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -13,6 +17,8 @@
     "@braid/vue-formulate": "2",
     "async": "3",
     "babel-loader": "8",
+    "babel-plugin-component": "^1.1.1",
+    "babel-preset-es2015": "^6.24.1",
     "css-loader": "5",
     "html-webpack-plugin": "4",
     "mini-css-extract-plugin": "1",
@@ -39,7 +45,7 @@
     "mongodb": "3",
     "mongoose": "5",
     "morgan": "1",
-    "mysql": "^2.18.1",
-    "sphinxapi": "^1.3.0"
+    "mysql": "2",
+    "sphinxapi": "1"
   }
 }
