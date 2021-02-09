@@ -59,13 +59,21 @@ const Doc = mongoose.model('Doc', DocSchema)
 
 // --------------------------------------------------------------------------
 
+const ContactSchema = new mongoose.Schema(
+    {
+        data: String,
+        description: String
+    }
+)
+
 const PersonSchema = new mongoose.Schema(
     {
         firstName: String,
         lastName: String,
         middleName: String,
         birthDay: Date,
-        passport: String
+        passport: String,
+        contact: [ContactSchema]
     },
     docSchemaOptions
 )
@@ -77,7 +85,7 @@ const Person = Doc.discriminator(
 
 // --------------------------------------------------------------------------
 
-const PropertySchema = 	new mongoose.Schema(
+const PropertySchema = new mongoose.Schema(
 	{
 		address: String,
 		description: String,

@@ -6,6 +6,20 @@
 			:schema="schema"
 			@submit="submitHandler"
 			/>
+
+		<div v-if="'contract' === model.kind">
+			<hr />
+
+			<!-- input
+				name="property"
+				type="text"
+				:value="model.property"
+				@change="changes"
+				/ -->
+
+			<doc :oid="model.property" :key="model.property || 'empty'"/>
+
+		</div>
 	</div>
 
 </template>
@@ -18,6 +32,8 @@ import personSchema from './schema/person.js'
 import propertySchema from './schema/property.js'
 import contractSchema from './schema/contract.js'
 
+import doc from './M/doc.vue'
+
 const docSchema = {
 	person: personSchema,
 	property: propertySchema,
@@ -26,6 +42,9 @@ const docSchema = {
 
 export default {
 	name: 'docEditForm',
+	components: {
+		doc
+	},
 	model: {
 		prop: 'oid'
 	},
@@ -33,6 +52,9 @@ export default {
 		oid: {
 			type: [ String, undefined ]
 		},
+		kind: {
+			type: [ String ]
+		}
 	},
 	data () {
 		return {
@@ -52,6 +74,7 @@ export default {
 		}
 	},
 	methods: {
+
 		submitHandler (formData) {
 
 			console.log('<doc_edit_form> submitHandler', formData, this.model)
@@ -74,9 +97,19 @@ export default {
 					this.model.birthDay = moment(response.body.birthDay).format('YYYY-MM-DD')
 				}
 
-				console.log('<doc_edit_form> submitHandler', response)
+				//console.log('<doc_edit_form> submitHandler', response)
 			}).catch((err) => {
 				console.error('<doc_edit_form> submitHandler', err)
+			})
+
+			return ok // https://vueformulate.com/guide/forms/#context-object
+		},
+
+		afterSchemaDefined () {
+
+			this.$nextTick(() => {
+				console.log('<doc_edit_form.vue> afterSchemaDefined', this)
+		//propertyObj
 			})
 
 		}
@@ -84,18 +117,17 @@ export default {
 	created () {
 		//console.log('<doc_edit_form> created', this.$props.oid)
 
-		const kind = this.$route.path.split('/')[1]
-		this.model.kind = kind
-		this.schema = docSchema[kind]
-
 		const docId = this.$props.oid
 
-		if (docId) {
+		if (docId) { // existent doc
 
 			this.$http.get(`/doc/${docId}`)
 			.then(response => {
 
 				const doc = Object.assign({}, response.body)
+
+				this.schema = docSchema[doc.kind]
+				this.afterSchemaDefined()
 
 				// FIXME - dirty schemaless hack
 				if (response.body.birthDay) {
@@ -104,11 +136,22 @@ export default {
 
 				this.model = doc
 
-				console.log('<doc_edit_form> updateModel', this.model)
+				//console.log('<doc_edit_form> updateModel', this.model)
 			})
 			.catch(err => {
 				console.error(err)
 			})
+
+		}
+		else { // new doc
+
+			//console.log('<doc_edit_form.vue>', this)
+
+			const kind = this.$route.path.split('/')[1]
+			this.model.kind = kind
+
+			this.schema = docSchema[kind]
+			this.afterSchemaDefined()
 
 		}
 	}

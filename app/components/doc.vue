@@ -8,14 +8,14 @@
 		</div>
 
 		<div class="doc-view">
-			<header>
+			<!-- header>
 				<header>
 					<button class="button-close" @click="closeHandler">
 						&lt;&lt;
 					</button>
 					<hr/>
 				</header>
-			</header>
+			</header -->
 
 			<router-view :key="$route.fullPath"></router-view>
 		</div>

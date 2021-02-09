@@ -1,14 +1,34 @@
 <template>
 	<div>
-		<div>{{ model.kind }}</div>
-		<pre>{{ model }}</pre>
-		<router-link v-if="model.kind" :to="{ name: model.kind + '_edit', params: { id: model._id }}">
-			Открыть
+		<router-link v-if="kind" :to="{ name: kind + '_edit', params: { id: _id }}">
+			{{ title }}
 		</router-link>
 	</div>
 </template>
 
 <script>
+
+const trans = {
+	contract (doc) {
+		return doc.title
+	},
+	property (doc) {
+		return doc.address
+	},
+	person (doc) {
+		var yobStr = ''
+
+		if (doc.birthDay) {
+			if ('string' === typeof doc.birthDay) {
+				doc.birthDay = new Date(doc.birthDay)
+			}
+
+			yobStr = ', ' + doc.birthDay.getFullYear()
+		}
+
+		return `${doc.lastName} ${doc.firstName} ${doc.middleName}${yobStr}`
+	},
+}
 
 import moment from 'moment'
 
@@ -19,7 +39,9 @@ export default {
 	},
 	data () {
 		return {
-			model: {}
+			title: '',
+			kind: null,
+			_id: null
 		}
 	},
 	created () {
@@ -31,14 +53,20 @@ export default {
 
 		this.$http.get(`/doc/${docId}`).then(response => {
 
-			const doc = Object.assign({}, response.body)
+			const doc = response.body
 
-			// FIXME - dirty schemaless hack
-			if (response.body.birthDay) {
-				doc.birthDay = moment(response.body.birthDay).format('YYYY-MM-DD')
+			var title = trans[doc.kind]
+
+			if (title instanceof Function) {
+				title = title(doc)
+			}
+			else {
+				title = doc
 			}
 
-			this.model = doc
+			this.title = title
+			this._id = doc._id
+			this.kind = doc.kind
 
 			//console.log('<M/doc.vue> created', this.model)
 		})

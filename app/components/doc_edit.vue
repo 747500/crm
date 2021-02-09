@@ -3,7 +3,7 @@
 
 		<div class="person">
 
-			<docEditForm :oid="docId" class="edit-form" />
+			<docEditForm :oid="docId" :kind="$props.kind" class="edit-form" />
 
 			<filesPanel v-if="docId" :oid="docId" class="files" />
 
@@ -18,10 +18,6 @@ img {
 	display: block;
 }
 
-.person-edit .edit-form {
-	flex: 10;
-}
-
 .person-edit .files {
 	flex: 20;
 }
@@ -34,7 +30,7 @@ img {
 }
 
 .person > div {
-	padding: 0.5em;
+	margin: 0.5em;
 }
 
 .person .edit-form {
@@ -45,9 +41,34 @@ img {
 	flex: 20;
 }
 
-.person .edit-upload {
-	flex: 1;
+.person .contact-list .formulate-input-group {
+	padding-left: 1em;
 }
+
+.person .formulate-form > .formulate-input {
+	margin: 0.5em 0;
+}
+
+.person .formulate-form .formulate-input-group-add-more {
+	margin: 0.5em 0;
+}
+
+.person .formulate-form .formulate-input-group-repeatable {
+	border: 1px solid #ccc;
+	border-radius: 0.333em;
+	padding: 0.5em;
+	margin: 0.25em 0;
+}
+
+.person .formulate-form textarea {
+	resize: vertical;
+	width: 95%;
+}
+
+.person .formulate-form input[type=text] {
+	width: 95%;
+}
+
 
 .files .list {
 	margin-top: 1em;
@@ -106,6 +127,9 @@ img {
 				type: String,
 				required: true
 			}
+		},
+		props: {
+			kind: String
 		},
 		computed: {
 		},

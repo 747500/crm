@@ -29,14 +29,11 @@ export default {
 	},
 	data () {
 		return {
-			//model: []
 		}
 	},
 	created () {
-		console.log(this)
 	},
 	methods: {
-
 	}
 }
 

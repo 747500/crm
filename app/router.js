@@ -29,17 +29,35 @@ const routes = [
 		path: '/calendar',
 		component: calendar
 	},
+	/*
+	{
+		title: 'Doc',
+		name: 'doc',
+		path: '/doc/:kind',
+		component: doc,
+		props: true,
+		children: [
+			{
+				name: 'view',
+				path: ':id',
+				component: doc_edit,
+				props: true
+			}
+		]
+	},
+	*/
 	{
 		title: 'Люди',
 		name: 'person',
 		path: '/person',
-		props: true,
 		component: doc,
+		props: true,
 		children: [
 			{
 				name: 'person_edit',
 				path: ':id',
 				component: doc_edit,
+				props: true,
 			}
 		]
 	},
@@ -54,6 +72,7 @@ const routes = [
 				name: 'property_edit',
 				path: ':id',
 				component: doc_edit,
+				props: true,
 			}
 		]
 	},
@@ -61,13 +80,14 @@ const routes = [
 		title: 'Сделки',
 		name: 'contract',
 		path: '/contract',
-		props: true,
 		component: doc,
+		props: true,
 		children: [
 			{
 				name: 'contract_edit',
 				path: ':id',
 				component: doc_edit,
+				props: true,
 			}
 		]
 	}

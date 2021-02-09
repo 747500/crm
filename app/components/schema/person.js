@@ -33,6 +33,27 @@ export default [
         label: 'Паспорт'
     },
     {
+        type: 'group',
+        repeatable: true,
+        name: 'contact',
+        label: 'Контакты',
+        addLabel: 'Добавить',
+        removeLabel: 'Убрать',
+        class: 'contact-list',
+        children: [
+            {
+                label: 'Контакт',
+                type: 'text',
+                name: 'data',
+            },
+            {
+                label: 'Описание',
+                type: 'text',
+                name: 'description',
+            }
+        ]
+    },
+    {
         name: 'submit',
         type: 'submit',
         label: 'Сохранить'

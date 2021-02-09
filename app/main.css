@@ -15,12 +15,26 @@ nav > div {
 
 nav a {
 	padding: 0.33em;
-	display: block
+	display: block;
 }
 
 nav a:hover {
 	background-color: #ddd;
 	border-radius: 0.5em 0.5em 0 0;
+}
+
+a {
+	text-decoration: none;
+	color: #064a89;
+	/*
+	#926aa6;
+	#064a89;
+	*/
+}
+
+a:visited {
+	color: #064a89;
+
 }
 
 .router-link-active {
@@ -39,17 +53,4 @@ pre {
 .oid input {
 	border: none;
 	color: gray;
-}
-
-a {
-	color: #194b4f;
-	/*
-	#926aa6;
-	#064a89;
-	*/
-}
-
-a:visited {
-	color: #234f53;
-
 }
