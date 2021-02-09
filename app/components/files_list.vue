@@ -16,8 +16,8 @@
 
 			<div class="text">
 				<div class="oid">{{ file._id }}</div>
-				<div>{{ file.name }}</div>
-				<div>{{ file.lastModified }}</div>
+				<div style="width: 95%; overflow: hidden;">{{ file.name }}</div>
+				<div>{{ new Date(file.lastModified).toLocaleString() }}</div>
 				<div>{{ file.size }}</div>
 
 				<inplaceTextEdit
