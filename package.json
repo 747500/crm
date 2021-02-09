@@ -13,26 +13,26 @@
     "serve": "node server/server.mjs"
   },
   "devDependencies": {
-    "@babel/core": "7",
+    "@babel/core": "^7.12.13",
     "@braid/vue-formulate": "2",
     "async": "3",
     "babel-loader": "8",
     "babel-plugin-component": "^1.1.1",
     "babel-preset-es2015": "^6.24.1",
-    "css-loader": "5",
+    "css-loader": "^5.0.2",
     "html-webpack-plugin": "4",
-    "mini-css-extract-plugin": "1",
-    "postcss": "8",
+    "mini-css-extract-plugin": "^1.3.6",
+    "postcss": "^8.2.5",
     "style-loader": "2",
     "vue": "2",
     "vue-loader": "15",
     "vue-resource": "1",
-    "vue-router": "3",
+    "vue-router": "^3.5.1",
     "vue-style-loader": "4",
     "vue-template-compiler": "2",
-    "vuex": "3",
-    "webpack": "5",
-    "webpack-cli": "4"
+    "vuex": "^3.6.2",
+    "webpack": "^5.21.2",
+    "webpack-cli": "^4.5.0"
   },
   "keywords": [
     "crm"
@@ -42,8 +42,8 @@
   "dependencies": {
     "express": "4",
     "moment": "2",
-    "mongodb": "3",
-    "mongoose": "5",
+    "mongodb": "^3.6.4",
+    "mongoose": "^5.11.15",
     "morgan": "1",
     "mysql": "2",
     "sphinxapi": "1"
