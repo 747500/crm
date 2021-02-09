@@ -306,12 +306,26 @@ sssInit(SubSystems).then(sss => {
 			.findById(req.params.id)
 			.then(
 				result => {
+
+					if (null === result) {
+						res.status(404).send('Doc not found')
+						return
+					}
+
 					console.log('* docLoad:\n', result.toObject())
 					res.locals.Doc = result
 					next()
 				}
 			)
-			.catch(next)
+			.catch(err => {
+
+				if (err instanceof mongoose.Error.CastError) {
+					res.status(400).send(err.toString())
+					return
+				}
+
+				next(err)
+			})
 
 	}
 
