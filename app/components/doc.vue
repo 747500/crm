@@ -78,13 +78,14 @@ export default {
 			vm.updateModel(to, from)
 		})
 	},
+	/*
 	beforeRouteUpdate (to, from, next) {
 		this.$nextTick(() => {
-			//this.updateModel(to, from)
+			this.updateModel(to, from)
 		})
 		next()
 	},
-
+	*/
 	created () {
 		this.kind = this.$route.path.split('/')[1]
 	},
@@ -109,12 +110,11 @@ export default {
 						item.extendedView = false
 						return item.ownerId && item.ownerId.length
 					})
-					.map(item => {
-						return this.$http.get(`/doc/${item.ownerId}`)
+					.map(item => this.$http.get(`/doc/${item.ownerId}`)
 							.then(response => {
 								item.ownerId = response.body
 							})
-					})
+					)
 				)
 			})
 			.catch(err => {

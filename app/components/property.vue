@@ -76,9 +76,6 @@
 	margin: 0.33em 0;
 }
 
-.property .list .item .header {
-}
-
 .property .list .item .info {
 	display: flex;
 }

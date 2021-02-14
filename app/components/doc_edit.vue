@@ -65,7 +65,7 @@ a[role=button] {
 }
 
 .person .contact-list .formulate-input-group {
-	/*padding-left: 1em;*/
+	padding-left: 0;
 }
 
 .contact-list .formulate-input-group-repeatable-remove {
