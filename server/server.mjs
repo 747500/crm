@@ -262,7 +262,7 @@ sssInit(SubSystems).then(sss => {
 
 		const month = parseInt(moment(req.query.yearmonth).format('MM'))
 
-		res.locals.Schema.aggregate([
+		models.Doc.aggregate([
 			{
 				$project: {
 					firstName: 1,

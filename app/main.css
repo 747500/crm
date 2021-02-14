@@ -14,13 +14,18 @@ nav > div {
 }
 
 nav a {
-	padding: 0.33em;
+	padding: 0.33em 0.33em 0.25em 0.33em;
 	display: block;
 }
 
 nav a:hover {
-	background-color: #ddd;
+	background-color: #F7DB15;
 	border-radius: 0.5em 0.5em 0 0;
+	border-bottom: 3px solid #F7DB15;
+}
+
+nav a.router-link-active {
+	border-bottom: 3px solid gray;
 }
 
 a {

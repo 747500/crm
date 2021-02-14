@@ -39,6 +39,7 @@ export default [
         label: 'Контакты',
         addLabel: 'Добавить',
         removeLabel: 'Убрать',
+        removeClass: 'contact-remove',
         class: 'contact-list',
         children: [
             {
@@ -52,10 +53,5 @@ export default [
                 name: 'description',
             }
         ]
-    },
-    {
-        name: 'submit',
-        type: 'submit',
-        label: 'Сохранить'
     }
 ]

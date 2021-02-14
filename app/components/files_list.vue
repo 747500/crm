@@ -115,7 +115,7 @@ export default {
 
 		const docId = this.$props.oid
 
-		console.log('<file_list> created', docId)
+		//console.log('<file_list.vue> created', docId)
 
 		if (!docId) {
 			return

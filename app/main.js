@@ -1,8 +1,12 @@
-'use strict'
+
+import './main.css'
+
+// --------------------------------------------------------------------------
 
 import Vue from 'vue'
 
-import './main.css'
+import Vue2Filters from 'vue2-filters'
+Vue.use(Vue2Filters)
 
 // --------------------------------------------------------------------------
 
@@ -17,6 +21,9 @@ Vue.use(VueResource);
 // --------------------------------------------------------------------------
 import VueFormulate from '@braid/vue-formulate'
 Vue.use(VueFormulate)
+
+import SelectOwner from './components/SelectOwner.vue'
+Vue.component('SelectOwner', SelectOwner)
 
 // --------------------------------------------------------------------------
 
@@ -42,7 +49,8 @@ const store = new Vuex.Store({
 
 new Vue({
 //	el: '#app',
-	components: {},
+	components: {
+	},
 	router,
 	store,
 	data: {

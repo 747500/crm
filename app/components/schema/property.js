@@ -1,25 +1,40 @@
 
+import person from './person.js'
+
 export default [
     {
-        class: "oid",
-        name: '_id',
-        type: 'text',
-        label: 'ID',
-        readonly: true
+        type: 'group',
+        name: 'property',
+        label: 'Объект',
+        children: [
+            {
+                class: 'oid',
+                name: '_id',
+                type: 'text',
+                label: 'ID',
+                readonly: true
+            },
+            {
+                type: 'text',
+                name: 'price',
+                label: 'Цена'
+            },
+            {
+                name: 'address',
+                type: 'text',
+                label: 'Адрес'
+            },
+            {
+                name: 'description',
+                type: 'textarea',
+                label: 'Описание'
+            },
+        ]
     },
     {
-        name: 'address',
-        type: 'text',
-        label: 'Адрес'
-    },
-    {
-        name: 'description',
-        type: 'textarea',
-        label: 'Описание'
-    },
-    {
-        name: 'submit',
-        type: 'submit',
-        label: 'Сохранить'
+        type: 'group',
+        name: 'owner',
+        label: 'Собственник',
+        children: person
     }
 ]

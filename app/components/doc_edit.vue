@@ -1,15 +1,25 @@
 <template>
-	<div class="person-edit">
 
-		<div class="person">
+	<Modal @close="closeEdit">
 
-			<docEditForm :oid="docId" :kind="$props.kind" class="edit-form" />
+		<template v-slot:title>
+			Заголовко
+		</template>
 
-			<filesPanel v-if="docId" :oid="docId" class="files" />
+		<div class="person-edit">
+			<div class="person">
+				<div class="edit-form">
+					<docEditForm :oid="docId" :kind="$props.kind" />
+				</div>
 
+				<div class="files">
+					<filesPanel v-if="docId" :oid="docId" />
+				</div>
+			</div>
 		</div>
 
-	</div>
+	</Modal>
+
 </template>
 
 <style>
@@ -18,8 +28,14 @@ img {
 	display: block;
 }
 
-.person-edit .files {
-	flex: 20;
+a[role=button] {
+	padding: 2px 6px;
+	border: 1px solid gray;
+	border-radius: 2px;
+	background-color: #eee;
+	cursor: pointer;
+	font-size: 13.333px;
+	color: black;
 }
 
 .person-edit .person {
@@ -29,20 +45,34 @@ img {
 	width: 100%;
 }
 
-.person > div {
+.person-edit .person > div {
 	margin: 0.5em;
 }
 
-.person .edit-form {
-	flex: 10;
+.person-edit .person .edit-form {
+	flex: 1;
+	overflow: hidden;
 }
 
-.person .edit-upload {
-	flex: 20;
+.person-edit .person .files {
+	flex: 2;
+	overflow: hidden;
+}
+
+.person-edit .person .edit-upload {
+	flex: 2;
+	overflow: hidden;
 }
 
 .person .contact-list .formulate-input-group {
-	padding-left: 1em;
+	/*padding-left: 1em;*/
+}
+
+.contact-list .formulate-input-group-repeatable-remove {
+	float: right;
+}
+.contact-list .formulate-input-group-add-more {
+	float: right;
 }
 
 .person .formulate-form > .formulate-input {
@@ -108,12 +138,15 @@ img {
 
 <script>
 
+	import Modal from './Modal.vue'
+
 	import docEditForm from './doc_edit_form.vue'
 	import filesPanel from './files_panel.vue'
 
 	export default {
 		name: 'personEdit',
 		components: {
+			Modal,
 			docEditForm,
 			filesPanel
 		},
@@ -147,6 +180,9 @@ img {
 
 		},
 		methods: {
+			closeEdit () {
+				this.$router.push('.')
+			}
 		}
 	}
 

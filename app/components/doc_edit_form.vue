@@ -1,25 +1,14 @@
 <template>
 
 	<div>
+
 		<FormulateForm
 			v-model="model"
 			:schema="schema"
 			@submit="submitHandler"
+			:ownerId-SelectOwner="model.ownerId"
 			/>
 
-		<div v-if="'contract' === model.kind">
-			<hr />
-
-			<!-- input
-				name="property"
-				type="text"
-				:value="model.property"
-				@change="changes"
-				/ -->
-
-			<doc :oid="model.property" :key="model.property || 'empty'"/>
-
-		</div>
 	</div>
 
 </template>
@@ -32,6 +21,8 @@ import personSchema from './schema/person.js'
 import propertySchema from './schema/property.js'
 import contractSchema from './schema/contract.js'
 
+//import SelectOwner from './SelectOwner.vue'
+
 import doc from './M/doc.vue'
 
 const docSchema = {
@@ -43,7 +34,8 @@ const docSchema = {
 export default {
 	name: 'docEditForm',
 	components: {
-		doc
+		doc,
+		//SelectOwner
 	},
 	model: {
 		prop: 'oid'
@@ -75,9 +67,17 @@ export default {
 	},
 	methods: {
 
+		openFind () {
+
+			console.log('<doc_edit_form.vue> openFind', this)
+
+		},
+
 		submitHandler (formData) {
 
 			console.log('<doc_edit_form> submitHandler', formData, this.model)
+
+			return
 
 			var ok
 
@@ -126,7 +126,15 @@ export default {
 
 				const doc = Object.assign({}, response.body)
 
-				this.schema = docSchema[doc.kind]
+				this.schema = [...docSchema[doc.kind]]
+				this.schema.push(
+					{
+				        name: 'submit',
+				        type: 'submit',
+				        label: 'Сохранить'
+					}
+				)
+
 				this.afterSchemaDefined()
 
 				// FIXME - dirty schemaless hack

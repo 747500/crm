@@ -88,6 +88,8 @@ const Person = Doc.discriminator(
 const PropertySchema = new mongoose.Schema(
 	{
 		address: String,
+        ownerId: mongoose.Types.ObjectId,
+        price: String,
 		description: String,
 	},
 	docSchemaOptions

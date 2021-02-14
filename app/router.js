@@ -62,7 +62,7 @@ const routes = [
 		]
 	},
 	{
-		title: 'Собственность',
+		title: 'Объекты',
 		name: 'property',
 		path: '/property',
 		props: true,

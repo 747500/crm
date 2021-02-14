@@ -4,7 +4,7 @@
 	<div class="doc">
 
 		<div class="doc-list">
-			<component :is="kind" v-model="list"></component>
+			<component :is="kind" v-model="list" @switchView="switchView"></component>
 		</div>
 
 		<div class="doc-view">
@@ -26,6 +26,7 @@
 
 <style>
 
+/*
 .doc {
 	display: flex;
 	margin: 0;
@@ -40,6 +41,7 @@
 	flex: 20;
 	border-left: 1px solid gray;
 }
+*/
 
 </style>
 
@@ -78,7 +80,7 @@ export default {
 	},
 	beforeRouteUpdate (to, from, next) {
 		this.$nextTick(() => {
-			this.updateModel(to, from)
+			//this.updateModel(to, from)
 		})
 		next()
 	},
@@ -87,14 +89,33 @@ export default {
 		this.kind = this.$route.path.split('/')[1]
 	},
 	methods: {
+		switchView (item) {
+			item.extendedView = !item.extendedView
+			this.list = [ ...this.list]
+		},
 		updateModel () {
 			// magic
 			this.kind = this.$route.path.split('/')[1]
 
-			this.$http.get(`/list/${this.kind}`)
+			this.$http
+			.get(`/list/${this.kind}`)
 			.then(response => {
-				console.log('<doc> response', response.body)
+				//console.log('<doc> response', response.body)
 				this.list = response.body
+
+				return Promise.allSettled(
+					this.list
+					.filter(item => {
+						item.extendedView = false
+						return item.ownerId && item.ownerId.length
+					})
+					.map(item => {
+						return this.$http.get(`/doc/${item.ownerId}`)
+							.then(response => {
+								item.ownerId = response.body
+							})
+					})
+				)
 			})
 			.catch(err => {
 				console.error(err)

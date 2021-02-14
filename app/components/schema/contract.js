@@ -21,10 +21,5 @@ export default [
 		name: 'property',
 		type: 'text',
 		label: 'Объект'
-	},
-    {
-        name: 'submit',
-        type: 'submit',
-        label: 'Сохранить'
-    }
+	}
 ]
