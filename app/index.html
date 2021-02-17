@@ -14,21 +14,7 @@
 
 
 	<body>
-		<div id="app">
-
-			<header>
-				<nav>
-					<div v-for="route in $router.options.routes" :key="route.name">
-						<router-link :to="route.path">{{ route.title }}</router-link>
-					</div>
-				</nav>
-			</header>
-
-			<div>
-				<router-view></router-view>
-			</div>
-		</div>
-
+		<div id="app"><router-view></router-view></div>
 	</body>
 
 

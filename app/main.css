@@ -1,46 +1,32 @@
 
+
 body {
 	padding: 2em;
 }
 
-nav {
-	display: flex;
-	border-bottom: 1px solid gray;
-}
-
-nav > div {
-	flex: auto;
-	text-align: center;
-}
-
-nav a {
-	padding: 0.33em 0.33em 0.25em 0.33em;
-	display: block;
-}
-
-nav a:hover {
-	background-color: #F7DB15;
-	border-radius: 0.5em 0.5em 0 0;
-	border-bottom: 3px solid #F7DB15;
-}
-
-nav a.router-link-active {
-	border-bottom: 3px solid gray;
-}
+/* ----------------------------------------------------------------------- */
 
 a {
 	text-decoration: none;
-	color: #064a89;
+	color: #113569;
 	/*
-	#926aa6;
-	#064a89;
+	1B55C0
+	926aa6
+	064a89
 	*/
 }
 
 a:visited {
-	color: #064a89;
-
+	color: #113569;
 }
+
+a:hover {
+	color: #113569;
+	text-decoration: underline;
+}
+
+/* ----------------------------------------------------------------------- */
+
 
 .router-link-active {
 	font-weight: bold;
