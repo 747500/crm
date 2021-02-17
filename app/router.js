@@ -8,11 +8,11 @@ import VueRouter from 'vue-router'
 
 import Nav from './components/nav.vue'
 
-import browser from './components/browser.vue'
-import calendar from './components/calendar.vue'
+import Browser from './components/browser.vue'
+import Calendar from './components/calendar.vue'
 
-import doc from './components/doc.vue'
-import doc_edit from './components/doc_edit.vue'
+import Doc from './components/doc.vue'
+import DocEdit from './components/doc_edit.vue'
 
 // --------------------------------------------------------------------------
 
@@ -30,13 +30,13 @@ const routes = [
 				title: 'Поиск',
 				name: 'browse',
 				path: '/browse',
-				component: browser
+				component: Browser
 			},
 			{
 				title: 'Календарь',
 				name: 'calendar',
 				path: '/calendar',
-				component: calendar
+				component: Calendar
 			},
 			/*
 			{
@@ -49,23 +49,23 @@ const routes = [
 					{
 						name: 'view',
 						path: ':id',
-						component: doc_edit,
+						component: DocEdit,
 						props: true
 					}
 				]
 			},
 			*/
 			{
-				title: 'Люди',
+				title: 'Контакты',
 				name: 'person',
 				path: '/person',
-				component: doc,
+				component: Doc,
 				props: true,
 				children: [
 					{
 						name: 'person_edit',
 						path: ':id',
-						component: doc_edit,
+						component: DocEdit,
 						props: true,
 					}
 				]
@@ -75,12 +75,12 @@ const routes = [
 				name: 'property',
 				path: '/property',
 				props: true,
-				component: doc,
+				component: Doc,
 				children: [
 					{
 						name: 'property_edit',
 						path: ':id',
-						component: doc_edit,
+						component: DocEdit,
 						props: true,
 					}
 				]
@@ -89,13 +89,13 @@ const routes = [
 				title: 'Сделки',
 				name: 'contract',
 				path: '/contract',
-				component: doc,
+				component: Doc,
 				props: true,
 				children: [
 					{
 						name: 'contract_edit',
 						path: ':id',
-						component: doc_edit,
+						component: DocEdit,
 						props: true,
 					}
 				]

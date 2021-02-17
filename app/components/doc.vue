@@ -1,24 +1,17 @@
 <template>
 
 
-	<div class="doc">
+	<div>
 
-		<div class="doc-list">
-			<component :is="kind" v-model="list" @switchView="switchView"></component>
-		</div>
+		<component
+			:is="kind"
+			v-model="list"
+			@create="createDoc"
+			@open="openDoc"
+			@edit="editDoc"
+			@remove="removeDoc"/>
 
-		<div class="doc-view">
-			<!-- header>
-				<header>
-					<button class="button-close" @click="closeHandler">
-						&lt;&lt;
-					</button>
-					<hr/>
-				</header>
-			</header -->
-
-			<router-view :key="$route.fullPath"></router-view>
-		</div>
+		<router-view :key="$route.fullPath" /><!-- /router-view -->
 
 	</div>
 
@@ -26,22 +19,6 @@
 
 <style>
 
-/*
-.doc {
-	display: flex;
-	margin: 0;
-}
-
-.doc-list {
-	flex: 10;
-	border-left: 1px solid gray;
-}
-
-.doc-view {
-	flex: 20;
-	border-left: 1px solid gray;
-}
-*/
 
 </style>
 
@@ -78,22 +55,43 @@ export default {
 			vm.updateModel(to, from)
 		})
 	},
-	/*
 	beforeRouteUpdate (to, from, next) {
 		this.$nextTick(() => {
 			this.updateModel(to, from)
 		})
 		next()
 	},
-	*/
 	created () {
 		this.kind = this.$route.path.split('/')[1]
 	},
 	methods: {
-		switchView (item) {
+
+		createDoc() {
+			console.log('<doc.vue> on createDoc')
+			this.$router.push({
+				path: `${this.kind}/new`
+			})
+		},
+
+		editDoc(item) {
+			console.log('<doc.vue> on editDoc', item)
+			this.$router.push({
+				path: `${item.kind}/${item._id}`
+			})
+		},
+
+		removeDoc(item) {
+			console.log('<doc.vue> on removeDoc', item)
+		},
+
+		openDoc (item) {
+			console.log('<doc.vue> on removeDoc', item)
+			/*
 			item.extendedView = !item.extendedView
 			this.list = [ ...this.list]
+			*/
 		},
+
 		updateModel () {
 			// magic
 			this.kind = this.$route.path.split('/')[1]

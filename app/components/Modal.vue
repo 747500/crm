@@ -90,6 +90,10 @@
 	text-decoration: none;
 }
 
+.crm-modal-close:hover {
+	text-decoration: none;
+}
+
 .crm-modal-body {
 	position: relative;
 	-webkit-box-flex: 1;

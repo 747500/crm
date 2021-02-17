@@ -1,54 +1,62 @@
 
 <template>
-	<div class="person-list">
-		<ul>
-			<li class="create">
-				<router-link :to="{ name: 'person_edit', params: { id: 'new' }}">
-					<div>Новая запись</div>
-				</router-link>
-			</li>
-			<li
-				v-for="p in list"
-				v-bind:class="{ 'strike': p.status }"
-				v-bind:key="p._id">
-				<router-link :to="{ name: 'person_edit', params: { id: p._id}}">
-					<div>{{ p.lastName }} {{ p.firstName }} {{ p.middleName }}</div>
-				</router-link>
-			</li>
-		</ul>
+	<div class="person">
+
+		<List
+			class="list"
+			v-model="list"
+			v-slot:default="props"
+			@edit="(doc) => $emit('edit', doc)"
+			@remove="(doc) => $emit('remove', doc)"
+			@create="(doc) => $emit('create')"
+			>
+
+			<MPerson :person="props.item" />
+
+		</List>
+
 	</div>
 </template>
 
-<style>
-
-.person-list ul {
-	margin-top: 0;
-	margin-bottom: 0;
-	padding-top: 0.33em;
-	padding-bottom: 0.33em;
-}
-
-.person-list li {
-	padding-top: .33em;
-	padding-bottom: .33em;
-}
-
-.person-list li.create {
-	list-style-type: circle;
-}
-
-</style>
-
 <script>
+
+	import List from './List.vue'
+	import MPerson from './M/person.vue'
 
 	export default {
 		name: 'person',
+
+		components: {
+			List,
+			MPerson
+		},
+
 		model: {
 			prop: 'list'
 		},
+
 		props: {
 			list: Array
+		},
+
+		methods: {
+
+			handler (...a) {
+				console.log(a)
+			},
+
+			switchView (event, item) {
+				//console.log(event)
+				if (event.target.localName === 'div') {
+					this.$emit('switchView', item)
+				}
+			}
 		}
-	};
+
+	}
 
 </script>
+
+<style>
+
+</style>

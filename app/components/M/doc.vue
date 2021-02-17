@@ -34,6 +34,8 @@ import moment from 'moment'
 
 export default {
 	name: 'doc',
+	components: [
+	],
 	props: {
 		oid: String
 	},

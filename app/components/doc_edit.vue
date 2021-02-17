@@ -6,8 +6,8 @@
 			Заголовко
 		</template>
 
-		<div class="person-edit">
-			<div class="person">
+		<div class="doc-edit">
+			<div class="doc">
 				<div class="edit-form">
 					<docEditForm :oid="docId" :kind="$props.kind" />
 				</div>
@@ -22,11 +22,60 @@
 
 </template>
 
-<style>
+<script>
 
-img {
-	display: block;
-}
+	import Modal from './Modal.vue'
+
+	import docEditForm from './doc_edit_form.vue'
+	import filesPanel from './files_panel.vue'
+
+	export default {
+		name: 'docEdit',
+		components: {
+			Modal,
+			docEditForm,
+			filesPanel
+		},
+		data () {
+		    return {
+				docId: null
+			}
+		},
+		params: {
+			oid: {
+				type: String,
+				required: true
+			}
+		},
+		props: {
+			kind: String
+		},
+		computed: {
+		},
+		created () {
+			//console.log('<doc_edit> created', this.$props.id)
+
+			this.docId = this.$route.params.id;
+
+			if ('new' === this.docId) {
+				this.docId = null
+			}
+
+		},
+		mounted () {
+
+		},
+		methods: {
+			closeEdit () {
+				this.$router.push('.')
+				this.$emit('updateDoc')
+			}
+		}
+	}
+
+</script>
+
+<style>
 
 a[role=button] {
 	padding: 2px 6px;
@@ -38,64 +87,72 @@ a[role=button] {
 	color: black;
 }
 
-.person-edit .person {
+.doc-edit .doc {
 	display: flex;
 	margin: 0;
 	padding: 0;
 	width: 100%;
 }
 
-.person-edit .person > div {
+.doc-edit .doc > div {
 	margin: 0.5em;
 }
 
-.person-edit .person .edit-form {
+.doc-edit .doc .edit-form {
 	flex: 1;
 	overflow: hidden;
 }
 
-.person-edit .person .files {
+.doc-edit .doc .files {
 	flex: 2;
 	overflow: hidden;
 }
 
-.person-edit .person .edit-upload {
+.doc-edit .doc .edit-upload {
 	flex: 2;
 	overflow: hidden;
 }
 
-.person .contact-list .formulate-input-group {
+.doc .contact-list .formulate-input-group {
 	padding-left: 0;
 }
 
 .contact-list .formulate-input-group-repeatable-remove {
-	float: right;
+	position: absolute;
+	right: 0.5em;
+	top: calc(50% - 2em);
 }
+
+.contact-list .formulate-input-group-repeatable-remove:hover {
+	text-decoration: none;
+}
+
 .contact-list .formulate-input-group-add-more {
 	float: right;
 }
 
-.person .formulate-form > .formulate-input {
+.doc .formulate-form > .formulate-input {
 	margin: 0.5em 0;
 }
 
-.person .formulate-form .formulate-input-group-add-more {
+.doc .formulate-form .formulate-input-group-add-more {
 	margin: 0.5em 0;
 }
 
-.person .formulate-form .formulate-input-group-repeatable {
+.doc .formulate-form .formulate-input-group-repeatable {
 	border: 1px solid #ccc;
 	border-radius: 0.333em;
 	padding: 0.5em;
 	margin: 0.25em 0;
+	position: relative;
 }
 
-.person .formulate-form textarea {
+.doc .formulate-form textarea {
 	resize: vertical;
 	width: 95%;
 }
 
-.person .formulate-form input[type=text] {
+.doc .formulate-form input[type=text] {
 	width: 95%;
 }
 
@@ -135,55 +192,3 @@ a[role=button] {
 }
 
 </style>
-
-<script>
-
-	import Modal from './Modal.vue'
-
-	import docEditForm from './doc_edit_form.vue'
-	import filesPanel from './files_panel.vue'
-
-	export default {
-		name: 'personEdit',
-		components: {
-			Modal,
-			docEditForm,
-			filesPanel
-		},
-		data () {
-		    return {
-				docId: null
-			}
-		},
-		params: {
-			oid: {
-				type: String,
-				required: true
-			}
-		},
-		props: {
-			kind: String
-		},
-		computed: {
-		},
-		created () {
-			//console.log('<doc_edit> created', this.$props.id)
-
-			this.docId = this.$route.params.id;
-
-			if ('new' === this.docId) {
-				this.docId = null
-			}
-
-		},
-		mounted () {
-
-		},
-		methods: {
-			closeEdit () {
-				this.$router.push('.')
-			}
-		}
-	}
-
-</script>

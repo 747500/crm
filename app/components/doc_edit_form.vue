@@ -77,7 +77,7 @@ export default {
 
 			console.log('<doc_edit_form> submitHandler', formData, this.model)
 
-			return
+			//return
 
 			var ok
 
