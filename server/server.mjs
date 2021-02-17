@@ -558,6 +558,60 @@ sssInit(SubSystems).then(sss => {
 
 	}
 
+	const fulltextAdd = (req, res, next) => {
+
+		const doc = res.locals.Doc
+		const id = doc.ctime.getTime()
+
+		sss.sphinxql.query(
+			//'UPDATE testrt SET content = ?, kind = ?, oid = ? WHERE id = ?',
+			'INSERT INTO testrt (id, content, oid, kind) VALUES (?, ?, ?, ?)',
+			[
+				id,
+				doc.fts,
+				doc._id.toString(),
+				doc.kind
+			],
+			(err, row, fields) => {
+				if (err) {
+					next(err)
+					return
+				}
+
+				console.log('fulltextAdd:', row)
+
+				next()
+
+			}
+		)
+	}
+
+	const fulltextUpdate = (req, res, next) => {
+		const doc = res.locals.Doc
+		const id = doc.ctime.getTime()
+
+		sss.sphinxql.query(
+			'REPLACE INTO testrt (id, content, oid, kind) VALUES (?, ?, ?, ?)',
+			[
+				id,
+				doc.fts,
+				doc._id.toString(),
+				doc.kind
+			],
+			(err, row, fields) => {
+				if (err) {
+					next(err)
+					return
+				}
+
+				console.log('fulltextUpdate:', row.affectedRows)
+
+				next()
+
+			}
+		)
+	}
+
 // ==========================================================================
 
 	sss.web.post('/s',
@@ -616,6 +670,7 @@ sssInit(SubSystems).then(sss => {
 	sss.web.post('/doc/:id',
 		docLoad,
 		docUpdate,
+		fulltextUpdate,
 		docAsResult,
 		docSave,
 		sendResultJSON
@@ -625,6 +680,7 @@ sssInit(SubSystems).then(sss => {
 		schemaResolve,
 		docNew,
 		docUpdate,
+		fulltextAdd,
 		docAsResult,
 		docSave,
 		sendResultJSON
