@@ -49,12 +49,17 @@ const store = new Vuex.Store({
 
 new Vue({
 //	el: '#app',
+
 	components: {
 	},
+
 	router,
+
 	store,
+
 	data: {
 	},
+
 	methods: {
 		haveMessage (message) {
 			this.messages.push({
@@ -63,7 +68,15 @@ new Vue({
 			})
 		}
 	},
+
 	created () {
 		console.log('Created')
+	},
+
+	mounted () {
+		if ('/' === this.$route.path) {
+			this.$router.push({ name: 'browse' })
+		}
 	}
+
 }).$mount('#app')
