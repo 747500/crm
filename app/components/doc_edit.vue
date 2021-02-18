@@ -53,7 +53,7 @@
 		computed: {
 		},
 		created () {
-			console.log('<doc_edit.vue> created', this)
+			//console.log('<doc_edit.vue> created', this)
 
 			this.docId = this.$route.params.id;
 
