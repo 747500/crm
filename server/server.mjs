@@ -312,7 +312,7 @@ sssInit(SubSystems).then(sss => {
 						return
 					}
 
-					console.log('* docLoad:\n', result.toObject())
+					//console.log('* docLoad:\n', result.toObject())
 					res.locals.Doc = result
 					next()
 				}
@@ -348,7 +348,7 @@ sssInit(SubSystems).then(sss => {
 			res.locals.Doc[k] = req.body[k]
 		})
 
-		console.log(res.locals.Doc)
+		// console.log('* docUpdate', res.locals.Doc)
 
 		next()
 	}
@@ -394,7 +394,7 @@ sssInit(SubSystems).then(sss => {
 			err => next(err)
 		)
 
-		console.log('* docSave', doc.toObject())
+		//console.log('* docSave', doc.toObject())
 
 	}
 
@@ -578,7 +578,7 @@ sssInit(SubSystems).then(sss => {
 					return
 				}
 
-				console.log('fulltextAdd:', row)
+				console.log('* fulltextAdd:', row)
 
 				next()
 

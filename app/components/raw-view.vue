@@ -1,5 +1,5 @@
 
-<template id="raw-view">
+<template>
 	<div>
 		<pre><slot></slot></pre>
 	</div>
@@ -8,8 +8,9 @@
 <script>
 
 	export default {
+
 		name: 'raw-view',
-		template: '#raw-view'
-	};
+
+	}
 
 </script>

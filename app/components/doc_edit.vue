@@ -3,13 +3,13 @@
 	<Modal @close="closeEdit">
 
 		<template v-slot:title>
-			Заголовко
+			{{ $route.meta.title || '-' }}
 		</template>
 
 		<div class="doc-edit">
 			<div class="doc">
 				<div class="edit-form">
-					<docEditForm :oid="docId" :kind="$props.kind" />
+					<docEditForm :oid="docId" />
 				</div>
 
 				<div class="files">
@@ -53,7 +53,7 @@
 		computed: {
 		},
 		created () {
-			//console.log('<doc_edit> created', this.$props.id)
+			console.log('<doc_edit.vue> created', this)
 
 			this.docId = this.$route.params.id;
 

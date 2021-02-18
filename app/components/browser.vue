@@ -36,11 +36,21 @@
 		</div>
 
 		<div class="result">
-			<browserList class="list" v-model="result" v-slot:default="props">
-				<div class="item">
-					<doc :oid="props.item.attrs.oid" />
-				</div>
-			</browserList>
+			<List
+				class="list"
+				v-model="result"
+				v-slot:default="props"
+				@open="openDoc"
+				>
+				<!--
+				@edit="(doc) => $emit('edit', doc)"
+				@remove="(doc) => $emit('remove', doc)"
+				-->
+
+				<MDoc :oid="props.item.attrs.oid" :icon="true" />
+
+			</List>
+
 		</div>
 
 	</div>
@@ -54,26 +64,19 @@
 	text-align: center;
 }
 
-.browser .list .item {
-	margin: 1em 0;
-	padding: 1em;
-	border: 1px solid gray;
-	border-radius: 1em;
-}
-
 </style>
 
 <script>
 
-import browserList from './browser_list.vue'
+import List from './List.vue'
 
-import doc from './M/doc.vue'
+import MDoc from './M/doc.vue'
 
 export default {
 	name: 'browser',
 	components: {
-		browserList,
-		doc
+		List,
+		MDoc
 	},
 	data () {
 		return {
@@ -87,7 +90,12 @@ export default {
 		this.searchInput()
 	},
 	methods: {
-
+		openDoc (item) {
+			//console.log('<browser.vue> openDoc', item)
+			this.$router.push({
+				path: `${item.attrs.kind}/${item.attrs.oid}`
+			})
+		},
 		searchInput () {
 			this.result = []
 
@@ -99,7 +107,7 @@ export default {
 			)
 			.then(response => {
 
-				console.log('+++++', response)
+				//console.log('<browser.vue> response:', response)
 
 				this.result = response.body
 			})

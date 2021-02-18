@@ -1,12 +1,18 @@
 <template>
 	<div class="m-person">
-		<div class="names">
-		{{ person.lastName }}
-		{{ person.firstName }}
-		{{ person.middleName }}
+
+		<div class="icon" v-if="$props.icon">
+			&#x1F464;
 		</div>
+
+		<div class="names">
+			{{ model.lastName }}
+			{{ model.firstName }}
+			{{ model.middleName }}
+		</div>
+
 		<div class="contacts">
-			<div v-for="c in person.contact" :key="c._id">
+			<div v-for="c in model.contact" :key="c._id">
 				{{ c.data }}
 				<span v-if="c.description">({{ c.description }})</span>
 			</div>
@@ -19,7 +25,8 @@
 export default {
 	name: 'MPerson',
 	props: {
-		person: Object
+		model: Object,
+		icon: Boolean,
 	}
 }
 
@@ -30,12 +37,16 @@ export default {
 	display: flex;
 }
 
-.m-person .names {
+.m-person .icon {
 	flex: 1;
 }
 
+.m-person .names {
+	flex: 10;
+}
+
 .m-person .contacts {
-	flex: 1;
+	flex: 10;
 }
 
 </style>

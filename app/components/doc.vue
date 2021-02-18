@@ -1,17 +1,23 @@
 <template>
 
-
 	<div>
 
-		<component
-			:is="kind"
-			v-model="list"
+		<List
+			:key="modelKey"
+			class="list"
+			v-model="model"
+			v-slot:default="props"
 			@create="createDoc"
 			@open="openDoc"
 			@edit="editDoc"
-			@remove="removeDoc"/>
+			@remove="removeDoc"
+			>
 
-		<router-view :key="$route.fullPath" /><!-- /router-view -->
+			<MDoc :oid="props.item" :icon="false" />
+
+		</List>
+
+		<router-view :key="$route.fullPath" />
 
 	</div>
 
@@ -24,23 +30,25 @@
 
 <script>
 
-import person from './person.vue'
-import property from './property.vue'
-import contract from './contract.vue'
+import List from './List.vue'
+import MDoc from './M/doc.vue'
 
 export default {
 	name: 'doc',
 
 	components: {
-		person,
-		property,
-		contract
+		List,
+		MDoc,
+		//person,
+		//property,
+		//contract
 	},
 
 	data () {
 		return  {
 			kind: null,
-			list: []
+			model: [],
+			modelKey: null
 		}
 	},
 
@@ -55,15 +63,18 @@ export default {
 			vm.updateModel(to, from)
 		})
 	},
+
 	beforeRouteUpdate (to, from, next) {
 		this.$nextTick(() => {
 			this.updateModel(to, from)
 		})
 		next()
 	},
+
 	created () {
 		this.kind = this.$route.path.split('/')[1]
 	},
+
 	methods: {
 
 		createDoc() {
@@ -75,8 +86,9 @@ export default {
 
 		editDoc(item) {
 			console.log('<doc.vue> on editDoc', item)
+
 			this.$router.push({
-				path: `${item.kind}/${item._id}`
+				path: `${this.kind}/${item}`
 			})
 		},
 
@@ -86,43 +98,29 @@ export default {
 
 		openDoc (item) {
 			console.log('<doc.vue> on removeDoc', item)
-			/*
-			item.extendedView = !item.extendedView
-			this.list = [ ...this.list]
-			*/
 		},
 
 		updateModel () {
 			// magic
 			this.kind = this.$route.path.split('/')[1]
 
+
 			this.$http
 			.get(`/list/${this.kind}`)
 			.then(response => {
-				//console.log('<doc> response', response.body)
-				this.list = response.body
-
-				return Promise.allSettled(
-					this.list
-					.filter(item => {
-						item.extendedView = false
-						return item.ownerId && item.ownerId.length
-					})
-					.map(item => this.$http.get(`/doc/${item.ownerId}`)
-							.then(response => {
-								item.ownerId = response.body
-							})
-					)
-				)
+				this.modelKey = Date.now()
+				this.model = response.body.map(item => {
+					return item._id
+				})
 			})
 			.catch(err => {
 				console.error(err)
 			})
 
 		},
+
 		closeHandler () {
-			//this.$router.push({ name: 'person' })
-			this.$router.push('.')
+			this.$router.go(-1) //push('.')
 		}
 	}
 }

@@ -4,7 +4,7 @@
 		<header>
 			<nav>
 				<div v-for="r in $router.options.routes[0].children" :key="r.name">
-					<router-link :to="r.path">{{ r.title }}</router-link>
+					<router-link :to="r.path">{{ r.meta.title }}</router-link>
 				</div>
 			</nav>
 		</header>
@@ -24,6 +24,11 @@ export default {
 
 	name: 'Nav',
 
+	watch: {
+		'$route' (to, from) {
+			document.title = to.meta.title || 'CRM'
+		}
+    },
 }
 
 </script>

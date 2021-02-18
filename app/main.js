@@ -8,6 +8,9 @@ import Vue from 'vue'
 import Vue2Filters from 'vue2-filters'
 Vue.use(Vue2Filters)
 
+//import { BIconHouseDoor } from 'bootstrap-icons-vue'
+//Vue.component(BIconHouseDoor)
+
 // --------------------------------------------------------------------------
 
 import rawView from './components/raw-view.vue'

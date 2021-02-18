@@ -21,10 +21,6 @@ import personSchema from './schema/person.js'
 import propertySchema from './schema/property.js'
 import contractSchema from './schema/contract.js'
 
-//import SelectOwner from './SelectOwner.vue'
-
-import doc from './M/doc.vue'
-
 const docSchema = {
 	person: personSchema,
 	property: propertySchema,
@@ -34,8 +30,6 @@ const docSchema = {
 export default {
 	name: 'docEditForm',
 	components: {
-		doc,
-		//SelectOwner
 	},
 	model: {
 		prop: 'oid'
@@ -44,9 +38,6 @@ export default {
 		oid: {
 			type: [ String, undefined ]
 		},
-		kind: {
-			type: [ String ]
-		}
 	},
 	data () {
 		return {
@@ -54,24 +45,42 @@ export default {
 			model: {
 				_id: null
 			},
-			schema: [
-				{
-			        name: '_id',
-			        type: 'text',
-			        label: 'ID',
-			        readonly: true,
-			        class: 'oid'
-			    }
-			]
 		}
 	},
+
+	created () {
+		//console.log('<doc_edit_form> created', this.$props.oid)
+
+		const docId = this.$props.oid
+
+		if (docId) { // existent doc
+
+			this.$http.get(`/doc/${docId}`)
+			.then(response => {
+
+				const doc = Object.assign({}, response.body)
+
+				// FIXME - dirty schemaless hack
+				if (response.body.birthDay) {
+					doc.birthDay = moment(response.body.birthDay).format('YYYY-MM-DD')
+				}
+
+				this.model = doc
+
+				//console.log('<doc_edit_form> updateModel', this.model)
+			})
+			.catch(err => {
+				console.error(err)
+			})
+
+			return
+		}
+
+		// new doc
+
+	},
+
 	methods: {
-
-		openFind () {
-
-			console.log('<doc_edit_form.vue> openFind', this)
-
-		},
 
 		submitHandler (formData) {
 
@@ -105,62 +114,37 @@ export default {
 			return ok // https://vueformulate.com/guide/forms/#context-object
 		},
 
-		afterSchemaDefined () {
-
-			this.$nextTick(() => {
-				console.log('<doc_edit_form.vue> afterSchemaDefined', this)
-		//propertyObj
-			})
-
-		}
 	},
-	created () {
-		//console.log('<doc_edit_form> created', this.$props.oid)
 
-		const docId = this.$props.oid
+	computed: {
 
-		if (docId) { // existent doc
+		kind () {
+			return this.model.kind || this.$route.path.split('/')[1]
+		},
 
-			this.$http.get(`/doc/${docId}`)
-			.then(response => {
+		schema () {
+			var kind = this.kind;
 
-				const doc = Object.assign({}, response.body)
+			var emptySchema = [
+				{
+			        name: '_id',
+			        type: 'text',
+			        label: 'ID',
+			        readonly: true,
+			        class: 'oid'
+			   	}
+			]
 
-				this.schema = [...docSchema[doc.kind]]
-				this.schema.push(
-					{
-				        name: 'submit',
-				        type: 'submit',
-				        label: 'Сохранить'
-					}
-				)
+			var schema = docSchema[kind] || emptySchema
 
-				this.afterSchemaDefined()
-
-				// FIXME - dirty schemaless hack
-				if (response.body.birthDay) {
-					doc.birthDay = moment(response.body.birthDay).format('YYYY-MM-DD')
+			return [
+				...schema,
+				{
+					name: 'submit',
+					type: 'submit',
+					label: 'Сохранить'
 				}
-
-				this.model = doc
-
-				//console.log('<doc_edit_form> updateModel', this.model)
-			})
-			.catch(err => {
-				console.error(err)
-			})
-
-		}
-		else { // new doc
-
-			//console.log('<doc_edit_form.vue>', this)
-
-			const kind = this.$route.path.split('/')[1]
-			this.model.kind = kind
-
-			this.schema = docSchema[kind]
-			this.afterSchemaDefined()
-
+			]
 		}
 	}
 }

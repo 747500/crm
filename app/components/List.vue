@@ -1,7 +1,7 @@
 <template>
 
 	<ul>
-		<li class="create">
+		<li v-if="$listeners.create" class="create">
 			<div class="btn-group btn-group-sm" role="group" aria-label="">
 				<button @click.prevent="() => $emit('create')" class="btn btn-primary">
 					+
@@ -12,11 +12,13 @@
 		<!-- @click.prevent="(event) => switchView(event, p)" -->
 
 		<li v-for="(item, n) in model"
-			v-bind:class="{ 'strike': item.status }"
 			v-bind:key="item._id"
 			>
 
-			<div class="item">
+			<div
+				v-on="$listeners.open ? { click: () => $emit('open', item) } : {}"
+				:class="[ { 'active': $listeners.open }, 'item' ]"
+				>
 				<slot v-bind:item="item">
 					<pre>{{ n }}: {{ item }}</pre>
 				</slot>
@@ -24,10 +26,16 @@
 
 			<div class="toolbar">
 				<div class="btn-group-vertical btn-group-sm" role="group" aria-label="">
-					<button	@click.prevent="() => $emit('edit', item)" class="btn btn-secondary">
+					<button
+						v-if="$listeners.edit"
+						@click.prevent="() => $emit('edit', item)"
+						class="btn btn-secondary">
 						🖉
 					</button>
-					<button @click.prevent="() => $emit('remove', item)" class="btn btn-danger">
+					<button
+						v-if="$listeners.remove"
+						@click.prevent="() => $emit('remove', item)"
+						class="btn btn-danger">
 						🗑
 					</button>
 				</div>
@@ -63,6 +71,7 @@ export default {
 	},
 
 	created () {
+		//console.log('<List.vue>', this)
 	},
 
 	methods: {
@@ -93,6 +102,10 @@ ul.list li:hover {
 
 ul.list li .item {
 	flex: 10;
+}
+
+ul.list li .item.active {
+	cursor: pointer;
 }
 
 ul.list li .toolbar {

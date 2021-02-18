@@ -1,51 +1,62 @@
 <template>
 	<div>
-		<router-link v-if="kind" :to="{ name: kind + '_edit', params: { id: _id }}">
-			{{ title }}
-		</router-link>
+<!--
+v-on="$listeners.open ? { click: () => $emit('open', item) } : {}"
+-->
+		<component v-if="model"
+			:is="model.kind"
+			:model="model"
+			v-on="$listeners.open ? { click: (event) => $emit('open', event) } : {}"
+			:icon="$props.icon"
+			/>
+
+		<pre v-else>{{ raw }}</pre>
+
 	</div>
 </template>
 
 <script>
 
-const trans = {
-	contract (doc) {
-		return doc.title
-	},
-	property (doc) {
-		return doc.address
-	},
-	person (doc) {
-		var yobStr = ''
+import async from 'async'
 
-		if (doc.birthDay) {
-			if ('string' === typeof doc.birthDay) {
-				doc.birthDay = new Date(doc.birthDay)
-			}
+import Person from './person.vue'
+import Property from './property.vue'
+import Contract from './contract.vue'
 
-			yobStr = ', ' + doc.birthDay.getFullYear()
-		}
-
-		return `${doc.lastName} ${doc.firstName} ${doc.middleName}${yobStr}`
+const component = {
+	'person': {
+		template: Person,
 	},
+	'property': {
+		template: Property,
+	},
+	'contract': {
+		template: Contract,
+	}
 }
 
-import moment from 'moment'
-
 export default {
+
 	name: 'doc',
-	components: [
-	],
-	props: {
-		oid: String
+
+	components: {
+		Person,
+		Property,
+		Contract,
 	},
+
+	props: {
+		oid: String,
+		icon: Boolean
+	},
+
 	data () {
 		return {
-			title: '',
-			kind: null,
-			_id: null
+			model: null,
+			raw: null
 		}
 	},
+
 	created () {
 		const docId = this.$props.oid
 
@@ -53,31 +64,56 @@ export default {
 			return
 		}
 
-		this.$http.get(`/doc/${docId}`).then(response => {
+		const q = async.queue((task, cb) => {
 
-			const doc = response.body
+			this.$http.get(task.uri)
+			.then(response => {
+				task.cb(response.body)
+				cb()
+			})
+			.catch(cb)
 
-			var title = trans[doc.kind]
+		}, 1)
 
-			if (title instanceof Function) {
-				title = title(doc)
-			}
-			else {
-				title = doc
-			}
-
-			this.title = title
-			this._id = doc._id
-			this.kind = doc.kind
-
-			//console.log('<M/doc.vue> created', this.model)
-		})
-		.catch(err => {
-			console.error(err)
+		q.error(err => {
+			console.log('<doc.vue>', err)
 		})
 
+		/*
+		q.drain(() => {
+			console.log('<doc.vue> queue drian', this)
+		})
+		*/
+
+		q.push({
+			uri: `/doc/${docId}`,
+			cb: doc => {
+				const C = component[doc.kind]
+
+				if (C) {
+					this.model = doc
+				}
+				else {
+					this.raw = doc
+				}
+
+				if ('property' === doc.kind && doc.ownerId) {
+
+					q.push({
+						uri: `/doc/${doc.ownerId}`,
+						cb: owner => {
+							doc.ownerId = owner
+						}
+					})
+				}
+			}
+		})
 
 	},
+
+	computed: {
+	},
+
 	methods: {
 
 	}

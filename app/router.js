@@ -20,23 +20,31 @@ Vue.use(VueRouter)
 
 const routes = [
 	{
-		title: '⌂',
 		name: 'home',
 		path: '/',
 		component: Nav,
+		meta: {
+			title: '⌂',
+		},
 		children: [
 
 			{
 				title: 'Поиск',
 				name: 'browse',
 				path: '/browse',
-				component: Browser
+				component: Browser,
+				meta: {
+					title: 'Поиск'
+				}
 			},
 			{
 				title: 'Календарь',
 				name: 'calendar',
 				path: '/calendar',
-				component: Calendar
+				component: Calendar,
+				meta: {
+					title: 'Календарь'
+				}
 			},
 			/*
 			{
@@ -61,42 +69,58 @@ const routes = [
 				path: '/person',
 				component: Doc,
 				props: true,
+				meta: {
+					title: 'Контакты'
+				},
 				children: [
 					{
 						name: 'person_edit',
 						path: ':id',
 						component: DocEdit,
 						props: true,
+						meta: {
+							title: '👤 Контакт',
+						},
 					}
 				]
 			},
 			{
-				title: 'Объекты',
 				name: 'property',
 				path: '/property',
 				props: true,
 				component: Doc,
+				meta: {
+					title: 'Объекты',
+				},
 				children: [
 					{
 						name: 'property_edit',
 						path: ':id',
 						component: DocEdit,
 						props: true,
+						meta: {
+							title: '🏠 Объект',
+						},
 					}
 				]
 			},
 			{
-				title: 'Сделки',
 				name: 'contract',
 				path: '/contract',
 				component: Doc,
 				props: true,
+				meta: {
+					title: 'Сделки',
+				},
 				children: [
 					{
 						name: 'contract_edit',
 						path: ':id',
 						component: DocEdit,
 						props: true,
+						meta: {
+							title: '📄 Сделка',
+						},
 					}
 				]
 			}
@@ -105,4 +129,21 @@ const routes = [
 	}
 ]
 
-export default new VueRouter({ routes })
+const router = new VueRouter({ routes })
+
+/*
+router.beforeEach((to, from, next) => {
+  document.title = to.meta.title || 'Your Website Title')
+  next()
+})
+*/
+
+/*
+router.afterEach((to, from) => {
+  if (to.meta && to.meta.title) {
+    document.title = to.meta.title + ' | Any suffix'
+  }
+})
+*/
+
+export default router
