@@ -97,7 +97,7 @@ export default {
 		},
 
 		openDoc (item) {
-			console.log('<doc.vue> on removeDoc', item)
+			console.log('<doc.vue> on openDoc', item)
 		},
 
 		updateModel () {
