@@ -2,24 +2,27 @@
 <template>
 
 	<div>
-		<div>
-			<input
-				ref="addFile"
-				name="addFile"
-				type="file"
-				multiple
-				@change="updateQueue"
-				style="display: none;"
-				/>
 
+		<input
+			ref="addFile"
+			name="addFile"
+			type="file"
+			multiple
+			@change="updateQueue"
+			style="display: none;"
+			/>
+
+		<div class="btn-group btn-group-sm" role="group" aria-label="Toolbar">
 			<button
+				class="btn btn-secondary"
 				type="file"
 				name="upload"
 				multiple
-				@click="(event) => this.$refs.addFile.click(event)"
+				@click="event => this.$refs.addFile.click(event)"
 				>Выбрать</button>
 
 			<button
+				class="btn btn-primary"
 				@click="upload"
 				:disabled="!queue.length"
 				>Загрузить</button>
