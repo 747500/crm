@@ -58,6 +58,7 @@ export default {
 	display: inline-block;
 	width: 12em;
 	overflow: hidden;
+	position: relative;
 }
 
 /*
@@ -70,14 +71,16 @@ export default {
 	background-color:  white; /*#b9c97b; #c0ffee; */
 }
 
-.files-panel .list .text {
-	padding: 0.25em;
+.files-panel .list .item .img {
+	border-bottom: 1px solid var(--border-color);
+}
+
+.files-panel .list .item .text {
 	display: flex;
 	flex-direction: column;
 }
 
-.files-panel .list .text > div {
-	padding: 0.12em;
+.files-panel .list .item .text > div {
 	flex: 1;
 	font-size: small;
 }
@@ -88,6 +91,30 @@ export default {
   height: 12em;
   border-radius: 1em 1em 0 0;
   display: block;
+}
+
+.files-list .item .toolbar {
+	position: absolute;
+	width: 100%;
+	/*height: 5em;*/
+}
+
+.files-list .item .toolbar:hover {
+	background: rgba(0, 0, 0, 0.33);
+}
+
+.files-list .item .toolbar .tools {
+	text-align: center;
+	margin: 0.33em;
+	/*
+	text-shadow: 0 0 1px #fff, 0 0 1px #fff, 0 0 1px #fff, 0 0 1px #fff;
+	*/
+	text-shadow: 1px 0px 3px #fff, -1px 0px 3px #fff, 0px 1px 3px #fff, 0px -1px 3px #fff;
+	visibility: hidden;
+}
+
+.files-list .item .toolbar:hover .tools {
+	visibility: visible;
 }
 
 </style>
