@@ -46,6 +46,9 @@
 	background: rgba(0, 0, 0, 0.50);
 }
 
+.inplace-text input[disabled] {
+	pointer-events: none;
+}
 
 </style>
 
@@ -98,10 +101,11 @@ export default {
 				},
 				keyup: event => {
 					if ('Enter' === event.key && (event.ctrlKey || event.metaKey)) {
-						this.model = event.target.innerText
 						elButton.elm.click()
 						event.preventDefault()
+						return
 					}
+					this.model = event.target.innerText
 				}
 			}
 		})
