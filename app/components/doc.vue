@@ -13,7 +13,7 @@
 			@remove="removeDoc"
 			>
 
-			<MDoc :oid="props.item" :icon="false" />
+			<MDoc :oid="props.item" :schema="options" />
 
 		</List>
 
@@ -48,7 +48,25 @@ export default {
 		return  {
 			kind: null,
 			model: [],
-			modelKey: null
+			modelKey: null,
+			options: {
+				person: {
+					icon: false,
+					image: true
+				},
+				property: {
+					icon: false,
+					image: true,
+					person: {
+						icon: false,
+						image: false,
+					}
+				},
+				contract: {
+					icon: false,
+					image: false
+				},
+			},
 		}
 	},
 

@@ -1,8 +1,12 @@
 <template>
 	<div class="m-person">
 
-		<div class="icon" v-if="$props.icon">
+		<div class="icon" v-if="options.icon">
 			&#x1F464;
+		</div>
+
+		<div class="picture" v-if="options.image">
+			<oidImage  v-if="model.mainPicture" :oid="model.mainPicture" />
 		</div>
 
 		<div class="names">
@@ -22,13 +26,26 @@
 
 <script>
 
-export default {
-	name: 'MPerson',
-	props: {
-		model: Object,
-		icon: Boolean,
+	import oidImage from '../oidImage.vue'
+
+	export default {
+		name: 'MPerson',
+
+		components: {
+			oidImage
+		},
+
+		props: {
+			model: Object,
+			schema: Object,
+		},
+
+		data () {
+			return {
+				options: this.$props.schema
+			}
+		}
 	}
-}
 
 </script>
 
@@ -47,6 +64,12 @@ export default {
 
 .m-person .contacts {
 	flex: 10;
+}
+
+.m-person .picture img {
+	width: 9em;
+	height: 9em;
+	object-fit: cover;
 }
 
 </style>

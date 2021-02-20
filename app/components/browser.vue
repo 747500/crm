@@ -47,7 +47,7 @@
 				@remove="(doc) => $emit('remove', doc)"
 				-->
 
-				<MDoc :oid="props.item.attrs.oid" :icon="true" />
+				<MDoc :oid="props.item.attrs.oid" :schema="schema" />
 
 			</List>
 
@@ -87,7 +87,24 @@ export default {
 			kinds: [],
 			search: '',
 			result: [],
-			slotProps: { a: 'b' }
+			schema: {
+				person: {
+					icon: true,
+					image: true,
+				},
+				property: {
+					icon: true,
+					image: true,
+					person: {
+						icon: false,
+						image: false
+					}
+				},
+				contract: {
+					icon: true,
+					image: false
+				}
+			}
 		}
 	},
 	created () {

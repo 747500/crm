@@ -5,10 +5,8 @@
 			:is="model.kind"
 			:model="model"
 			v-on="$listeners.open ? { click: (event) => $emit('open', event) } : {}"
-			:icon="$props.icon"
+			:schema="options[model.kind]"
 			/>
-
-		<!-- pre v-else>{{ raw }}</pre -->
 
 	</div>
 </template>
@@ -35,13 +33,13 @@ export default {
 
 	props: {
 		oid: String,
-		icon: Boolean
+		schema: Object,
 	},
 
 	data () {
 		return {
 			model: null,
-			raw: null
+			options: this.$props.schema
 		}
 	},
 
