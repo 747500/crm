@@ -482,7 +482,11 @@ sssInit(SubSystems).then(sss => {
 
 			stream.once('error', next)
 
-			const resize = sharp().resize(350).jpeg()
+			const resize = sharp({
+				pages: 1
+			}).resize(350).jpeg()
+
+			resize.once('error', next)
 
 			stream.pipe(resize).pipe(res)
 
