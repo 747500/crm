@@ -99,6 +99,10 @@ export default {
 	/*height: 5em;*/
 }
 
+.files-list .item .tools > *{
+	display: block;
+}
+
 .files-list .item .toolbar:hover {
 	background: rgba(0, 0, 0, 0.33);
 }
