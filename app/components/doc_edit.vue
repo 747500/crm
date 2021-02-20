@@ -3,43 +3,29 @@
 	<Modal @close="closeEdit">
 
 		<template v-slot:title>
-			{{ $route.meta.title || '-' }}
+			<ul class="tabs">
+				<li class="tab"
+					:class="{ active: tabView === 'docEditForm' }"
+					role="tab"
+					data-tab-component="docEditForm"
+					@click.prevent="clickTab"
+					>
+					{{ $route.meta.title || '-' }}
+				</li>
+				<li class="tab"
+					:class="{ active: tabView === 'filesPanel' }"
+					role="tab"
+					data-tab-component="filesPanel"
+					@click.prevent="clickTab"
+					>
+					Файлы
+				</li>
+			</ul>
 		</template>
-
-		<ul class="tabs">
-			<li class="tab"
-				:class="{ active: tabView === 'docEditForm' }"
-				role="tab"
-				data-tab-component="docEditForm"
-				@click.prevent="clickTab"
-				>
-				Форма
-			</li>
-			<li class="tab"
-				:class="{ active: tabView === 'filesPanel' }"
-				role="tab"
-				data-tab-component="filesPanel"
-				@click.prevent="clickTab"
-				>
-				Файлы
-			</li>
-		</ul>
 
 		<div class="doc-edit">
 			<component :is="tabView" :oid="docId" />
 		</div>
-
-		<!-- div class="doc-edit">
-			<div class="doc">
-				<div class="edit-form">
-					<docEditForm :oid="docId" />
-				</div>
-
-				<div class="files">
-					<filesPanel v-if="docId" :oid="docId" />
-				</div>
-			</div>
-		</div -->
 
 	</Modal>
 
@@ -54,28 +40,34 @@
 
 	export default {
 		name: 'docEdit',
+
 		components: {
 			Modal,
 			docEditForm,
 			filesPanel
 		},
+
 		data () {
 		    return {
 				tabView: 'docEditForm',
 				docId: null
 			}
 		},
+
 		params: {
 			oid: {
 				type: String,
 				required: true
 			}
 		},
+
 		props: {
 			kind: String
 		},
+
 		computed: {
 		},
+
 		created () {
 			//console.log('<doc_edit.vue> created', this)
 
@@ -86,21 +78,23 @@
 			}
 
 		},
+
 		mounted () {
 
 		},
+
 		methods: {
+
 			closeEdit () {
 				this.$router.push('.')
 				this.$emit('updateDoc')
 			},
+
 			clickTab (event) {
 				const el = event.target
-
 				this.tabView = el.dataset.tabComponent
-
-				console.log(event)
 			}
+
 		}
 	}
 
@@ -119,16 +113,20 @@ a[role=button] {
 }
 
 ul.tabs {
-	margin: 0 0 1em 0;
+	list-style: none;
+	margin: 0;
 	padding: 0;
 	border-bottom: 1px solid var(--border-color);
+	width: 100%;
+	display: flex;
 }
 
 li.tab {
 	cursor: pointer;
 	display: inline-block;
 	margin: 0;
-	padding: 0 2em;
+	padding: 0 2em .33em 2em;
+	flex: initial;
 	border-bottom: 2px solid transparent;
 }
 

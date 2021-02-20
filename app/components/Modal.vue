@@ -8,7 +8,8 @@
 		<div class="crm-modal-dialog">
 			<div class="crm-modal-content">
 				<div class="crm-modal-header">
-					<h3 class="crm-modal-title"><slot name="title"></slot></h3>
+					<slot name="title"></slot>
+					<!-- h3 class="crm-modal-title"></h3 -->
 					<a href="#close" @click.prevent="() => { $emit('close') }" title="Close" class="crm-modal-close">×</a>
 				</div>
 
@@ -67,7 +68,6 @@
 	-ms-flex-pack: justify;
 	justify-content: space-between;
 	padding: 15px;
-	border-bottom: 1px solid #eceeef;
 }
 
 .crm-modal-title {
@@ -76,6 +76,7 @@
 	line-height: 1.5;
 	font-size: 1.25rem;
 	font-weight: 500;
+	width: 100%;
 }
 
 .crm-modal-close {
