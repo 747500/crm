@@ -10,7 +10,7 @@
 				<div class="crm-modal-header">
 					<slot name="title"></slot>
 					<!-- h3 class="crm-modal-title"></h3 -->
-					<a href="#close" @click.prevent="() => { $emit('close') }" title="Close" class="crm-modal-close">×</a>
+					<a v-if="$listeners.close" href="#close" @click.prevent="() => { $emit('close') }" title="Close" class="crm-modal-close">×</a>
 				</div>
 
 				<div class="crm-modal-body">
@@ -76,7 +76,7 @@
 	line-height: 1.5;
 	font-size: 1.25rem;
 	font-weight: 500;
-	width: 100%;
+	/*width: 100%;*/
 }
 
 .crm-modal-close {
