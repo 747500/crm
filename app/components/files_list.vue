@@ -14,6 +14,7 @@
 					<aConfirm
 						message="Отмена"
 						:onconfirm="() => { removeFile(file) }">Удалить</aConfirm>
+					<a href="" @click.prevent="() => setAsMain(file)">Сделать главной</a>
 				</div>
 			</div>
 			<div class="content">
@@ -72,6 +73,25 @@ export default {
 		}
 	},
 	methods: {
+
+		setAsMain (file) {
+			this.$http.post(
+				`/doc/${this.$props.oid}`,
+				{
+					mainPicture: file._id
+				},
+				{
+					headers: {
+						'Content-Type': 'application/json'
+					}
+				}
+			).then(result => {
+				console.log('setAsMain http result', result)
+
+			}).catch(console.error)
+
+		},
+
 		saveText (file) {
 
 			this.$http.post(
@@ -142,9 +162,10 @@ export default {
 						return file
 					}
 
-					return this.$http.get('/f/' + file._id, {
+					return this.$http.get('/t/' + file._id, {
 						responseType: 'blob'
-					}).then(response => {
+					})
+					.then(response => {
 
 						var filename = response.headers.get('content-disposition') || ''
 						filename = decodeURIComponent(
@@ -164,7 +185,8 @@ export default {
 						file.name = decodeURIComponent(filename || 'blob')
 						file.caption = decodeURIComponent(caption)
 
-					}).catch(err => {
+					})
+					.catch(err => {
 						console.error(err)
 					})
 				})
