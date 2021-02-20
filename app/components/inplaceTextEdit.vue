@@ -2,7 +2,6 @@
 
 .inplace-text {
 	overflow: hidden;
-	border-bottom: 1px solid var(--border-color);
 	padding: 0;
 	position: relative;
 }
