@@ -20,6 +20,7 @@
     white-space: -pre-wrap;      /* Opera 4-6 */
     white-space: -o-pre-wrap;    /* Opera 7 */
     word-wrap: break-word;       /* Internet Explorer 5.5+ */
+	font-family: var(--bs-font-sans-serif);
 }
 
 .inplace-text pre:focus {
@@ -34,8 +35,8 @@
 	border-radius: calc(50%);
 	display: block;
 	position: absolute;
-	bottom: 0px;
-	right: 0px;
+	bottom: 0.25em;
+	right: 0.25em;
 	width: 1.5em;
 	height: 1.5em;
 	background: rgba(0, 0, 0, 0.25);
