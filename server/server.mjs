@@ -17,6 +17,8 @@ import SphinxClient from 'sphinxapi'
 
 import mysql from 'mysql'
 
+import sharp from 'sharp'
+
 // ==========================================================================
 
 const SubSystems = [
@@ -328,15 +330,18 @@ sssInit(SubSystems).then(sss => {
 
 	}
 
-	// TODO validation
 	const docUpdate = (req, res, next) => {
 
 		const skip = {
 			'_id': true,
 			'__v': true,
 			'kind': true,
-			'id': true
+			'id': true,
+			'fts': true,
+			'time': true,
 		}
+
+		var fieldsUpdated = 0
 
 		Object.keys(res.locals.Doc.schema.tree).forEach(k => {
 
@@ -344,10 +349,19 @@ sssInit(SubSystems).then(sss => {
 				return
 			}
 
-			res.locals.Doc[k] = req.body[k]
+			console.log('>>>', k, req.body[k])
+
+			if (k in req.body) {
+				fieldsUpdated ++;
+				res.locals.Doc[k] = req.body[k]
+			}
+
 		})
 
-		// console.log('* docUpdate', res.locals.Doc)
+		if (0 === fieldsUpdated) {
+			res.status(400).send('Zero fields updated')
+			return;
+		}
 
 		next()
 	}
@@ -388,11 +402,14 @@ sssInit(SubSystems).then(sss => {
 
 		const doc = res.locals.Doc
 
-		doc.save()
-		.then(() => next())
-		.catch(next)
+		console.log('* docSave input\n', doc.toObject())
 
-		//console.log('* docSave', doc.toObject())
+		doc.save()
+		.then((result) => {
+			console.log('* docSave result\n', result)
+			next()
+		})
+		.catch(next)
 
 	}
 
@@ -427,6 +444,50 @@ sssInit(SubSystems).then(sss => {
 //		console.log('* after docUploadFile:', doc);
 
 		req.pipe(stream)
+
+	}
+
+	const getThumbnail = (req, res, next) => {
+
+		const oid = mongoose.Types.ObjectId(req.params.id)
+
+		sss.files.collection.findOne({ _id: oid })
+		.then(fileinfo => {
+
+			if (null === fileinfo) { // 404
+				next()
+				return;
+			}
+
+			const hasLastModified =
+					'object' === typeof fileinfo.metadata &&
+					fileinfo.metadata.lastModified instanceof Date
+
+			const lastModified =
+					hasLastModified ?
+					fileinfo.metadata.lastModified :
+					fileinfo.uploadDate
+
+			const caption =
+					querystring.escape(fileinfo.metadata.caption || '')
+
+			res.set({
+				//'Content-Length': fileinfo.length,
+				'Content-Type': 'image/jpeg',
+				'Last-Modified': lastModified.toISOString(),
+				'X-Meta-Caption': caption
+			})
+
+			const stream = sss.files.bucket.openDownloadStream(oid)
+
+			stream.once('error', next)
+
+			const resize = sharp().resize(350).jpeg()
+
+			stream.pipe(resize).pipe(res)
+
+		})
+		.catch(next)
 
 	}
 
@@ -565,6 +626,8 @@ sssInit(SubSystems).then(sss => {
 		const doc = res.locals.Doc
 		const id = doc.ctime.getTime()
 
+		console.log('* fulltextAdd:', doc.fts)
+
 		sss.sphinxql.query(
 			//'UPDATE testrt SET content = ?, kind = ?, oid = ? WHERE id = ?',
 			'INSERT INTO testrt (id, content, oid, kind) VALUES (?, ?, ?, ?)',
@@ -591,6 +654,8 @@ sssInit(SubSystems).then(sss => {
 	const fulltextUpdate = (req, res, next) => {
 		const doc = res.locals.Doc
 		const id = doc.ctime.getTime()
+
+		console.log('* fulltextUpdate:', doc.fts)
 
 		sss.sphinxql.query(
 			'REPLACE INTO testrt (id, content, oid, kind) VALUES (?, ?, ?, ?)',
@@ -621,6 +686,10 @@ sssInit(SubSystems).then(sss => {
 	)
 
 // --------------------------------------------------------------------------
+
+	sss.web.get('/t/:id',
+		getThumbnail
+	)
 
 	sss.web.get('/f/:id',
 		getFile
@@ -672,9 +741,9 @@ sssInit(SubSystems).then(sss => {
 	sss.web.post('/doc/:id',
 		docLoad,
 		docUpdate,
-		fulltextUpdate,
 		docAsResult,
 		docSave,
+		fulltextUpdate,
 		sendResultJSON
 	)
 
