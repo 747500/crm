@@ -1,7 +1,7 @@
 
 <template>
 
-	<div>
+	<div class="files-list" style="max-height: calc(100vh - 15em); overflow: auto;">
 
 
 		<div v-for="(file) in files.slice().reverse()"
@@ -9,28 +9,30 @@
 			:class="{ busy: true == file.busy }"
 			class="item"
 			>
-
-			<div class="img">
-				<iimg :src="file.blob"/>
-			</div>
-
-			<div class="text">
-				<div class="oid">{{ file._id }}</div>
-				<div style="width: 95%; overflow: hidden;">{{ file.name }}</div>
-				<div>{{ new Date(file.lastModified).toLocaleString() }}</div>
-				<div>{{ file.size }}</div>
-
-				<inplaceTextEdit
-					@savetext="() => saveText({ oid: file._id, caption: file.caption })"
-					v-model="file.caption"
-					label="." />
-
+			<div class="toolbar">
 				<div class="tools">
 					<aConfirm
 						message="Отмена"
 						:onconfirm="() => { removeFile(file) }">Удалить</aConfirm>
 				</div>
+			</div>
+			<div class="content">
+				<div class="img">
+					<iimg :src="file.blob"/>
+				</div>
 
+				<div class="text">
+					<!--
+					<div class="oid">{{ file._id }}</div>
+					<div style="width: 95%; overflow: hidden;">{{ file.name }}</div>
+					<div>{{ new Date(file.lastModified).toLocaleString() }}</div>
+					<div>{{ file.size }}</div>
+					-->
+					<inplaceTextEdit
+						@savetext="() => saveText({ oid: file._id, caption: file.caption })"
+						v-model="file.caption"
+						label="🖉" />
+				</div>
 			</div>
 		</div>
 	</div>
@@ -39,6 +41,34 @@
 </template>
 
 <style>
+
+.files-list .item {
+	position: relative;
+}
+
+.files-list .item .toolbar {
+	position: absolute;
+	width: 100%;
+	height: 5em;
+}
+
+.files-list .item .toolbar:hover {
+	background: rgba(0, 0, 0, 0.33);
+}
+
+.files-list .item .toolbar .tools {
+	text-align: center;
+	margin: 0.33em;
+	/*
+	text-shadow: 0 0 1px #fff, 0 0 1px #fff, 0 0 1px #fff, 0 0 1px #fff;
+	*/
+	text-shadow: 1px 0px 3px #fff, -1px 0px 3px #fff, 0px 1px 3px #fff, 0px -1px 3px #fff;
+	display: none;
+}
+
+.files-list .item .toolbar:hover .tools {
+	display: block;
+}
 
 .busy {
 	outline: 1px dotted red;
