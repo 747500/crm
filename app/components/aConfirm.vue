@@ -5,6 +5,14 @@
 	</span>
 </template>
 
+<style>
+
+.confirm.active a:last-child {
+	color: red;
+}
+
+</style>
+
 <script>
 
 export default {
@@ -29,11 +37,10 @@ export default {
 			if (this.confirm) {
 				this.confirm(event)
 				this.confirm = null
+				return;
 			}
-			else
-			{
-				this.confirm = this.$props.onconfirm
-			}
+
+			this.confirm = this.$props.onconfirm
 		},
 		onCancel (event) {
 			this.confirm = null
