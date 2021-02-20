@@ -63,7 +63,7 @@
 				this.updateModel()
 			},
 			updateModel () {
-				console.log("updateModel")
+				console.log("<calendar.vue> updateModel")
 				this.$http.get(
 					'/person/events',
 					{
