@@ -2,6 +2,18 @@
 
 	<div>
 
+		<div v-if="mainPicture" class="main-picture">
+			<!--
+			<div class="toolbar">
+				<div class="content">
+					<div>Загрузить</div>
+					<div><a href="" @click.prevent="selectPicture">Выбрать</a></div>
+				</div>
+			</div>
+			-->
+			<oidImage :oid="mainPicture" :key="mainPicture" />
+		</div>
+
 		<FormulateForm
 			v-model="model"
 			:schema="schema"
@@ -9,13 +21,64 @@
 			:ownerId-SelectOwner="model.ownerId"
 			/>
 
+		<Modal v-if="selectPictureModal" @close="() => { selectPictureModal = false }">
+			<template slot="title">
+				Blah
+			</template>
+			<div>
+				blah
+			</div>
+		</Modal>
+
 	</div>
 
 </template>
 
+<style>
+
+.main-picture {
+	width: 12em;
+	height: 12em;
+	overflow: hidden;
+	border: 1px solid var(--border-color);
+	position: relative;
+}
+
+/*
+.main-picture .toolbar {
+	width: 100%;
+	position: absolute;
+	right: 0px;
+}
+
+.main-picture .toolbar .content {
+	visibility: hidden;
+}
+
+.main-picture:hover .toolbar {
+	background: rgba(0, 0, 0, 0.33);
+}
+
+.main-picture:hover .toolbar .content {
+	visibility: visible;
+}
+*/
+
+.main-picture img {
+	width: 12em;
+	height: 12em;
+
+	object-fit: cover;
+}
+
+</style>
+
 <script>
 
 import moment from 'moment'
+
+import oidImage from './oidImage.vue'
+import Modal from './Modal.vue'
 
 import personSchema from './schema/person.js'
 import propertySchema from './schema/property.js'
@@ -30,6 +93,8 @@ const docSchema = {
 export default {
 	name: 'docEditForm',
 	components: {
+		oidImage,
+		Modal,
 	},
 	model: {
 		prop: 'oid'
@@ -45,6 +110,8 @@ export default {
 			model: {
 				_id: null
 			},
+			mainPicture: null,
+			selectPictureModal: false,
 		}
 	},
 
@@ -67,7 +134,11 @@ export default {
 
 				this.model = doc
 
-				//console.log('<doc_edit_form> updateModel', this.model)
+				if (this.model.mainPicture) {
+					this.mainPicture = this.model.mainPicture
+				}
+
+				console.log('<doc_edit_form.vue> updateModel', this.model)
 			})
 			.catch(err => {
 				console.error(err)
@@ -81,6 +152,11 @@ export default {
 	},
 
 	methods: {
+
+		selectPicture () {
+			this.selectPictureModal = true
+			console.log()
+		},
 
 		submitHandler (formData) {
 
