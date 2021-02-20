@@ -48,6 +48,7 @@
     "mongoose": "^5.11.15",
     "morgan": "1",
     "mysql": "2",
+    "sharp": "^0.27.1",
     "sphinxapi": "1"
   }
 }
