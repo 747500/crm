@@ -1,8 +1,6 @@
 <template>
 	<div>
-<!--
-v-on="$listeners.open ? { click: () => $emit('open', item) } : {}"
--->
+
 		<component v-if="model"
 			:is="model.kind"
 			:model="model"
@@ -10,7 +8,7 @@ v-on="$listeners.open ? { click: () => $emit('open', item) } : {}"
 			:icon="$props.icon"
 			/>
 
-		<pre v-else>{{ raw }}</pre>
+		<!-- pre v-else>{{ raw }}</pre -->
 
 	</div>
 </template>
@@ -23,17 +21,7 @@ import Person from './person.vue'
 import Property from './property.vue'
 import Contract from './contract.vue'
 
-const component = {
-	'person': {
-		template: Person,
-	},
-	'property': {
-		template: Property,
-	},
-	'contract': {
-		template: Contract,
-	}
-}
+var q = null
 
 export default {
 
@@ -64,38 +52,35 @@ export default {
 			return
 		}
 
-		const q = async.queue((task, cb) => {
+		if (null === q) {
+			q = async.queue((task, cb) => {
 
-			this.$http.get(task.uri)
-			.then(response => {
-				task.cb(response.body)
-				cb()
+				this.$http.get(task.uri)
+				.then(response => {
+					task.cb(response.body)
+					cb()
+				})
+				.catch(cb)
+
+			}, 4)
+
+			q.error(err => {
+				console.log('<doc.vue>', err)
 			})
-			.catch(cb)
 
-		}, 1)
+			/*
+			q.drain(() => {
+				console.log('<doc.vue> queue drian', this)
+			})
+			*/
+		}
 
-		q.error(err => {
-			console.log('<doc.vue>', err)
-		})
-
-		/*
-		q.drain(() => {
-			console.log('<doc.vue> queue drian', this)
-		})
-		*/
 
 		q.push({
 			uri: `/doc/${docId}`,
 			cb: doc => {
-				const C = component[doc.kind]
 
-				if (C) {
-					this.model = doc
-				}
-				else {
-					this.raw = doc
-				}
+				this.model = doc
 
 				if ('property' === doc.kind && doc.ownerId) {
 
