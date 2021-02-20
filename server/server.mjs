@@ -246,12 +246,14 @@ sssInit(SubSystems).then(sss => {
 	// TODO validation
 	const docList = (req, res, next) => {
 
-		res.locals.Schema.find().then(
+		res.locals.Schema.find()
+		.then(
 			result => {
 				res.locals.Result = result
 				next()
 			}
-		).catch(next)
+		)
+		.catch(next)
 
 	}
 
@@ -279,53 +281,50 @@ sssInit(SubSystems).then(sss => {
 					month: month
 				}
 			}
-		]).then(
-			result => {
-				res.locals.Result = result.map(i => {
+		])
+		.then(result => {
+			res.locals.Result = result.map(i => {
 
-					const birthDate = moment(i.birthDay).format('DD-MM-YYYY')
-					const day = moment(i.birthDay).format('DD')
-					const eventDate = `${req.query.yearmonth}-${day}`
-					const age = 1 + moment(eventDate).diff(i.birthDay, 'years');
+				const birthDate = moment(i.birthDay).format('DD-MM-YYYY')
+				const day = moment(i.birthDay).format('DD')
+				const eventDate = `${req.query.yearmonth}-${day}`
+				const age = 1 + moment(eventDate).diff(i.birthDay, 'years');
 
-					return {
-						eventAt: eventDate,
-						eventTitle: `${birthDate} ${i.lastName} ${i.firstName} ${i.middleName} ${age}`
-					}
-				})
-				next()
-			}
-		).catch(next)
+				return {
+					eventAt: eventDate,
+					eventTitle: `${birthDate} ${i.lastName} ${i.firstName} ${i.middleName} ${age}`
+				}
+			})
+			next()
+		})
+		.catch(next)
 	}
 
 
 	// TODO validation
 	const docLoad = (req, res, next) => {
 
-		models.Doc
-			.findById(req.params.id)
-			.then(
-				result => {
+		models.Doc.findById(req.params.id)
+		.then(result => {
 
-					if (null === result) {
-						res.status(404).send('Doc not found')
-						return
-					}
+			if (null === result) {
+				res.status(404).send('Doc not found')
+				return
+			}
 
-					//console.log('* docLoad:\n', result.toObject())
-					res.locals.Doc = result
-					next()
-				}
-			)
-			.catch(err => {
+			//console.log('* docLoad:\n', result.toObject())
+			res.locals.Doc = result
+			next()
+		})
+		.catch(err => {
 
-				if (err instanceof mongoose.Error.CastError) {
-					res.status(400).send(err.toString())
-					return
-				}
+			if (err instanceof mongoose.Error.CastError) {
+				res.status(400).send(err.toString())
+				return
+			}
 
-				next(err)
-			})
+			next(err)
+		})
 
 	}
 
@@ -389,10 +388,9 @@ sssInit(SubSystems).then(sss => {
 
 		const doc = res.locals.Doc
 
-		doc.save().then(
-			() => next(),
-			err => next(err)
-		)
+		doc.save()
+		.then(() => next())
+		.catch(next)
 
 		//console.log('* docSave', doc.toObject())
 
@@ -436,7 +434,8 @@ sssInit(SubSystems).then(sss => {
 
 		const oid = mongoose.Types.ObjectId(req.params.id)
 
-		sss.files.collection.findOne({ _id: oid }).then(fileinfo => {
+		sss.files.collection.findOne({ _id: oid })
+		.then(fileinfo => {
 
 			if (null === fileinfo) { // 404
 				next()
@@ -475,7 +474,8 @@ sssInit(SubSystems).then(sss => {
 
 			stream.pipe(res)
 
-		}).catch(next)
+		})
+		.catch(next)
 	}
 
 	const docDeleteFile = (req, res, next) => {
@@ -524,7 +524,8 @@ sssInit(SubSystems).then(sss => {
 			{
 				$set: set
 			}
-		).then(result => {
+		)
+		.then(result => {
 
 			if (null === result) { // 404
 				next()
@@ -535,7 +536,8 @@ sssInit(SubSystems).then(sss => {
 
 			res.send('ok')
 
-		}).catch(next)
+		})
+		.catch(next)
 	}
 
 	const getFilesList = (req, res, next) => {
@@ -604,7 +606,7 @@ sssInit(SubSystems).then(sss => {
 					return
 				}
 
-				console.log('fulltextUpdate:', row.affectedRows)
+				console.log('* fulltextUpdate:', row.affectedRows)
 
 				next()
 
