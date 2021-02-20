@@ -73,7 +73,8 @@ const PersonSchema = new mongoose.Schema(
         middleName: String,
         birthDay: Date,
         passport: String,
-        contact: [ContactSchema]
+        contact: [ContactSchema],
+        mainPicture: mongoose.Types.ObjectId,
     },
     docSchemaOptions
 )
@@ -91,6 +92,7 @@ const PropertySchema = new mongoose.Schema(
         ownerId: mongoose.Types.ObjectId,
         price: String,
 		description: String,
+        mainPicture: mongoose.Types.ObjectId,
 	},
 	docSchemaOptions
 )
