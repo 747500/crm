@@ -95,7 +95,6 @@ export default [
             },
         /*]
     },
-    
     {
         type: 'group',
         name: 'owner',
