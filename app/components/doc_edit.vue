@@ -6,7 +6,30 @@
 			{{ $route.meta.title || '-' }}
 		</template>
 
+		<ul class="tabs">
+			<li class="tab"
+				:class="{ active: tabView === 'docEditForm' }"
+				role="tab"
+				data-tab-component="docEditForm"
+				@click.prevent="clickTab"
+				>
+				Форма
+			</li>
+			<li class="tab"
+				:class="{ active: tabView === 'filesPanel' }"
+				role="tab"
+				data-tab-component="filesPanel"
+				@click.prevent="clickTab"
+				>
+				Файлы
+			</li>
+		</ul>
+
 		<div class="doc-edit">
+			<component :is="tabView" :oid="docId" />
+		</div>
+
+		<!-- div class="doc-edit">
 			<div class="doc">
 				<div class="edit-form">
 					<docEditForm :oid="docId" />
@@ -16,7 +39,7 @@
 					<filesPanel v-if="docId" :oid="docId" />
 				</div>
 			</div>
-		</div>
+		</div -->
 
 	</Modal>
 
@@ -38,6 +61,7 @@
 		},
 		data () {
 		    return {
+				tabView: 'docEditForm',
 				docId: null
 			}
 		},
@@ -69,6 +93,13 @@
 			closeEdit () {
 				this.$router.push('.')
 				this.$emit('updateDoc')
+			},
+			clickTab (event) {
+				const el = event.target
+
+				this.tabView = el.dataset.tabComponent
+
+				console.log(event)
 			}
 		}
 	}
@@ -87,59 +118,75 @@ a[role=button] {
 	color: black;
 }
 
-.doc-edit .doc {
-	display: flex;
-	margin: 0;
+ul.tabs {
+	margin: 0 0 1em 0;
 	padding: 0;
-	width: 100%;
+	border-bottom: 1px solid var(--border-color);
 }
 
-.doc-edit .doc > div {
-	margin: 0.5em;
+li.tab {
+	cursor: pointer;
+	display: inline-block;
+	margin: 0;
+	padding: 0 2em;
+	border-bottom: 2px solid transparent;
 }
 
-.doc-edit .doc .edit-form {
+li.tab.active {
+	font-weight: bold;
+	border-bottom: 2px solid var(--border-color);
+}
+
+.form-content {
+	display: flex;
+}
+
+.form-column {
+	flex: 1;
+}
+
+.doc-edit .edit-form {
 	flex: 1;
 	overflow: hidden;
 }
 
-.doc-edit .doc .files {
+.doc-edit .files {
 	flex: 2;
 	overflow: hidden;
 }
 
-.doc-edit .doc .edit-upload {
+.doc-edit .edit-upload {
 	flex: 2;
 	overflow: hidden;
 }
 
-.doc .contact-list .formulate-input-group {
+.doc-edit .contact-list .formulate-input-group {
 	padding-left: 0;
 }
 
-.contact-list .formulate-input-group-repeatable-remove {
+.doc-edit .contact-list .formulate-input-group-repeatable-remove {
 	position: absolute;
 	right: 0.5em;
 	top: calc(50% - 2em);
 }
 
-.contact-list .formulate-input-group-repeatable-remove:hover {
+.doc-edit .contact-list .formulate-input-group-repeatable-remove:hover {
 	text-decoration: none;
 }
 
-.contact-list .formulate-input-group-add-more {
+.doc-edit .contact-list .formulate-input-group-add-more {
 	float: right;
 }
 
-.doc .formulate-form > .formulate-input {
+.doc-edit  .formulate-form > .formulate-input {
 	margin: 0.5em 0;
 }
 
-.doc .formulate-form .formulate-input-group-add-more {
+.doc-edit  .formulate-form .formulate-input-group-add-more {
 	margin: 0.5em 0;
 }
 
-.doc .formulate-form .formulate-input-group-repeatable {
+.doc-edit  .formulate-form .formulate-input-group-repeatable {
 	border: 1px solid #ccc;
 	border-radius: 0.333em;
 	padding: 0.5em;
@@ -147,48 +194,14 @@ a[role=button] {
 	position: relative;
 }
 
-.doc .formulate-form textarea {
+.doc-edit  .formulate-form textarea {
 	resize: vertical;
 	width: 95%;
 }
 
-.doc .formulate-form input[type=text] {
+.doc-edit  .formulate-form input[type=text] {
 	width: 95%;
 }
 
-
-.files .list {
-	margin-top: 1em;
-}
-
-.files .list .item {
-	margin: 0.5em 0;
-	padding: 0.5em;
-	background-color: #faebd7;
-	border-radius: 1em;
-	display: flex;
-}
-
-.files .queue .list .item {
-	background-color: #b9c97b; /* #c0ffee; */
-}
-
-.files .list .text {
-	padding: 0.25em;
-}
-
-.files .list .text > div {
-	padding: 0.25em;
-	flex: 1;
-	font-size: smaller;
-}
-
-.files .list .item img {
-  object-fit: cover;
-  width: 9em;
-  height: 9em;
-  border-radius: 1em;
-  display: block;
-}
 
 </style>
