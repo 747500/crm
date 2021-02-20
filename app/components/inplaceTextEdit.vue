@@ -15,6 +15,12 @@
 	line-height: 1.5em;
 	height: 4.5em;
 	text-align: center;
+	overflow-wrap: anywhere;
+	white-space: pre-wrap;       /* Since CSS 2.1 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
 }
 
 .inplace-text pre:focus {
@@ -26,16 +32,21 @@
 	border: none;
 	margin: 1pt;
 	padding: 0 2pt;
-	border-radius: 3px;
+	border-radius: calc(50%);
 	display: block;
 	position: absolute;
-	right: 0;
-	bottom: 0;
+	bottom: 0px;
+	right: 0px;
+	width: 1.5em;
+	height: 1.5em;
+	background: rgba(0, 0, 0, 0.25);
 }
 
 .inplace-text input[type=submit]:hover {
-	box-shadow: 0px 0px 0px 1px var(--border-color);
+	border-color: var(--border-color);
+	background: rgba(0, 0, 0, 0.50);
 }
+
 
 </style>
 
@@ -53,11 +64,12 @@ export default {
 	},
 	data () {
 		return {
-			saved: ''
+			saved: '',
+			model: ''
 		}
 	},
 	created () {
-		this.saved = this.$props.text
+		this.model = this.saved = this.$props.text
 	},
 	render (createElement) {
 
@@ -65,11 +77,12 @@ export default {
 			attrs: {
 				type: 'submit',
 				value: this.$props.label,
-				disabled: true
+				disabled: true,
 			},
 			on: {
 				click: (event) => {
-					this.$emit('savetext', this.saved)
+					this.$emit('savetext', this.saved = this.model)
+					elButton.elm.disabled = true
 				}
 			}
 		})
@@ -80,21 +93,21 @@ export default {
 			},
 			on: {
 				input: event => {
-					this.saved = event.target.value
-
 					elButton.elm.disabled = (
-						this.$props.text === event.target.value
+						this.saved === event.target.innerText
 					)
 				},
 				keyup: event => {
 					if ('Enter' === event.key && (event.ctrlKey || event.metaKey)) {
+						this.model = event.target.innerText
 						elButton.elm.click()
+						event.preventDefault()
 					}
 				}
 			}
 		})
 
-		elText.text = this.$props.text
+		elText.text = this.model
 
 /*
 		const elText = createElement('textarea', {
