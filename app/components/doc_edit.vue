@@ -3,24 +3,7 @@
 	<Modal @close="closeEdit">
 
 		<template v-slot:title>
-			<ul class="tabs">
-				<li class="tab"
-					:class="{ active: tabView === 'docEditForm' }"
-					role="tab"
-					data-tab-component="docEditForm"
-					@click.prevent="clickTab"
-					>
-					{{ $route.meta.title || '-' }}
-				</li>
-				<li class="tab"
-					:class="{ active: tabView === 'filesPanel' }"
-					role="tab"
-					data-tab-component="filesPanel"
-					@click.prevent="clickTab"
-					>
-					Файлы
-				</li>
-			</ul>
+			<TabView :schema="tabSchema" @tab="tab => { tabView = tab }" />
 		</template>
 
 		<div class="doc-edit">
@@ -34,6 +17,7 @@
 <script>
 
 	import Modal from './Modal.vue'
+	import TabView from './TabView.vue'
 
 	import docEditForm from './doc_edit_form.vue'
 	import filesPanel from './files_panel.vue'
@@ -43,14 +27,25 @@
 
 		components: {
 			Modal,
+			TabView,
 			docEditForm,
 			filesPanel
 		},
 
 		data () {
 		    return {
-				tabView: 'docEditForm',
-				docId: null
+				docId: null,
+				tabView: null,
+				tabSchema: [
+					{
+						component: 'docEditForm',
+						title: this.$route.meta.title
+					},
+					{
+						component: 'filesPanel',
+						title: 'Файлы'
+					}
+				]
 			}
 		},
 
@@ -90,11 +85,6 @@
 				this.$emit('updateDoc')
 			},
 
-			clickTab (event) {
-				const el = event.target
-				this.tabView = el.dataset.tabComponent
-			}
-
 		}
 	}
 
@@ -110,29 +100,6 @@ a[role=button] {
 	cursor: pointer;
 	font-size: 13.333px;
 	color: black;
-}
-
-ul.tabs {
-	list-style: none;
-	margin: 0;
-	padding: 0;
-	border-bottom: 1px solid var(--border-color);
-	width: 100%;
-	display: flex;
-}
-
-li.tab {
-	cursor: pointer;
-	display: inline-block;
-	margin: 0;
-	padding: 0 2em .33em 2em;
-	flex: initial;
-	border-bottom: 2px solid transparent;
-}
-
-li.tab.active {
-	font-weight: bold;
-	border-bottom: 2px solid var(--border-color);
 }
 
 .form-content {
