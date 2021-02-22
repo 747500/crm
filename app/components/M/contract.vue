@@ -1,14 +1,9 @@
 <template>
 
 	<div class="m-contract">
-		<div class="icon" v-if="$props.icon">
-			📄
-		</div>
-
 		<div class="data">
-			<pre>{{ model }}</pre>
+			<pre>{{ $props.model }}</pre>
 		</div>
-
 	</div>
 
 </template>
@@ -17,11 +12,10 @@
 
 	export default {
 
-		name: 'contract',
+		name: 'MContract',
 
 		props: {
 			model: Object,
-			icon: Boolean
 		},
 
 	}

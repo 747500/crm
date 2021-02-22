@@ -1,13 +1,13 @@
 <template>
 	<div class="files-panel">
 		<filesUpload class="queue"
-			:oid="$props.oid"
+			:oid="$props.model._id"
 			@active="uploadActive"
 			/>
 
 		<filesList class="list"
 			v-if="showFilesList"
-			:oid="$props.oid"
+			:oid="$props.model._id"
 			/>
 	</div>
 
@@ -26,7 +26,7 @@ export default {
 		filesList
 	},
 	props: {
-		oid: String
+		model: Object
 	},
 	data () {
 		return {

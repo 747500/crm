@@ -1,26 +1,16 @@
 <template>
 
-	<div>
+	<div class="doc-edit-form">
 
-		<div v-if="mainPicture" class="main-picture">
-			<!--
-			<div class="toolbar">
-				<div class="content">
-					<div>Загрузить</div>
-					<div><a href="" @click.prevent="selectPicture">Выбрать</a></div>
-				</div>
-			</div>
-			-->
-			<oidImage :oid="mainPicture" :key="mainPicture" />
-		</div>
-
+		<!--
 		<FormulateForm
-			v-model="model"
+			v-model="doc"
 			:schema="schema"
 			@submit="submitHandler"
-			:ownerId-SelectOwner="model.ownerId"
 			/>
+		-->
 
+		<!--
 		<Modal v-if="selectPictureModal" @close="() => { selectPictureModal = false }">
 			<template slot="title">
 				Blah
@@ -29,49 +19,26 @@
 				blah
 			</div>
 		</Modal>
+		-->
+
+		<div v-for="(item, n) in schema" :key="item.is" :class="[item.class]">
+
+			<FormulateForm v-if="item.is === 'FormulateForm'"
+				v-model="doc[item.model]"
+				:schema="formSchema"
+				@submit="item.submit"
+				/>
+
+			<component v-if="item.is !== 'FormulateForm'"
+				:is="item.is"
+				v-bind="item"
+				/>
+
+		</div>
 
 	</div>
 
 </template>
-
-<style>
-
-.main-picture {
-	width: 12em;
-	height: 12em;
-	overflow: hidden;
-	border: 1px solid var(--border-color);
-	position: relative;
-}
-
-/*
-.main-picture .toolbar {
-	width: 100%;
-	position: absolute;
-	right: 0px;
-}
-
-.main-picture .toolbar .content {
-	visibility: hidden;
-}
-
-.main-picture:hover .toolbar {
-	background: rgba(0, 0, 0, 0.33);
-}
-
-.main-picture:hover .toolbar .content {
-	visibility: visible;
-}
-*/
-
-.main-picture img {
-	width: 12em;
-	height: 12em;
-
-	object-fit: cover;
-}
-
-</style>
 
 <script>
 
@@ -84,6 +51,7 @@ import personSchema from './schema/person.js'
 import propertySchema from './schema/property.js'
 import contractSchema from './schema/contract.js'
 
+
 const docSchema = {
 	person: personSchema,
 	property: propertySchema,
@@ -91,63 +59,36 @@ const docSchema = {
 }
 
 export default {
+
 	name: 'docEditForm',
+
 	components: {
 		oidImage,
 		Modal,
 	},
-	model: {
-		prop: 'oid'
-	},
+
 	props: {
-		oid: {
-			type: [ String, undefined ]
-		},
+		model: Object,
 	},
+
 	data () {
 		return {
-			docId: null,
-			model: {
-				_id: null
-			},
+			schema: null,
+			doc: null,
 			mainPicture: null,
 			selectPictureModal: false,
 		}
 	},
 
+	mounted () {
+
+		this.doc = this.$props.model
+		this.schema = this.Schema[this.doc.kind]
+
+		console.log(this.schema)
+	},
+
 	created () {
-		//console.log('<doc_edit_form> created', this.$props.oid)
-
-		const docId = this.$props.oid
-
-		if (docId) { // existent doc
-
-			this.$http.get(`/doc/${docId}`)
-			.then(response => {
-
-				const doc = Object.assign({}, response.body)
-
-				// FIXME - dirty schemaless hack
-				if (response.body.birthDay) {
-					doc.birthDay = moment(response.body.birthDay).format('YYYY-MM-DD')
-				}
-
-				this.model = doc
-
-				if (this.model.mainPicture) {
-					this.mainPicture = this.model.mainPicture
-				}
-
-				console.log('<doc_edit_form.vue> updateModel', this.model)
-			})
-			.catch(err => {
-				console.error(err)
-			})
-
-			return
-		}
-
-		// new doc
 
 	},
 
@@ -160,7 +101,7 @@ export default {
 
 		submitHandler (formData) {
 
-			console.log('<doc_edit_form> submitHandler', formData, this.model)
+			console.log('<doc_edit_form.vue> submitHandler', formData, this.model)
 
 			//return
 
@@ -195,10 +136,58 @@ export default {
 	computed: {
 
 		kind () {
-			return this.model.kind || this.$route.path.split('/')[1]
+			return this.$props.model.kind || this.$route.path.split('/')[1]
 		},
 
-		schema () {
+		Schema () {
+
+			return {
+
+				person: [
+					{
+						is: 'oidImage',
+						class: 'picture',
+						oid: this.doc.mainPicture,
+					},
+					{
+						is: 'FormulateForm',
+						class: 'form',
+						model: 'person',
+						schema: personSchema,
+						submit: this.submitHandler
+					},
+
+				],
+
+				property: [
+					{
+						is: 'oidImage',
+						class: 'picture',
+						oid: this.doc.mainPicture,
+					},
+					{
+						is: 'FormulateForm',
+						class: 'form',
+						model: 'property',
+						schema: propertySchema,
+						submit: this.submitHandler
+					},
+				],
+
+				contract: [
+					{
+						is: 'FormulateForm',
+						model: 'contract',
+						class: 'form',
+						schema: contractSchema,
+						submit: this.submitHandler
+					},
+				],
+
+			}
+		},
+
+		formSchema () {
 			var kind = this.kind;
 
 			var emptySchema = [
@@ -226,3 +215,42 @@ export default {
 }
 
 </script>
+
+<style>
+
+.doc-edit-form .picture {
+	width: 12em;
+	height: 12em;
+	overflow: hidden;
+	border: 1px solid var(--border-color);
+	position: relative;
+}
+
+/*
+.main-picture .toolbar {
+	width: 100%;
+	position: absolute;
+	right: 0px;
+}
+
+.main-picture .toolbar .content {
+	visibility: hidden;
+}
+
+.main-picture:hover .toolbar {
+	background: rgba(0, 0, 0, 0.33);
+}
+
+.main-picture:hover .toolbar .content {
+	visibility: visible;
+}
+*/
+
+.doc-edit-form .picture img {
+	width: 12em;
+	height: 12em;
+
+	object-fit: cover;
+}
+
+</style>

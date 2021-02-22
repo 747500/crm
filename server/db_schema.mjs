@@ -68,12 +68,14 @@ const ContactSchema = new mongoose.Schema(
 
 const PersonSchema = new mongoose.Schema(
     {
-        firstName: String,
-        lastName: String,
-        middleName: String,
-        birthDay: Date,
-        passport: String,
-        contact: [ContactSchema],
+        person: {
+            firstName: String,
+            lastName: String,
+            middleName: String,
+            birthDay: Date,
+            passport: String,
+            contact: [ContactSchema],
+        },
         mainPicture: mongoose.Types.ObjectId,
     },
     docSchemaOptions
@@ -88,10 +90,12 @@ const Person = Doc.discriminator(
 
 const PropertySchema = new mongoose.Schema(
 	{
-		address: String,
+        property: {
+            address: String,
+            price: String,
+            description: String,
+        },
         ownerId: mongoose.Types.ObjectId,
-        price: String,
-		description: String,
         mainPicture: mongoose.Types.ObjectId,
 	},
 	docSchemaOptions
@@ -106,8 +110,10 @@ const Property = Doc.discriminator(
 
 const ContractSchema = new mongoose.Schema(
     {
-        title: String,
-        description: String,
+        contract: {
+            title: String,
+            description: String,
+        },
         property: mongoose.Types.ObjectId,
         person: [ mongoose.Types.ObjectId ],
     },

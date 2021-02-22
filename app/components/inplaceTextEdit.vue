@@ -67,12 +67,11 @@ export default {
 	},
 	data () {
 		return {
-			saved: '',
 			model: ''
 		}
 	},
 	created () {
-		this.model = this.saved = this.$props.text
+		this.model = this.$props.text
 	},
 	render (createElement) {
 
@@ -84,7 +83,8 @@ export default {
 			},
 			on: {
 				click: (event) => {
-					this.$emit('savetext', this.saved = this.model)
+					this.model = elText.elm.innerText
+					this.$emit('savetext', this.model)
 					elButton.elm.disabled = true
 				}
 			}
@@ -97,7 +97,7 @@ export default {
 			on: {
 				input: event => {
 					elButton.elm.disabled = (
-						this.saved === event.target.innerText
+						this.model === event.target.innerText
 					)
 				},
 				keyup: event => {
@@ -106,59 +106,12 @@ export default {
 						event.preventDefault()
 						return
 					}
-					this.model = event.target.innerText
 				}
 			}
 		})
 
 		elText.text = this.model
 
-/*
-		const elText = createElement('textarea', {
-			attrs: {
-				rows: '2',
-			},
-			on: {
-				input: event => {
-					this.saved = event.target.value
-
-					elButton.elm.disabled = (
-						this.$props.text === event.target.value
-					)
-				},
-				keyup: event => {
-					if ('Enter' === event.key) {
-						elButton.elm.click()
-					}
-				}
-			}
-		})
-
-		elText.text = this.$props.text
-*/
-
-/*
-		const elText = createElement('input', {
-			attrs: {
-				type: 'text',
-				value: this.$props.text
-			},
-			on: {
-				input: event => {
-					this.saved = event.target.value
-
-					elButton.elm.disabled = (
-						this.$props.text === event.target.value
-					)
-				},
-				keyup: event => {
-					if ('Enter' === event.key) {
-						elButton.elm.click()
-					}
-				}
-			}
-		})
-*/
 		const div = createElement('div',
 			{
 				attrs: {

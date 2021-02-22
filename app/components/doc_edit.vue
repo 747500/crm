@@ -7,7 +7,14 @@
 		</template>
 
 		<div class="doc-edit">
-			<component :is="tabView" :oid="docId" />
+
+			<component
+				v-if="tabView"
+				:is="tabView.component"
+				:model="model"
+				:key="model._id"
+				/>
+
 		</div>
 
 	</Modal>
@@ -16,11 +23,14 @@
 
 <script>
 
+	import moment from 'moment'
+
 	import Modal from './Modal.vue'
 	import TabView from './TabView.vue'
 
 	import docEditForm from './doc_edit_form.vue'
 	import filesPanel from './files_panel.vue'
+	import PersonSelect from './person_select.vue'
 
 	export default {
 		name: 'docEdit',
@@ -29,23 +39,16 @@
 			Modal,
 			TabView,
 			docEditForm,
-			filesPanel
+			filesPanel,
+			PersonSelect
 		},
 
 		data () {
 		    return {
 				docId: null,
 				tabView: null,
-				tabSchema: [
-					{
-						component: 'docEditForm',
-						title: this.$route.meta.title
-					},
-					{
-						component: 'filesPanel',
-						title: 'Файлы'
-					}
-				]
+				kind: null,
+				model: {}
 			}
 		},
 
@@ -57,10 +60,36 @@
 		},
 
 		props: {
-			kind: String
+			//kind: String
 		},
 
 		computed: {
+			tabSchema () {
+
+				const Schema = [
+					{
+						kind: '*',
+						component: 'docEditForm',
+						title: this.$route.meta.title,
+					},
+					{
+						kind: [ 'property' ],
+						component: 'PersonSelect',
+						title: 'Собственник'
+					},
+					{
+						kind: [ 'person', 'property', 'contract' ],
+						component: 'filesPanel',
+						title: 'Файлы'
+					}
+				]
+
+				return Schema.filter(item => {
+					const hasKind = (this.model && this.model.kind)
+					return '*' === item.kind ||
+						(hasKind ? item.kind.includes(this.model.kind) : false)
+				})
+			},
 		},
 
 		created () {
@@ -69,8 +98,27 @@
 			this.docId = this.$route.params.id;
 
 			if ('new' === this.docId) {
-				this.docId = null
+				return
 			}
+
+			this.$http
+			.get(`/doc/${this.docId}`)
+			.then(response => {
+
+				const doc = response.body
+
+				// FIXME - dirty schemaless hack
+				if (doc.person && doc.person.birthDay) {
+					doc.person.birthDay = moment(doc.person.birthDay).format('YYYY-MM-DD')
+				}
+
+				this.model = doc
+
+				console.log('<doc_edit.vue>', this.model)
+			})
+			.catch(err => {
+				console.error(err)
+			})
 
 		},
 
@@ -85,6 +133,10 @@
 				this.$emit('updateDoc')
 			},
 
+			setKind (kind) {
+				console.log('* doc_edit.vue', kind, this.tabSchema)
+				this.kind = kind
+			}
 		}
 	}
 

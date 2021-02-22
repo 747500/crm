@@ -1,13 +1,6 @@
 
 export default [
     {
-        name: '_id',
-        type: 'text',
-        label: 'ID',
-        readonly: true,
-        class: 'oid'
-    },
-    {
         component: 'div',
         class: 'form-content',
         children: [
@@ -57,14 +50,16 @@ export default [
                         class: 'contact-list',
                         children: [
                             {
-                                label: 'Контакт',
+                                //label: 'Контакт',
                                 type: 'text',
                                 name: 'data',
+                                placeholder: 'телефон, e-mail'
                             },
                             {
-                                label: 'Описание',
+                                //label: 'Описание',
                                 type: 'text',
                                 name: 'description',
+                                placeholder: 'описание'
                             }
                         ]
                     }

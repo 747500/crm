@@ -64,7 +64,7 @@
 	text-align: center;
 }
 
-.result ul.doc-list li:first-child {
+.result ul.doc-list > li:first-child {
 	border-top: 1px solid var(--border-color);
 }
 

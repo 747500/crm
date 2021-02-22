@@ -8,13 +8,6 @@ export default [
         label: 'Объект',
         children: [*/
             {
-                class: 'oid',
-                name: '_id',
-                type: 'text',
-                label: 'ID',
-                readonly: true
-            },
-            {
                 type: 'text',
                 name: 'price',
                 label: 'Цена'

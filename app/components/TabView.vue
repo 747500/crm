@@ -4,8 +4,8 @@
 		<li v-for="(item, n) in $props.schema" :key="item.component"
 			class="tab"
 			role="tab"
-			:class="{ active: currentTab === item.component }"
-			:data-tab-component="item.component"
+			:class="{ active: currentTab.component === item.component }"
+			:data-n="n"
 			@click.prevent="clickTab"
 			>
 			{{ item.title }}
@@ -35,7 +35,7 @@
 
 		data () {
 			return {
-				currentTab: this.$props.schema[0].component
+				currentTab: this.$props.schema[0]
 			}
 		},
 
@@ -46,8 +46,7 @@
 		methods: {
 
 			clickTab (event) {
-				const el = event.target
-				this.currentTab = el.dataset.tabComponent
+				this.currentTab = this.$props.schema[event.target.dataset.n]
 				this.$emit('tab', this.currentTab)
 			},
 

@@ -88,30 +88,30 @@ ul.doc-list {
 	padding: 0.33em 0;
 }
 
-ul.doc-list li {
+ul.doc-list > li {
 	padding: .33em;
 	display: flex;
 	border-bottom: 1px solid var(--border-color);
 }
 
-ul.doc-list li:hover {
+ul.doc-list > li:hover {
 	background-color: var(--hover-color);
 }
 
-ul.doc-list li .item {
+ul.doc-list > li .item {
 	flex: 10;
 }
 
-ul.doc-list li .item.active {
+ul.doc-list > li .item.active {
 	cursor: pointer;
 }
 
-ul.doc-list li .toolbar {
+ul.doc-list > li .toolbar {
 	flex: 1;
 	text-align: right;
 }
 
-ul.doc-list li.create {
+ul.doc-list > li.create {
 	list-style-type: circle;
 }
 

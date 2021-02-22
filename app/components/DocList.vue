@@ -122,7 +122,6 @@ export default {
 			// magic
 			this.kind = this.$route.path.split('/')[1]
 
-
 			this.$http
 			.get(`/list/${this.kind}`)
 			.then(response => {

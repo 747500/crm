@@ -1,17 +1,63 @@
 <template>
-	<div>
+	<div
+		:class="[ 'm-doc', model.kind ]"
+		:key="model._id"
+		v-on="$listeners.open ? { click: () => $emit('open', model._id) } : {}"
+		>
 
-		<component v-if="model"
-			:is="model.kind"
-			:model="model"
-			v-on="$listeners.open ? { click: (event) => $emit('open', event) } : {}"
-			:schema="options[model.kind]"
-			/>
+		<div v-for="(s) in kindSchema" :key="s.model" :class="s.model">
+
+			<component
+				v-if="model[s.model]"
+				:is="s.component"
+				:model="model[s.model]"
+				/>
+
+		</div>
 
 	</div>
 </template>
 
 <script>
+
+import MPicture from './picture.vue'
+import MPerson from './person.vue'
+import MProperty from './property.vue'
+import MContract from './contract.vue'
+
+const KindSchema = {
+	person: [
+		{
+			model: 'mainPicture',
+			component: 'MPicture',
+		},
+		{
+			model: 'person',
+			component: 'MPerson',
+		},
+	],
+	property: [
+		{
+			model: 'mainPicture',
+			component: 'MPicture',
+		},
+		{
+			model: 'property',
+			component: 'MProperty',
+		},
+		{
+			model: 'owner',
+			component: 'MPerson',
+		},
+	],
+	contract: [
+		{
+			model: 'contract',
+			component: 'MContract',
+			icon: '📄'
+		}
+	],
+}
 
 import async from 'async'
 
@@ -19,16 +65,15 @@ import Person from './person.vue'
 import Property from './property.vue'
 import Contract from './contract.vue'
 
-var q = null
-
 export default {
 
 	name: 'doc',
 
 	components: {
-		Person,
-		Property,
-		Contract,
+		MPicture,
+		MPerson,
+		MProperty,
+		MContract,
 	},
 
 	props: {
@@ -38,7 +83,7 @@ export default {
 
 	data () {
 		return {
-			model: null,
+			model: {},
 			options: this.$props.schema
 		}
 	},
@@ -50,51 +95,21 @@ export default {
 			return
 		}
 
-		if (null === q) {
-			q = async.queue((task, cb) => {
-
-				this.$http.get(task.uri)
-				.then(response => {
-					task.cb(response.body)
-					cb()
-				})
-				.catch(cb)
-
-			}, 4)
-
-			q.error(err => {
-				console.log('<doc.vue>', err)
-			})
-
-			/*
-			q.drain(() => {
-				console.log('<doc.vue> queue drian', this)
-			})
-			*/
-		}
-
-
-		q.push({
-			uri: `/doc/${docId}`,
-			cb: doc => {
-
-				this.model = doc
-
-				if ('property' === doc.kind && doc.ownerId) {
-
-					q.push({
-						uri: `/doc/${doc.ownerId}`,
-						cb: owner => {
-							doc.ownerId = owner
-						}
-					})
-				}
-			}
+		this.$http
+		.get(`/doc/${docId}`)
+		.then(response => {
+			//console.log(response.body)
+			this.model = response.body
 		})
+		.catch(console.error)
 
 	},
 
 	computed: {
+		kindSchema () {
+			//console.log('kindSchema', KindSchema[this.model.kind])
+			return KindSchema[this.model.kind]
+		}
 	},
 
 	methods: {
@@ -102,3 +117,36 @@ export default {
 	}
 }
 </script>
+
+<style>
+
+.m-doc {
+	display: flex;
+}
+
+.m-doc .mainPicture {
+	flex: initial;
+}
+
+.m-doc .property {
+	margin: 0 0.5rem;
+	flex: 3;
+}
+
+.m-doc .owner {
+	margin: 0 0.5rem;
+	flex: 4;
+}
+
+.m-doc .person {
+	margin: 0 0.5rem;
+	flex: auto;
+}
+
+.m-doc .mainPicture img {
+	object-fit: cover;
+	width: 9rem;
+	height: 9rem;
+}
+
+</style>
