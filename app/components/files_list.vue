@@ -6,7 +6,7 @@
 
 		<div v-for="(file) in files.slice().reverse()"
 			:key="file.key"
-			:class="{ busy: true == file.busy }"
+			:class="{ busy: true == file.busy, avatar: file._id === $props.avatar }"
 			class="item"
 			>
 			<div class="toolbar">
@@ -14,7 +14,8 @@
 					<aConfirm
 						message="Отмена"
 						:onconfirm="() => { removeFile(file) }">Удалить</aConfirm>
-					<a href="" @click.prevent="() => setAsMain(file)">Сделать главной</a>
+					<!-- a href="" @click.prevent="() => setAsMain(file)">Сделать главной</a -->
+					<a href="" @click.prevent="() => $emit('setMain', file._id)">Сделать главной</a>
 				</div>
 			</div>
 			<div class="content">
@@ -59,13 +60,14 @@ export default {
 	components: {
 		iimg,
 		inplaceTextEdit,
-		aConfirm
+		aConfirm,
 	},
 	model: {
-		prop: 'oid'
+		prop: 'oid',
 	},
 	props: {
-		oid: [ String, undefined ]
+		oid: [ String, undefined ],
+		avatar: String,
 	},
 	data () {
 		return {
@@ -73,24 +75,6 @@ export default {
 		}
 	},
 	methods: {
-
-		setAsMain (file) {
-			this.$http.post(
-				`/doc/${this.$props.oid}`,
-				{
-					mainPicture: file._id
-				},
-				{
-					headers: {
-						'Content-Type': 'application/json'
-					}
-				}
-			).then(result => {
-				console.log('setAsMain http result', result)
-
-			}).catch(console.error)
-
-		},
 
 		saveText (file) {
 

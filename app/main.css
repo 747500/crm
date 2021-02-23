@@ -34,7 +34,7 @@ a:visited {
 }
 
 a:hover {
-	color: #113569;
+	color: darkred;
 	text-decoration: underline;
 }
 

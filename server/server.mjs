@@ -262,29 +262,35 @@ sssInit(SubSystems).then(sss => {
 	// TODO validation
 	const docEvents = (req, res, next) => {
 
-		console.log(req.query)
+		console.log('* docEvents\n', req.query)
 
 		const month = parseInt(moment(req.query.yearmonth).format('MM'))
+		console.log('* docEvents\n', month)
 
 		models.Doc.aggregate([
 			{
 				$project: {
-					firstName: 1,
-					middleName: 1,
-					lastName: 1,
-					birthDay: 1,
+					_id: true,
+					kind: true,
+					firstName: '$person.firstName',
+					middleName: '$person.middleName',
+					lastName: '$person.lastName',
+					birthDay: '$person.birthDay',
 					month: {
-						$month: '$birthDay'
+						$month: '$person.birthDay'
 					}
 				}
 			},
 			{
 				$match: {
+					kind: 'person',
 					month: month
 				}
 			}
 		])
 		.then(result => {
+			console.log('* docEvents\n', result)
+
 			res.locals.Result = result.map(i => {
 
 				const birthDate = moment(i.birthDay).format('DD-MM-YYYY')
@@ -294,7 +300,8 @@ sssInit(SubSystems).then(sss => {
 
 				return {
 					eventAt: eventDate,
-					eventTitle: `${birthDate} ${i.lastName} ${i.firstName} ${i.middleName} ${age}`
+					eventTitle: `${birthDate} ${i.lastName} ${i.firstName} ${i.middleName} ${age}`,
+					subjectId: i._id.toString(),
 				}
 			})
 			next()

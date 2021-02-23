@@ -3,7 +3,7 @@
 	<Modal @close="closeEdit">
 
 		<template v-slot:title>
-			<TabView :schema="tabSchema" @tab="tab => { tabView = tab }" />
+			<TabView :schema="TabViewSchema" @tab="tab => { tabView = tab }" />
 		</template>
 
 		<div class="doc-edit">
@@ -28,17 +28,17 @@
 	import Modal from './Modal.vue'
 	import TabView from './TabView.vue'
 
-	import docEditForm from './doc_edit_form.vue'
+	import DocEdit from './DocEdit.vue'
 	import filesPanel from './files_panel.vue'
 	import PersonSelect from './person_select.vue'
 
 	export default {
-		name: 'docEdit',
+		name: 'Doc',
 
 		components: {
 			Modal,
 			TabView,
-			docEditForm,
+			DocEdit,
 			filesPanel,
 			PersonSelect
 		},
@@ -47,7 +47,6 @@
 		    return {
 				docId: null,
 				tabView: null,
-				kind: null,
 				model: {}
 			}
 		},
@@ -60,40 +59,48 @@
 		},
 
 		props: {
-			//kind: String
+			kind: String
 		},
 
 		computed: {
-			tabSchema () {
 
-				const Schema = [
+			TabViewSchema () {
+
+				return [
+
 					{
 						kind: '*',
-						component: 'docEditForm',
 						title: this.$route.meta.title,
+						component: 'DocEdit',
 					},
 					{
 						kind: [ 'property' ],
+						title: 'Собственник',
 						component: 'PersonSelect',
-						title: 'Собственник'
 					},
 					{
 						kind: [ 'person', 'property', 'contract' ],
+						title: 'Файлы',
 						component: 'filesPanel',
-						title: 'Файлы'
 					}
-				]
 
-				return Schema.filter(item => {
-					const hasKind = (this.model && this.model.kind)
-					return '*' === item.kind ||
-						(hasKind ? item.kind.includes(this.model.kind) : false)
+				].filter(item => {
+
+					if ('*' === item.kind) {
+						return true
+					}
+
+					if (this.model && this.model.kind) {
+						return item.kind.includes(this.model.kind)
+					}
+
+					return false
 				})
 			},
 		},
 
-		created () {
-			//console.log('<doc_edit.vue> created', this)
+		mounted () {
+			console.log('<doc_edit.vue> mounted', this.$route.params)
 
 			this.docId = this.$route.params.id;
 
@@ -113,30 +120,23 @@
 				}
 
 				this.model = doc
-
-				console.log('<doc_edit.vue>', this.model)
 			})
-			.catch(err => {
-				console.error(err)
-			})
+			.catch(console.error)
 
 		},
 
-		mounted () {
+		created () {
 
 		},
 
 		methods: {
 
 			closeEdit () {
-				this.$router.push('.')
+				//this.$router.push('.')
+				this.$router.go(-1)
 				this.$emit('updateDoc')
 			},
 
-			setKind (kind) {
-				console.log('* doc_edit.vue', kind, this.tabSchema)
-				this.kind = kind
-			}
 		}
 	}
 
@@ -154,11 +154,11 @@ a[role=button] {
 	color: black;
 }
 
-.form-content {
+.doc-edit .form-content {
 	display: flex;
 }
 
-.form-column {
+.doc-edit .form-column {
 	flex: 1;
 }
 
@@ -195,15 +195,15 @@ a[role=button] {
 	float: right;
 }
 
-.doc-edit  .formulate-form > .formulate-input {
+.doc-edit .formulate-form > .formulate-input {
 	margin: 0.5em 0;
 }
 
-.doc-edit  .formulate-form .formulate-input-group-add-more {
+.doc-edit .formulate-form .formulate-input-group-add-more {
 	margin: 0.5em 0;
 }
 
-.doc-edit  .formulate-form .formulate-input-group-repeatable {
+.doc-edit .formulate-form .formulate-input-group-repeatable {
 	border: 1px solid #ccc;
 	border-radius: 0.333em;
 	padding: 0.5em;
@@ -211,12 +211,12 @@ a[role=button] {
 	position: relative;
 }
 
-.doc-edit  .formulate-form textarea {
+.doc-edit .formulate-form textarea {
 	resize: vertical;
 	width: 95%;
 }
 
-.doc-edit  .formulate-form input[type=text] {
+.doc-edit .formulate-form input[type=text] {
 	width: 95%;
 }
 

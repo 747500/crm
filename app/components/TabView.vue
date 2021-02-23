@@ -4,11 +4,14 @@
 		<li v-for="(item, n) in $props.schema" :key="item.component"
 			class="tab"
 			role="tab"
-			:class="{ active: currentTab.component === item.component }"
-			:data-n="n"
-			@click.prevent="clickTab"
 			>
-			{{ item.title }}
+			<a href=""
+				:class="{ active: currentTab.component === item.component }"
+				:data-n="n"
+				@click.prevent="clickTab"
+				>
+				{{ item.title }}
+			</a>
 		</li>
 	</ul>
 
@@ -66,15 +69,21 @@ ul.tab-view {
 }
 
 ul.tab-view li.tab {
-	cursor: pointer;
 	display: inline-block;
 	margin: 0;
-	padding: 0 2em .33em 2em;
+	padding: 0;
+	list-style: none;
 	flex: initial;
+}
+
+ul.tab-view li.tab a {
+	display: block;
+	margin: 0;
+	padding: 0 2rem .33rem 2rem;
 	border-bottom: 2px solid transparent;
 }
 
-ul.tab-view li.tab.active {
+ul.tab-view li.tab a.active {
 	font-weight: bold;
 	border-bottom: 2px solid var(--border-color);
 }

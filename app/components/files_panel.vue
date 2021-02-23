@@ -8,6 +8,8 @@
 		<filesList class="list"
 			v-if="showFilesList"
 			:oid="$props.model._id"
+			:avatar="$props.model.mainPicture"
+			@setMain="setAsMain"
 			/>
 	</div>
 
@@ -15,7 +17,6 @@
 
 <script>
 
-	import docEditForm from './doc_edit_form.vue'
 	import filesUpload from './files_upload_queue.vue'
 	import filesList from './files_list.vue'
 
@@ -36,7 +37,26 @@ export default {
 	methods: {
 		uploadActive (message) {
 			this.showFilesList = !message
-		}
+		},
+
+		setAsMain (oid) {
+			this.$http.post(
+				`/doc/${this.$props.model._id}`,
+				{
+					mainPicture: oid
+				},
+				{
+					headers: {
+						'Content-Type': 'application/json'
+					}
+				}
+			).then(result => {
+				console.log('setAsMain http result', result)
+
+			}).catch(console.error)
+
+		},
+
 	}
 
 }

@@ -51,7 +51,7 @@
 
 				this.$http.get(`/doc/${this.$props.model}`)
 				.then(response => {
-					console.log(response)
+					//console.log('<M/person.vue>', response)
 					this.person = response.body.person
 
 					//this.key = '' + this.person._id + '-' + this.person.mtime.getTime()

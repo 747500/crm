@@ -23,6 +23,11 @@ export default [
                 type: 'select',
                 options: [
                     {
+                        value: '',
+                        label: 'Новостройка',
+                        disabled: true,
+                    },
+                    {
                         value: 'new',
                         label: 'Новостройка'
                     },

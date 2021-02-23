@@ -12,7 +12,7 @@ import Browser from './components/browser.vue'
 import Calendar from './components/calendar.vue'
 
 import DocList from './components/DocList.vue'
-import DocEdit from './components/doc_edit.vue'
+import Doc from './components/Doc.vue'
 
 // --------------------------------------------------------------------------
 
@@ -76,7 +76,7 @@ const routes = [
 					{
 						name: 'person_edit',
 						path: ':id',
-						component: DocEdit,
+						component: Doc,
 						props: true,
 						meta: {
 							title: '👤 Контакт',
@@ -96,7 +96,7 @@ const routes = [
 					{
 						name: 'property_edit',
 						path: ':id',
-						component: DocEdit,
+						component: Doc,
 						props: true,
 						meta: {
 							title: '🏠 Объект',
@@ -116,7 +116,7 @@ const routes = [
 					{
 						name: 'contract_edit',
 						path: ':id',
-						component: DocEdit,
+						component: Doc,
 						props: true,
 						meta: {
 							title: '📄 Сделка',

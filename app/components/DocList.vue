@@ -13,7 +13,7 @@
 			@remove="removeDoc"
 			>
 
-			<MDoc :oid="props.item" :schema="options" />
+			<MDoc :oid="props.item" />
 
 		</List>
 
@@ -39,9 +39,6 @@ export default {
 	components: {
 		List,
 		MDoc,
-		//person,
-		//property,
-		//contract
 	},
 
 	data () {
@@ -49,24 +46,6 @@ export default {
 			kind: null,
 			model: [],
 			modelKey: null,
-			options: {
-				person: {
-					icon: false,
-					image: true
-				},
-				property: {
-					icon: false,
-					image: true,
-					person: {
-						icon: false,
-						image: false,
-					}
-				},
-				contract: {
-					icon: false,
-					image: false
-				},
-			},
 		}
 	},
 
@@ -98,7 +77,10 @@ export default {
 		createDoc() {
 			console.log('<doc.vue> on createDoc')
 			this.$router.push({
-				path: `${this.kind}/new`
+				path: `${this.kind}/new`,
+				props: {
+					model: this.kind
+				}
 			})
 		},
 
