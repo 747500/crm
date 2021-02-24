@@ -40,28 +40,6 @@ const SubSystems = [
 		}
 	},
 
-	// ----------------------------------------------------------------------
-
-	{
-		name: 'sphinx',
-		init () {
-			return new Promise((resolve, reject) => {
-
-				var cl = new SphinxClient()
-
-				cl.SetServer('127.0.0.1', 9312)
-
-				cl.Status((err, result) => {
-					if (err) {
-						reject(err)
-						return
-					}
-					resolve(cl)
-				})
-			})
-		}
-	},
-
 	// --------------------------------------------------------------------------
 
 	{
@@ -170,63 +148,55 @@ sssInit(SubSystems).then(sss => {
 
 		const searchString = req.body.q
 
-		/*
+		const queryArgs = [req.body.q]
+		var query = 'SELECT * FROM testrt WHERE MATCH(?)'
+
+		if (req.body.kind) {
+			if ((req.body.kind instanceof Array) && req.body.kind.length) {
+				queryArgs.push(req.body.kind)
+			}
+			else
+			if ('string' === typeof req.body.kind) {
+				queryArgs.push(req.body.kind)
+			}
+
+			if (queryArgs.length === 2) {
+				query += ' AND kind IN (?)'
+			}
+		}
+
 		sss.sphinxql.query(
-			'SELECT * FROM testrt WHERE MATCH(?)'
-			[
-				//req.body.kinds,
-				req.body.q
-				//doc.ctime.getTime()
-			],
-			(err, row, fields) => {
+			query, queryArgs,
+			(err, rows, fields) => {
 
 				if (err) {
 					console.error(err)
 					return
 				}
 
-				console.log('SELECT', row)
+				console.log('* Sphinx SELECT', rows)
+
+				sss.sphinxql.query(
+					'SHOW META LIKE ?',
+					[ 'total_found' ],
+					(err, meta, fields) => {
+
+						if (err) {
+							console.error(err)
+							return
+						}
+
+						console.log('* Sphinx total_found:', meta[0].Value)
+						//res.send(rows)
+
+						res.send({
+							total_found: meta[0].Value,
+							result: rows
+						})
+					}
+				)
 			}
 		)
-		*/
-		sss.sphinx.SetMatchMode(SphinxClient.SPH_MATCH_EXTENDED)
-
-		sss.sphinx.Query(
-			req.body.q,
-			(err, rows, fields) => {
-				if (err) {
-					next(err)
-					return
-				}
-
-				console.log(rows);
-
-				res.send(rows.matches)
-			}
-		)
-
-/*
-		models.Person
-		.find({
-			$text: {
-				$search: searchString,
-				$language: 'ru'
-			}
-		})
-    	//.skip(20)
-		.limit(10)
-		.exec(function(err, result) {
-			if (err) {
-				next(err)
-				return
-			}
-
-			console.log('<search> result', result)
-
-			res.send(result)
-
-		});
-*/
 	}
 
 // --------------------------------------------------------------------------
@@ -346,7 +316,11 @@ sssInit(SubSystems).then(sss => {
 			'id': true,
 			'fts': true,
 			'time': true,
+			'mtime': true,
+			'ctime': true,
 		}
+
+		//console.log('* docUpdate', req.body)
 
 		var fieldsUpdated = 0
 
@@ -356,7 +330,7 @@ sssInit(SubSystems).then(sss => {
 				return
 			}
 
-			console.log('>>>', k, req.body[k])
+			//console.log('>>>', k, req.body[k])
 
 			if (k in req.body) {
 				fieldsUpdated ++;
@@ -366,7 +340,7 @@ sssInit(SubSystems).then(sss => {
 		})
 
 		if (0 === fieldsUpdated) {
-			res.status(400).send('Zero fields updated')
+			res.status(400).send('Can\'t find fields to update')
 			return;
 		}
 
@@ -409,11 +383,11 @@ sssInit(SubSystems).then(sss => {
 
 		const doc = res.locals.Doc
 
-		console.log('* docSave input\n', doc.toObject())
+		//console.log('* docSave input\n', doc.toObject())
 
 		doc.save()
 		.then((result) => {
-			console.log('* docSave result\n', result)
+			//console.log('* docSave result\n', result)
 			next()
 		})
 		.catch(next)
@@ -636,15 +610,16 @@ sssInit(SubSystems).then(sss => {
 
 		const doc = res.locals.Doc
 		const id = doc.ctime.getTime()
+		const docFts = doc.fts.join(' ')
 
-		console.log('* fulltextAdd:', doc.fts)
+		console.log('* fulltextAdd:', docFts)
 
 		sss.sphinxql.query(
 			//'UPDATE testrt SET content = ?, kind = ?, oid = ? WHERE id = ?',
 			'INSERT INTO testrt (id, content, oid, kind) VALUES (?, ?, ?, ?)',
 			[
 				id,
-				doc.fts,
+				docFts,
 				doc._id.toString(),
 				doc.kind
 			],
@@ -665,29 +640,43 @@ sssInit(SubSystems).then(sss => {
 	const fulltextUpdate = (req, res, next) => {
 		const doc = res.locals.Doc
 		const id = doc.ctime.getTime()
+		const docFts = doc.fts
 
-		console.log('* fulltextUpdate:', doc.fts)
+		console.log('* fulltextUpdate:', docFts)
 
 		sss.sphinxql.query(
-			'REPLACE INTO testrt (id, content, oid, kind) VALUES (?, ?, ?, ?)',
-			[
-				id,
-				doc.fts,
-				doc._id.toString(),
-				doc.kind
-			],
+			'DELETE FROM testrt WHERE oid = ?',
+			[ doc._id.toString() ],
 			(err, row, fields) => {
 				if (err) {
 					next(err)
 					return
 				}
 
-				console.log('* fulltextUpdate:', row.affectedRows)
+				sss.sphinxql.query(
+					'REPLACE INTO testrt (id, content, oid, kind) VALUES (?, ?, ?, ?)',
+					[
+						id,
+						docFts.join(' '),
+						doc._id.toString(),
+						doc.kind
+					],
+					(err, row, fields) => {
+						if (err) {
+							next(err)
+							return
+						}
 
-				next()
+						console.log('* fulltextUpdate:', row.affectedRows)
+
+						next()
+
+					}
+				)
 
 			}
 		)
+
 	}
 
 // ==========================================================================
@@ -737,6 +726,8 @@ sssInit(SubSystems).then(sss => {
 		sendResultJSON
 	)
 
+	// --------------------------------------------------------------------------
+
 	sss.web.get('/doc/:id',
 		docLoad,
 		docAsResult,
@@ -762,9 +753,9 @@ sssInit(SubSystems).then(sss => {
 		schemaResolve,
 		docNew,
 		docUpdate,
-		fulltextAdd,
 		docAsResult,
 		docSave,
+		fulltextAdd,
 		sendResultJSON
 	)
 

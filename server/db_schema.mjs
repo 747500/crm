@@ -39,20 +39,43 @@ const DocSchema = new mongoose.Schema(
 DocSchema.virtual('fts').get(function (a) {
     const fts = []
 
-//    console.log('doc>', this)
+    //console.log('* FTS Doc:', this._doc)
 
-    Object.keys(this._doc).map(k => {
-        if ('kind' === k)
-            return
+    const walk = (o) => {
 
-        if ('string' === typeof this[k]) {
-            fts.push(this._doc[k])
-        }
-    })
+        Object.keys(o).map(k => {
+            //console.log('>', k, typeof o[k])
 
-//    console.log('\t', fts)
+            if ('kind' === k) {
+                return
+            }
 
-    return fts.join(' ')
+            if ('fts' === k) {
+                return
+            }
+
+            if ('string' === typeof o[k]) {
+                fts.push(o[k])
+                return
+            }
+
+            if ('object' !== typeof o[k]) {
+                return
+            }
+
+            if (k === this._doc.kind) {
+                walk(o[k])
+                return
+            }
+        })
+
+    }
+
+    walk(this._doc)
+
+    //console.log('* fts:', fts)
+
+    return fts
 })
 
 const Doc = mongoose.model('Doc', DocSchema)
