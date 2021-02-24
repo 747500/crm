@@ -24,12 +24,17 @@ mongoose.connect(
 
 	function doTheJob (item, cb) {
 
-		console.log('-------------------------\n', item);
+		models.Doc.findById(item._id)
+		.then(doc => {
+			console.log('fts>', doc.fts)
+			cb()
 
-		console.log()
+		})
+		.catch(console.error)
 
-		db.collection('docs')
 		/*
+		db.collection('docs')
+
 		.updateOne(
 			{
 			_id: item._id
@@ -85,6 +90,7 @@ mongoose.connect(
 		)
 		*/
 
+		/*
 		.replaceOne(
 			{
 			_id: item._id
@@ -103,12 +109,15 @@ mongoose.connect(
 				person: item.person,
 			}
 		)
+		*/
 
+		/*
 		.then(result => {
 			console.log(result)
 			cb()
 		})
 		.catch(err => cb(err))
+		*/
 
 		//setTimeout(cb, 1000)
 	}
@@ -119,10 +128,10 @@ mongoose.connect(
 		db.collection('docs')
 		.find(
 			{
-				kind: 'contract',
-				contract: {
-					$exists: false
-				}
+				//kind: 'contract',
+				//contract: {
+				//	$exists: false
+				//}
 			},
 			(err, cursor) => {
 
