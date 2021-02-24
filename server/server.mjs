@@ -270,7 +270,7 @@ sssInit(SubSystems).then(sss => {
 
 				return {
 					eventAt: eventDate,
-					eventTitle: `${birthDate} ${i.lastName} ${i.firstName} ${i.middleName} ${age}`,
+					eventTitle: `ДР - ${age}`,
 					subjectId: i._id.toString(),
 				}
 			})

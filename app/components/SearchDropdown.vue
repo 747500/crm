@@ -3,7 +3,9 @@
 	<div class="search">
 
 		<div class="query">
+
 			<div class="label prefix">🔍</div>
+
 			<input ref="searchInput"
 				tabindex="1"
 				class="query"
@@ -12,7 +14,12 @@
 				@focus="handleSearchFocus"
 				@blur="handleSearchFocus"
 				/>
-			<a role="button" href="" class="label suffix" @click.prevent="searchQueryClean">🗙</a>
+
+			<a role="button"
+				href=""
+				class="label suffix"
+				@click.prevent="searchQueryClean">🗙</a>
+
 		</div>
 
 		<div :class="[ 'result', { active: searchResults.length } ]">
@@ -22,14 +29,13 @@
 				>
 				<li v-for="(item, n) in searchResults" :key="item.id">
 					<SDoc :oid="item.oid" />
-					<!-- pre>{{ item }}</pre -->
 				</li>
 			</ul>
 		</div>
+
 	</div>
 
 </template>
-
 
 <script>
 
@@ -81,6 +87,7 @@
 			handleSearchFocus (event) {
 				//console.log(event)
 
+				// it's possible to dnf code below, leaved as is for clarity
 				if ('blur' === event.type &&
 					(
 						null === event.relatedTarget
@@ -142,8 +149,6 @@
 	}
 
 </script>
-
-
 
 <style>
 

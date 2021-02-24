@@ -9,7 +9,7 @@ import VueRouter from 'vue-router'
 import Nav from './components/nav.vue'
 
 import Browser from './components/browser.vue'
-import Calendar from './components/calendar.vue'
+import Events from './components/Events.vue'
 
 import DocList from './components/DocList.vue'
 import Doc from './components/Doc.vue'
@@ -41,7 +41,7 @@ const routes = [
 				title: 'Календарь',
 				name: 'calendar',
 				path: '/calendar',
-				component: Calendar,
+				component: Events,
 				meta: {
 					title: 'Календарь'
 				}
