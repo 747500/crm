@@ -80,6 +80,7 @@ const routes = [
 						props: true,
 						meta: {
 							title: '👤 Контакт',
+							kind: 'person',
 						},
 					}
 				]
@@ -100,6 +101,7 @@ const routes = [
 						props: true,
 						meta: {
 							title: '🏠 Объект',
+							kind: 'property',
 						},
 					}
 				]
@@ -120,6 +122,7 @@ const routes = [
 						props: true,
 						meta: {
 							title: '📄 Сделка',
+							kind: 'contract',
 						},
 					}
 				]

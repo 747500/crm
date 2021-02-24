@@ -9,18 +9,10 @@
 			:class="{ busy: true == file.busy, avatar: file._id === $props.avatar }"
 			class="item"
 			>
-			<div class="toolbar">
-				<div class="tools">
-					<aConfirm
-						message="Отмена"
-						:onconfirm="() => { removeFile(file) }">Удалить</aConfirm>
-					<!-- a href="" @click.prevent="() => setAsMain(file)">Сделать главной</a -->
-					<a href="" @click.prevent="() => $emit('setMain', file._id)">Сделать главной</a>
-				</div>
-			</div>
 			<div class="content">
 				<div class="img">
 					<iimg :src="file.blob"/>
+					<div class="lamp">💡</div>
 				</div>
 
 				<div class="text">
@@ -36,6 +28,21 @@
 						label="🖉" />
 				</div>
 			</div>
+
+			<div class="toolbar">
+				<div class="tools">
+					<aConfirm
+						class="btn btn-outline-danger btn-sm"
+						message="Отмена"
+						:onconfirm="() => { removeFile(file) }">️ 🗑 </aConfirm>
+					<button
+						class="btn btn-dark btn-sm"
+						:disabled="file._id === $props.avatar"
+						@click.prevent="() => $emit('setMain', file._id)">
+						{{ file._id === $props.avatar ? 'Главная' : 'Сделать главной' }}
+					</button>
+				</div>
+			</div>
 		</div>
 	</div>
 
@@ -43,6 +50,26 @@
 </template>
 
 <style>
+
+.item .content .img {
+	position: relative;
+}
+
+.item .content .img .lamp {
+	position: absolute;
+	line-height: 2em;
+	bottom: 0px;
+	right: 0px;
+	display: none;
+	width: 2em;
+	height: 2em;
+	text-align: center;
+	text-shadow: 1px 0px 3px #fff, -1px 0px 3px #fff, 0px 1px 3px #fff, 0px -1px 3px #fff;
+}
+
+.item.avatar .content .img .lamp {
+	display: block;
+}
 
 .busy {
 	outline: 1px dotted red;

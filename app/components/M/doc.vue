@@ -1,5 +1,6 @@
 <template>
 	<div
+		:id="model._id"
 		:class="[ 'm-doc', model.kind ]"
 		:key="model._id"
 		v-on="$listeners.open ? { click: () => $emit('open', model._id) } : {}"
@@ -10,7 +11,7 @@
 			<component
 				v-if="model[s.model]"
 				:is="s.component"
-				:model="model[s.model]"
+				:model="'contract' == s.model ? model : model[s.model]"
 				/>
 
 		</div>
@@ -55,7 +56,11 @@ const KindSchema = {
 			model: 'contract',
 			component: 'MContract',
 			icon: '📄'
-		}
+		},
+		{
+			model: 'mainPicture',
+			component: 'MPicture',
+		},
 	],
 }
 

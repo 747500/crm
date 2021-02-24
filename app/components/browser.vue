@@ -13,25 +13,33 @@
 					/><input type="button" value="🔍" @click="searchInput"/>
 			</div>
 
-			<!-- div>
+			<div>
+				<FormulateInput
+					type="checkbox"
+					v-model="kind"
+					:options="{ person: 'Контакты', property: 'Собственность', contract: 'Сделки' }"
+					@input="searchFilter"
+					/>
+					<!--
 				<label>
 					Люди
-					<input v-model="kinds" type="checkbox" name="kind" value="person" checked />
+					<input v-model="kind" type="checkbox" name="kind" value="person" />
 				</label>
 
 				<label>
 					Собственность
-					<input v-model="kinds" type="checkbox" name="kind" value="property" checked />
+					<input v-model="kind" type="checkbox" name="kind" value="property" />
 				</label>
 
 				<label>
 					Сделки
-					<input v-model="kinds" type="checkbox" name="kind" value="contract" checked />
+					<input v-model="kind" type="checkbox" name="kind" value="contract" />
 				</label>
-			</div -->
+					-->
+			</div>
 
 			<div>
-				<span>{{ result.length }} results found</span>
+				<span>Найдено: {{ total_found }}</span>
 			</div>
 		</div>
 
@@ -47,7 +55,7 @@
 				@remove="(doc) => $emit('remove', doc)"
 				-->
 
-				<MDoc :oid="props.item.attrs.oid" :schema="schema" />
+				<MDoc :oid="props.item.oid" />
 
 			</List>
 
@@ -68,6 +76,17 @@
 	border-top: 1px solid var(--border-color);
 }
 
+.browser .formulate-input-group {
+	max-width: 50vh;
+	margin: 0.5rem auto;
+	display: flex;
+}
+
+.browser .formulate-input-group > div{
+	margin: 0.5rem;
+	flex: 1;
+}
+
 </style>
 
 <script>
@@ -84,9 +103,10 @@ export default {
 	},
 	data () {
 		return {
-			kinds: [],
+			kind: [ ],
 			search: '',
 			result: [],
+			total_found: 0,
 			schema: {
 				person: {
 					icon: true,
@@ -108,7 +128,7 @@ export default {
 		}
 	},
 	created () {
-		this.searchInput()
+		this.searchFilter()
 	},
 	methods: {
 		openDoc (item) {
@@ -123,19 +143,29 @@ export default {
 			this.$http.post('/s',
 				{
 					q: this.search,
-					kind: this.kinds
+					kind: this.kind
 				}
 			)
 			.then(response => {
 
 				//console.log('<browser.vue> response:', response)
 
-				this.result = response.body
+				this.result = response.body.result
+				this.total_found = response.body.total_found
 			})
 			.catch(err => {
 				console.error(err)
 			})
 		},
+
+		searchFilter() {
+			if (0 === this.kind.length) {
+				this.kind = [ 'person', 'property', 'contract' ]
+			}
+
+			console.log(this.kind)
+			this.searchInput()
+		}
 
 	}
 }

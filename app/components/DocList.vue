@@ -51,7 +51,7 @@ export default {
 
 	on: {
 		listChange (event) {
-			console.log('<doc.vue> on listChange', event)
+			console.log('<DocList.vue> on listChange', event)
 		}
 	},
 
@@ -75,7 +75,7 @@ export default {
 	methods: {
 
 		createDoc() {
-			console.log('<doc.vue> on createDoc')
+			console.log('<DocList.vue> on createDoc')
 			this.$router.push({
 				path: `${this.kind}/new`,
 				props: {
@@ -85,7 +85,7 @@ export default {
 		},
 
 		editDoc(item) {
-			console.log('<doc.vue> on editDoc', item)
+			console.log('<DocList.vue> on editDoc', item)
 
 			this.$router.push({
 				path: `${this.kind}/${item}`
@@ -93,11 +93,11 @@ export default {
 		},
 
 		removeDoc(item) {
-			console.log('<doc.vue> on removeDoc', item)
+			console.log('<DocList.vue> on removeDoc', item)
 		},
 
 		openDoc (item) {
-			console.log('<doc.vue> on openDoc', item)
+			console.log('<DocList.vue> on openDoc', item)
 		},
 
 		updateModel () {

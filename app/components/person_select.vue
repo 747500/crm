@@ -1,9 +1,14 @@
 <template>
 
-	<div :key="owner._id">
-		<DocEdit v-if="owner._id" :model="owner" />
-		<div v-else>
-			$props.owner: {{ owner }}
+	<div>
+
+		<SearchDropdown />
+
+		<div :key="owner._id">
+			<DocForm :model="owner.person" :kind="kind" />
+			<!-- div v-else>
+				$props.owner: {{ owner }}
+			</div-->
 		</div>
 	</div>
 
@@ -11,14 +16,19 @@
 
 <script>
 
-	import DocEdit from './DocEdit.vue'
+	import SearchDropdown from './SearchDropdown.vue'
+
+	import SDoc from './S/doc.vue'
+	import DocForm from './DocForm.vue'
 
 	export default {
 
 		name: 'PersonSelect',
 
 		components: {
-			DocEdit
+			SearchDropdown,
+			SDoc,
+			DocForm
 		},
 
 		props: {
@@ -27,7 +37,8 @@
 
 		data () {
 			return {
-				owner: {}
+				kind: 'person',
+				owner: {},
 			}
 		},
 
@@ -40,7 +51,17 @@
 				})
 				.catch(console.error)
 			}
+		},
+
+		methods: {
+
+
 		}
 	}
 
 </script>
+
+<style>
+
+
+</style>

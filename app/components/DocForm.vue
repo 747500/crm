@@ -1,6 +1,6 @@
 <template>
 
-	<div class="doc-edit-form">
+	<div class="doc-form">
 
 		<FormulateForm
 			v-model="doc"
@@ -29,7 +29,7 @@ const docSchema = {
 
 export default {
 
-	name: 'docEditForm',
+	name: 'DocForm',
 
 	components: {
 	},
@@ -83,9 +83,14 @@ export default {
 			return [
 				...schema,
 				{
+					component: 'div',
+					class: 'hr',
+				},
+				{
 					name: 'submit',
 					type: 'submit',
-					label: 'Сохранить'
+					label: 'Сохранить',
+					inputClass: 'btn btn-success'
 				}
 			]
 		}

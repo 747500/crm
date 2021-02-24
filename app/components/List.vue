@@ -84,7 +84,8 @@ export default {
 <style>
 
 ul.doc-list {
-	margin: 0;
+	margin: 0 auto;
+	max-width: 50rem;
 	padding: 0.33em 0;
 }
 

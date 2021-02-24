@@ -1,6 +1,6 @@
 <template>
 
-	<div>
+	<div class="doc-edit">
 		<div v-for="(item, n) in Schema[doc.kind]" :key="item.is" :class="[item.class]">
 			<component :is="item.is" v-bind="item" />
 		</div>
@@ -9,6 +9,8 @@
 </template>
 
 <script>
+
+	import moment from  'moment'
 
 	import oidImage from './oidImage.vue'
 	import DocForm from './DocForm.vue'
@@ -28,12 +30,20 @@
 
 		data () {
 			return {
-				doc: null
+				doc: this.$props.model
 			}
 		},
 
 		created () {
-			this.doc = this.$props.model
+			//this.doc = this.$props.model
+			if (this.doc) {
+				if (this.doc.person && this.doc.person.birthDay) {
+					this.doc.person.birthDay = moment(this.doc.person.birthDay).format('YYYY-MM-DD')
+				}
+
+				this.key = `${this.doc._id}-${this.doc.__v}`
+			}
+
 		},
 
 		computed: {
@@ -92,34 +102,21 @@
 
 			submitHandler (formData) {
 
-				console.log('<DocEdit.vue> submitHandler', formData, this.model)
+				//console.log('<DocEdit.vue> submitHandler', formData, this.model)
 
-				return
+				const postData = {}
 
-				var ok
-
-				if (null === this.model._id) {
-					ok = this.$http.put('/doc', formData)
+				if (this.doc._id) { // update
+					postData._id = this.doc._id
 				}
-				else {
-					ok = this.$http.post(`/doc/${this.model._id}`, formData)
+				else { // create new
+					postData.kind = this.doc.kind
 				}
 
-				ok.then(response => {
-					//this.key = `${response.body._id}-${response.body.__v}`
-					this.model = response.body
+				postData[this.doc.kind] = formData
 
-					// FIXME - dirty schemaless hack
-					if (response.body.birthDay) {
-						this.model.birthDay = moment(response.body.birthDay).format('YYYY-MM-DD')
-					}
+				this.$emit('update', postData)
 
-					//console.log('<doc_edit_form> submitHandler', response)
-				}).catch((err) => {
-					console.error('<doc_edit_form> submitHandler', err)
-				})
-
-				return ok // https://vueformulate.com/guide/forms/#context-object
 			},
 
 		}
@@ -127,3 +124,116 @@
 	}
 
 </script>
+
+<style>
+
+.doc-edit .picture {
+	width: 9rem;
+	height: 9rem;
+}
+
+.doc-edit .picture img {
+	width: 9rem;
+	height: 9rem;
+	object-fit: cover;
+}
+
+.doc-edit .form-content {
+	display: flex;
+}
+
+.doc-edit .form-column {
+	padding: 0.33rem;
+	flex: 1;
+}
+
+.doc-edit .doc-form {
+	flex: 1;
+	overflow: hidden;
+}
+
+.doc-edit .files {
+	flex: 2;
+	overflow: hidden;
+}
+
+.doc-edit .edit-upload {
+	flex: 2;
+	overflow: hidden;
+}
+
+/*
+.doc-edit .contact-list .formulate-input-group {
+	padding-left: 0;
+}
+*/
+
+.doc-edit .contact-list .contact-remove {
+	position: absolute;
+	right: 0.5rem;
+	top: calc(25%);
+}
+
+/*
+.doc-edit .contact-list .formulate-input-group-repeatable-remove:hover {
+	text-decoration: none;
+}
+*/
+
+.doc-edit .contact-list .contact-add {
+	float: right;
+	width: 3rem;
+}
+
+.doc-edit .contact-list .contact-add button {
+	margin: -.6rem -1.25rem;
+	padding: .6rem 1.25rem;
+	border: none;
+	background-color: transparent;
+}
+
+.doc-edit .contact-list .contact-add button span {
+	display: block;
+	color: var(--bs-success);
+	font-weight: 700;
+}
+
+.doc-edit .contact-list .contact-add button:hover span {
+	color: white;
+}
+
+/*
+.doc-edit .formulate-form > .formulate-input {
+	margin: 0.5em 0;
+}
+
+.doc-edit .formulate-form .formulate-input-group-add-more {
+	margin: 0.5em 0;
+}
+*/
+
+.doc-edit .formulate-form .formulate-input-group-repeatable {
+	border: 1px solid #ccc;
+	border-radius: 0.333rem;
+	padding: 0.5rem;
+	margin: 0.25rem 0;
+	position: relative;
+}
+
+.doc-edit .formulate-form .formulate-input-group-repeatable .form-control {
+	width: calc(100% - 3.5rem);
+}
+
+/*
+.doc-edit .formulate-form textarea {
+	resize: vertical;
+	width: 95%;
+}
+*/
+/*
+.doc-edit .formulate-form input[type=text] {
+	width: 95%;
+}
+*/
+
+</style>

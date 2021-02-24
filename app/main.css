@@ -9,8 +9,12 @@
 	--border-color: #cccccc;
 }
 
+div#app {
+	max-width: 65rem;
+}
+
 body {
-	padding: 2em;
+	padding: 2rem;
 }
 
 img {
@@ -36,6 +40,23 @@ a:visited {
 a:hover {
 	color: darkred;
 	text-decoration: underline;
+}
+
+a[role=button] {
+	text-decoration: none;
+}
+
+a[role=button]:hover {
+	text-decoration: none;
+}
+
+/* ----------------------------------------------------------------------- */
+
+div.hr {
+	width: 100%;
+	height: 1px;
+	border-top: 1px solid var(--border-color);
+	margin: 1rem 0;
 }
 
 /* ----------------------------------------------------------------------- */
