@@ -1,10 +1,8 @@
-<template>
+<template lang="pug">
 
-	<div class="doc-edit">
-		<div v-for="(item, n) in Schema[doc.kind]" :key="item.is" :class="[item.class]">
-			<component :is="item.is" v-bind="item" />
-		</div>
-	</div>
+	div(class="doc-edit")
+		div(v-for="(item, n) in Schema[doc.kind]" :key="item.is" :class="[item.class]")
+			component(:is="item.is" v-bind="item")/
 
 </template>
 
@@ -13,6 +11,7 @@
 	import moment from  'moment'
 
 	import oidImage from './oidImage.vue'
+	import DocFormOwner from './DocFormOwner.vue'
 	import DocForm from './DocForm.vue'
 
 	export default {
@@ -21,6 +20,7 @@
 
 		components: {
 			oidImage,
+			DocFormOwner,
 			DocForm,
 		},
 
@@ -63,23 +63,24 @@
 							class: 'form',
 							model: this.doc.person,
 							kind: this.doc.kind,
-							submit: this.submitHandler
+							submit: this.submitHandler,
 						},
 
 					],
 
 					property: [
-						//{
-						//	is: 'oidImage',
-						//	class: 'picture',
-						//	oid: this.doc.mainPicture,
-						//},
+						{
+							is: 'DocFormOwner',
+							class: 'owner',
+							oid: this.doc.owner,
+							submit: this.submitOwner,
+						},
 						{
 							is: 'DocForm',
 							class: 'form',
 							model: this.doc.property,
 							kind: this.doc.kind,
-							submit: this.submitHandler
+							submit: this.submitHandler,
 						},
 					],
 
@@ -89,7 +90,7 @@
 							class: 'form',
 							model: this.doc.contract,
 							kind: this.doc.kind,
-							submit: this.submitHandler
+							submit: this.submitHandler,
 						},
 					],
 
@@ -119,6 +120,11 @@
 
 			},
 
+			submitOwner (... args) {
+
+				console.log('<DocFormOwner.vue> submitOwner', args)
+
+			}
 		}
 
 	}
@@ -235,5 +241,10 @@
 	width: 95%;
 }
 */
+
+.doc-edit > .owner {
+	width: 33.3%;
+	padding: 0.33rem;
+}
 
 </style>

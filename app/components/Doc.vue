@@ -1,24 +1,21 @@
-<template>
+<template lang="pug">
 
-	<Modal @close="closeEdit">
+	Modal(@close="closeEdit")
 
-		<template v-slot:title>
-			<TabView :schema="TabViewSchema" @tab="tab => { tabView = tab }" />
-		</template>
+		template(v-slot:title)
+			TabView(
+				:schema="TabViewSchema"
+				@tab="tab => { tabView = tab }"
+			)/
 
-		<div class="doc">
-
-			<component
+		div(class="doc")
+			component(
 				v-if="tabView"
 				:is="tabView.component"
 				:model="model"
 				:key="key"
 				@update="onUpdate"
-				/>
-
-		</div>
-
-	</Modal>
+			)/
 
 </template>
 
@@ -94,7 +91,7 @@
 		},
 
 		mounted () {
-			console.log('<Doc.vue> mounted', this.$route.params, this.$props)
+			//console.log('<Doc.vue> mounted', this.$route.params, this.$props)
 
 			if ('new' === this.$route.params.id) {
 				this.model = {
@@ -140,7 +137,7 @@
 
 			onUpdate (doc) {
 
-				console.log('<Doc.vue> onUpdate', doc)
+				//console.log('<Doc.vue> onUpdate', doc)
 
 				var ok
 

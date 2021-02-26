@@ -1,33 +1,20 @@
-<template>
-    <div class="calendar">
-        <div class="page" :key="now">
-            <div class="header">
+<template lang="pug">
 
-                <div class="day" v-for="day in weekdays" :key="day">
-                    {{ day }}
-                </div>
+    div(class="calendar")
+        div(class="page" :key="now")
+            div(class="header")
+                div(class="day" v-for="day in weekdays" :key="day") {{ day }}
 
-            </div>
-            <div class="week" v-for="(week) in page" :key="week.start">
-
-                <div v-for="d in week.days"
+            div(class="week" v-for="(week) in page" :key="week.start")
+                div(
+                    v-for="d in week.days"
                     :key="week.start + ' ' + d.num"
-                    :class="['day', { 'holiday': d.holiday }, { 'disabled': d.disabled }, { 'selected': d.selected } ]"
+                    :class="[ 'day', { 'holiday': d.holiday }, { 'disabled': d.disabled }, { 'selected': d.selected } ]"
                     @click="() => onDayClick(d)"
-                    >
+                    )
+                    div(class="num") {{ d.num }}
+                    div(class="events") {{ d.events.birthday ? '🎁' : '' }}
 
-                    <div class="num">
-                        {{ d.num }}
-                    </div>
-                    <div class="events">
-                        {{ d.events.birthday ? '🎁' : '' }}
-                    </div>
-
-                </div>
-
-            </div>
-        </div>
-    </div>
 </template>
 
 <script>

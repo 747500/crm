@@ -1,14 +1,11 @@
-<template>
+<template lang="pug">
 
-	<div class="doc-form">
-
-		<FormulateForm
+	div(class="doc-form")
+		FormulateForm(
 			v-model="doc"
 			:schema="formSchema"
 			@submit="submitHandler"
-			/>
-
-	</div>
+		)/
 
 </template>
 
@@ -52,7 +49,7 @@ export default {
 
 	created () {
 		this.doc = this.$props.model
-		console.log('<doc_edit_form.vue> mounted:', this.doc)
+		//console.log('<DocForm.vue> created', this.doc)
 	},
 
 	methods: {
