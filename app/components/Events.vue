@@ -1,59 +1,39 @@
 
-<template>
-	<div class="events">
-		<div>
-			<!--
-			<FormulateInput
-			  type="date"
-			  name="sample"
-			  label="Дата"
-			  placeholder="Sample date placeholder"
-			  help="Sample date help text"
-			  validation="required|after:2019-01-01"
-			  min="2018-12-01"
-			  max="2021-01-01"
-			  error-behavior="live"
-			/>
-			-->
-			<FormulateInput
-			  type="month"
-			  name="sample"
-			  label="Дата"
-			  v-model="focus"
-			  @input="loadEvents"
-			/>
-		</div>
-		<div>
-			<pre>focus: {{ focus }}</pre>
-		</div>
+<template lang="pug">
 
-		<div class="content">
+	div(class="events")
+		div(class="content")
 
-			<Calendar
-				:now="focus"
-				:events="calendarEvents"
-				@click="onCalendarClick"
-				/>
+			div(class="events-calendar")
 
-			<div class="active-events">
-				<div>{{ calendarCurrent }}</div>
+				FormulateInput(
+					class="selector"
+					type="month"
+					name="sample"
+					v-model="focus"
+					@input="loadEvents"
+				)/
 
-				<ul>
-					<li v-for="(item, n) in eventsList" :key="item._id">
+				Calendar(
+					:now="focus"
+					:events="calendarEvents"
+					@click="onCalendarClick"
+				)/
 
-						<SEvent
+			div(class="events-list")
+
+				div(class="date") {{ calendarCurrent }}
+
+				ul
+					li(v-for="(item, n) in eventsList" :key="item._id")
+
+						SEvent(
 							:oid="item._id"
 							:type="item.type"
 							:title="item.title"
-							@click="onEventClick"/>
+							@click="onEventClick"
+						)/
 
-					</li>
-				</ul>
-
-			</div>
-		</div>
-
-	</div>
 </template>
 
 <script>
@@ -127,7 +107,7 @@
 					this.events = response.data.reduce(
 						(result, v) => {
 
-							if ('array' !== typeof result[v.eventAt]) {
+							if ('object' !== typeof result[v.eventAt]) {
 								result[v.eventAt] = {
 									type: 'birthday',
 									list: []
@@ -196,26 +176,42 @@
 
 .events .content {
 	display: flex;
+	margin-top: 1em;
 }
 
-.events .content .calendar {
+.events .content > div {
 	flex: 1;
 }
 
+/*
+.events .content .events-calendar {
+}
+*/
 
-.events .content .active-events {
-	flex: 1;
+
+.events .content .events-calendar .selector {
+	height: 2em;
+}
+
+.events .content .events-list {
 	overflow-x: hidden;
 }
 
-.active-events > ul {
+.events .content .events-list .date {
+	line-height: 2em;
+	padding-left: 1em;
+}
+
+.events .content .events-list > ul {
 	list-style: none;
 	margin: 0;
 	padding: 0;
+	padding-left: 1em;
 }
 
-.active-events > ul > li {
-	padding-left: 1em;
+.events .content .events-list > ul > li {
+	margin: 0;
+	padding: 0;
 	list-style: none;
 }
 

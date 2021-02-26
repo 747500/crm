@@ -1,67 +1,44 @@
-<template>
+<template lang="pug">
 
-	<div class="browser">
+	div(class="browser")
 
-		<div class="query">
-			<div>
-				<input
+		div(class="query")
+			div
+				input(
 					ref="search"
 					v-model="search"
 					type="text"
 					@keyup.enter="searchInput"
 					@input="searchInput"
-					/><input type="button" value="🔍" @click="searchInput"/>
-			</div>
+				)/
+				input(
+					type="button"
+					value="🔍"
+					@click="searchInput"
+				)/
 
-			<div>
-				<FormulateInput
+			div
+				FormulateInput(
 					type="checkbox"
 					v-model="kind"
 					:options="{ person: 'Контакты', property: 'Собственность', contract: 'Сделки' }"
 					@input="searchFilter"
-					/>
-					<!--
-				<label>
-					Люди
-					<input v-model="kind" type="checkbox" name="kind" value="person" />
-				</label>
+					)/
 
-				<label>
-					Собственность
-					<input v-model="kind" type="checkbox" name="kind" value="property" />
-				</label>
+			div
+				span Найдено: {{ total_found }}
 
-				<label>
-					Сделки
-					<input v-model="kind" type="checkbox" name="kind" value="contract" />
-				</label>
-					-->
-			</div>
-
-			<div>
-				<span>Найдено: {{ total_found }}</span>
-			</div>
-		</div>
-
-		<div class="result">
-			<List
+		div(class="result")
+			List(
 				class="list"
 				v-model="result"
-				v-slot:default="props"
+				v-slot:default="data"
 				@open="openDoc"
-				>
-				<!--
-				@edit="(doc) => $emit('edit', doc)"
-				@remove="(doc) => $emit('remove', doc)"
-				-->
+			)
+				// @edit="(doc) => $emit('edit', doc)"
+				// @remove="(doc) => $emit('remove', doc)"
 
-				<MDoc :oid="props.item.oid" />
-
-			</List>
-
-		</div>
-
-	</div>
+				MDoc(:oid="data.item._id")/
 
 </template>
 
@@ -132,9 +109,9 @@ export default {
 	},
 	methods: {
 		openDoc (item) {
-			//console.log('<browser.vue> openDoc', item)
+			// console.log('* <browser.vue> openDoc', item)
 			this.$router.push({
-				path: `${item.attrs.kind}/${item.attrs.oid}`
+				path: `/${item.kind}/${item._id}`
 			})
 		},
 		searchInput () {
@@ -148,10 +125,16 @@ export default {
 			)
 			.then(response => {
 
-				//console.log('<browser.vue> response:', response)
+				// console.log('* <browser.vue> response:', response)
 
-				this.result = response.body.result
 				this.total_found = response.body.total_found
+
+				this.result = response.body.result.map(item => {
+					return {
+						_id: item.oid,
+						kind: item.kind,
+					}
+				})
 			})
 			.catch(err => {
 				console.error(err)

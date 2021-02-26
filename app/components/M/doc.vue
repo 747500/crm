@@ -82,14 +82,12 @@ export default {
 	},
 
 	props: {
-		oid: String,
-		schema: Object,
+		oid: String
 	},
 
 	data () {
 		return {
-			model: {},
-			options: this.$props.schema
+			model: {}
 		}
 	},
 

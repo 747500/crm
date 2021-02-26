@@ -11,12 +11,10 @@
 
 		<!-- @click.prevent="(event) => switchView(event, p)" -->
 
-		<li v-for="(item, n) in model"
-			v-bind:key="item._id"
-			>
+		<li v-for="(item, n) in model" :key="item._id">
 
 			<div
-				v-on="$listeners.open ? { click: () => $emit('open', item) } : {}"
+				v-on="$listeners.open ? { click: () => onClick(item) } : {}"
 				:class="[ { 'active': $listeners.open }, 'item' ]"
 				>
 				<slot v-bind:item="item">
@@ -75,6 +73,10 @@ export default {
 	},
 
 	methods: {
+		onClick (item) {
+			//console.log('* <List.vue>', item)
+			this.$emit('open', item)
+		}
 	}
 
 }

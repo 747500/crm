@@ -1,22 +1,23 @@
-<template>
-	<div
+<template lang="pug">
+
+	div(
 		:id="model._id"
 		:key="model._id"
-		:class="[ 's-doc', model.kind ]"
-		v-on="$listeners.open ? { click: () => $emit('open', model._id) } : {}"
-		>
+		:class="[ 's-doc', model.kind, { 'clickable': $listeners.open } ]"
+		v-on="$listeners.open ? { click: onClick } : {}"
+	)
 
-		<div v-for="(s) in kindSchema" :key="s.model" :class="s.model">
-
-			<component
+		div(
+			v-for="(s) in kindSchema"
+			:key="s.model"
+			:class="s.model"
+		)
+			component(
 				v-if="model[s.model]"
 				:is="s.component"
 				:model="'contract' == s.model ? model : model[s.model]"
-				/>
+				)/
 
-		</div>
-
-	</div>
 </template>
 
 <script>
@@ -112,7 +113,11 @@ export default {
 	},
 
 	methods: {
-
+		onClick (event) {
+			event.preventDefault()
+			//console.log('* <S/doc.vue> onClick', event)
+			this.$emit('open', this.model)
+		},
 	}
 }
 </script>
@@ -121,6 +126,10 @@ export default {
 
 .s-doc {
 	display: flex;
+}
+
+.s-doc.clickable {
+	cursor: pointer;
 }
 
 .s-doc .mainPicture {

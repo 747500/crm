@@ -1,35 +1,40 @@
-<template>
+<template lang="pug">
 
-	<div>
-		<header>
-			<nav>
-				<div v-for="r in $router.options.routes[0].children" :key="r.name">
-					<router-link :to="r.path">{{ r.meta.title }}</router-link>
-				</div>
-			</nav>
-		</header>
+	div
+		header
+			nav
+				div(v-for="r in $router.options.routes[0].children" :key="r.name")
+					router-link(:to="r.path")
+						| {{ r.meta.icon }}
+						| {{ r.meta.title }}
 
-		<content>
-			<router-view></router-view>
-		</content>
+				//div
+					//SearchDropdown()/
 
-	</div>
+		content
+			router-view()/
 
 </template>
 
 
 <script>
 
-export default {
+	import SearchDropdown from './SearchDropdown.vue'
 
-	name: 'Nav',
+	export default {
 
-	watch: {
-		'$route' (to, from) {
-			document.title = to.meta.title || 'CRM'
-		}
-    },
-}
+		name: 'Nav',
+
+		components: {
+			SearchDropdown
+		},
+
+		watch: {
+			'$route' (to, from) {
+				document.title = to.meta.title || 'CRM'
+			}
+	    },
+	}
 
 </script>
 

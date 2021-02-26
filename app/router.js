@@ -8,6 +8,8 @@ import VueRouter from 'vue-router'
 
 import Nav from './components/nav.vue'
 
+import EnquiryList from './components/EnquiryList.vue'
+
 import Browser from './components/browser.vue'
 import Events from './components/Events.vue'
 
@@ -34,57 +36,69 @@ const routes = [
 				path: '/browse',
 				component: Browser,
 				meta: {
-					title: 'Поиск'
+					title: 'Поиск',
+					icon: '🔍',
 				}
 			},
+
 			{
 				title: 'Календарь',
 				name: 'calendar',
 				path: '/calendar',
 				component: Events,
 				meta: {
-					title: 'Календарь'
+					title: 'Календарь',
+					icon: '📆',
 				}
 			},
-			/*
+
 			{
-				title: 'Doc',
-				name: 'doc',
-				path: '/doc/:kind',
-				component: doc,
+				name: 'enquiries',
+				path: '/enquiries',
+				component: EnquiryList,
 				props: true,
+				meta: {
+					title: 'Заявки',
+					icon: '📋',
+				},
+				/*
 				children: [
 					{
-						name: 'view',
+						name: 'enquiry_edit',
 						path: ':id',
-						component: DocEdit,
-						props: true
+						component: Enquiry,
+						props: true,
+						meta: {
+							title: 'Заявка',
+						},
 					}
 				]
+				*/
 			},
-			*/
+
 			{
-				title: 'Контакты',
-				name: 'person',
-				path: '/person',
+				name: 'contract',
+				path: '/contract',
 				component: DocList,
 				props: true,
 				meta: {
-					title: 'Контакты'
+					title: 'Сделки',
+					icon: '⇄',
 				},
 				children: [
 					{
-						name: 'person_edit',
+						name: 'contract_edit',
 						path: ':id',
 						component: Doc,
 						props: true,
 						meta: {
-							title: '👤 Контакт',
-							kind: 'person',
+							title: '📄 Сделка',
+							kind: 'contract',
 						},
 					}
 				]
 			},
+
 			{
 				name: 'property',
 				path: '/property',
@@ -92,6 +106,7 @@ const routes = [
 				component: DocList,
 				meta: {
 					title: 'Объекты',
+					icon: '🏠',
 				},
 				children: [
 					{
@@ -106,27 +121,30 @@ const routes = [
 					}
 				]
 			},
+
 			{
-				name: 'contract',
-				path: '/contract',
+				title: 'Контакты',
+				name: 'person',
+				path: '/person',
 				component: DocList,
 				props: true,
 				meta: {
-					title: 'Сделки',
+					title: 'Контакты',
+					icon: '👤',
 				},
 				children: [
 					{
-						name: 'contract_edit',
+						name: 'person_edit',
 						path: ':id',
 						component: Doc,
 						props: true,
 						meta: {
-							title: '📄 Сделка',
-							kind: 'contract',
+							title: '👤 Контакт',
+							kind: 'person',
 						},
 					}
 				]
-			}
+			},
 
 		]
 	}

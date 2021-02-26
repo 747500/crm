@@ -1,23 +1,28 @@
-<template>
+<template lang="pug">
 
-	<div class="s-event" @click="() => $emit('click', oid)">
+	// @click.prevent="onEventClick"
 
-		<SDoc :oid="oid" />
+	div(class="s-event")
 
-		<div class="event-data">
-			<div>
-				{{ type }}
-			</div>
-			<div>
-				{{ title }}
-			</div>
-		</div>
+		SDoc(
+			ref="doc"
+			:oid="oid"
+			@open="onDocOpen"
+		)/
 
-	</div>
+		div(class="event-data")
+			div
+			| {{ Icon }}
+			| {{ title }}
 
 </template>
 
 <script>
+
+	const typeIcons = {
+		birthday: '🎁',
+		default: '💥',
+	}
 
 	import SDoc from './doc.vue'
 
@@ -33,8 +38,22 @@
 			oid: String,
 			type: String,
 			title: String
-		}
+		},
 
+		methods: {
+
+			onDocOpen (item) {
+				//console.log('* <S/event.vue> onDocOpen', item)
+				this.$router.push(`/${item.kind}/${item._id}`)
+			},
+
+		},
+
+		computed: {
+			Icon () {
+				return typeIcons[this.$props.type] || typeIcons.default
+			},
+		},
 	}
 
 </script>
@@ -42,19 +61,29 @@
 <style>
 
 .s-event {
-	display: flex;
+	position: relative;
 }
 
-.s-event:hover {
+.s-event:hover .s-doc {
 	background-color: var(--hover-color);
 }
 
 .s-event > .s-doc {
-	flex: 2;
+	width: calc(100% - 1em);
+	border: 1px solid var(--border-color);
+	margin-bottom: 1em;
+	margin-right: 1em;
+	border-radius: 0.3em;
 }
 
 .s-event > .event-data {
-	flex: 1;
+	position: absolute;
+	right: 0;
+	bottom: -0.5em;
+	background: rgba(0, 0.05, 0.05, 0.2);
+	border-radius: 1em;
+	padding: 0.5em .75em;
+	border: 1px solid var(--border-color);
 }
 
 </style>
