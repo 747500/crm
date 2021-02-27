@@ -118,7 +118,7 @@ const PropertySchema = new mongoose.Schema(
             price: String,
             description: String,
         },
-        ownerId: mongoose.Types.ObjectId,
+        owner: mongoose.Types.ObjectId,
         mainPicture: mongoose.Types.ObjectId,
 	},
 	docSchemaOptions

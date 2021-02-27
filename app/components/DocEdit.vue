@@ -35,7 +35,7 @@
 		},
 
 		created () {
-			//this.doc = this.$props.model
+
 			if (this.doc) {
 				if (this.doc.person && this.doc.person.birthDay) {
 					this.doc.person.birthDay = moment(this.doc.person.birthDay).format('YYYY-MM-DD')
@@ -63,7 +63,7 @@
 							class: 'form',
 							model: this.doc.person,
 							kind: this.doc.kind,
-							submit: this.submitHandler,
+							submit: this.submitOwner,
 						},
 
 					],
@@ -73,7 +73,7 @@
 							is: 'DocFormOwner',
 							class: 'owner',
 							oid: this.doc.owner,
-							submit: this.submitOwner,
+							select: this.selectOwner,
 						},
 						{
 							is: 'DocForm',
@@ -101,6 +101,11 @@
 
 		methods: {
 
+			selectOwner (oid) {
+				console.log('selectOwner', oid, this.doc)
+				this.doc.owner = oid
+			},
+
 			submitHandler (formData) {
 
 				//console.log('<DocEdit.vue> submitHandler', formData, this.model)
@@ -115,6 +120,10 @@
 				}
 
 				postData[this.doc.kind] = formData
+
+				if ('property' === this.doc.kind) {
+					postData.owner = this.doc.owner
+				}
 
 				this.$emit('update', postData)
 

@@ -13,7 +13,7 @@
 				v-if="tabView"
 				:is="tabView.component"
 				:model="model"
-				:key="key"
+				:key="model._id + '-' + model.mtime"
 				@update="onUpdate"
 			)/
 
@@ -28,7 +28,6 @@
 
 	import DocEdit from './DocEdit.vue'
 	import filesPanel from './files_panel.vue'
-	import PersonSelect from './person_select.vue'
 
 	export default {
 		name: 'Doc',
@@ -63,11 +62,6 @@
 						kind: '*',
 						title: this.$route.meta.title,
 						component: 'DocEdit',
-					},
-					{
-						kind: [ 'property' ],
-						title: 'Собственник',
-						component: 'PersonSelect',
 					},
 					{
 						kind: [ 'person', 'property', 'contract' ],
@@ -137,7 +131,7 @@
 
 			onUpdate (doc) {
 
-				//console.log('<Doc.vue> onUpdate', doc)
+				console.log('<Doc.vue> onUpdate', doc)
 
 				var ok
 

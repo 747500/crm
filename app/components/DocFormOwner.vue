@@ -27,7 +27,7 @@
 						@click.prevent="listClose"
 					) ︿
 
-			div(class="list-container" v-if="list.length")
+			div(:class="[ 'list-container', { active: list.length } ]")
 				div(class="list" ref="list")
 					a(
 						v-for="(item) in list"
@@ -57,7 +57,7 @@
 
 		props: {
 			oid: String,
-			submit: Function,
+			select: Function,
 		},
 
 		data () {
@@ -78,7 +78,7 @@
 		methods: {
 
 			selectedClear () {
-				this.selected = null
+				this.listSelect(null)
 			},
 
 			listOpen () {
@@ -103,6 +103,13 @@
 							kind: item.kind,
 						}
 					})
+
+					if (this.list.length) {
+						this.$nextTick(() => {
+							console.log(this)
+							this.$refs.list.firstChild.focus()
+						})
+					}
 				})
 				.catch(err => {
 					console.error(err)
@@ -111,10 +118,14 @@
 			},
 
 			listClose () {
-
 				this.isOpen = false
 				this.list = []
+			},
 
+			listSelect(oid) {
+				this.selected = oid
+				this.$props.select(oid)
+				this.listClose()
 			},
 
 			onItemKeydown (event, item) {
@@ -153,7 +164,7 @@
 
                 if ('Enter' == event.key) {
                     event.preventDefault()
-                    this.selected = item._id
+					this.listSelect(item._id)
                 }
 
                 if ('Tab' === event.key) {
@@ -164,8 +175,7 @@
 
             onItemClick (event, item) {
                 event.preventDefault()
-				this.selected = item._id
-				this.listClose()
+				this.listSelect(item._id)
             },
 
             onItemBlur (event) {
@@ -213,6 +223,7 @@
 .doc-form-owner .select .container .controls button {
 	display: block;
 	height: 50%;
+	width: 100%;
 	text-align: center;
 	line-height: 3em;
 	background-color: transparent;
@@ -236,10 +247,14 @@
 }
 
 div.list-container {
-	height: 1px;
 	position: relative;
+	height: 0px;
 	width: 100%;
-	background-color: red;
+	display: none;
+}
+
+div.list-container.active {
+	display: block;
 }
 
 div.list-container div.list {
@@ -260,8 +275,8 @@ div.list-container .list > a.item {
 }
 
 div.list-container .list > a.item.active * {
-	background-color: #ff9966;
-	font-weight: 700;
+	background-color: var(--bs-primary);
+	color: var(--bs-white);
 }
 
 </style>

@@ -320,7 +320,10 @@ sssInit(SubSystems).then(sss => {
 			'ctime': true,
 		}
 
-		//console.log('* docUpdate', req.body)
+		console.log('-------------------------------------')
+		console.log('* docUpdate', req.body)
+
+		console.log('-------------------------------------')
 
 		var fieldsUpdated = 0
 
@@ -330,7 +333,7 @@ sssInit(SubSystems).then(sss => {
 				return
 			}
 
-			//console.log('>>>', k, req.body[k])
+			console.log('>>>', k, req.body[k])
 
 			if (k in req.body) {
 				fieldsUpdated ++;
@@ -338,6 +341,10 @@ sssInit(SubSystems).then(sss => {
 			}
 
 		})
+		console.log('-------------------------------------')
+
+		console.log('* docUpdate', res.locals.Doc)
+		console.log('-------------------------------------')
 
 		if (0 === fieldsUpdated) {
 			res.status(400).send('Can\'t find fields to update')
