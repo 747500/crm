@@ -63,7 +63,7 @@
 							class: 'form',
 							model: this.doc.person,
 							kind: this.doc.kind,
-							submit: this.submitOwner,
+							submit: this.submitHandler,
 						},
 
 					],
@@ -129,11 +129,6 @@
 
 			},
 
-			submitOwner (... args) {
-
-				console.log('<DocFormOwner.vue> submitOwner', args)
-
-			}
 		}
 
 	}
