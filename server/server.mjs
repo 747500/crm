@@ -218,8 +218,27 @@ sssInit(SubSystems).then(sss => {
 	// TODO validation
 	const docList = (req, res, next) => {
 
-		res.locals.Schema.find()
-		.then(
+		var ok = res.locals.Schema.find()
+
+		switch (res.locals.kind) {
+
+			case 'person':
+				ok = ok.sort({
+					'person.lastName': 1,
+					'person.firstName': 1,
+					'person.middleName': 1,
+				})
+				break;
+
+			case 'property':
+				ok = ok.sort({
+					'mtime': -1,
+				})
+				break;
+
+		}
+
+		ok.then(
 			result => {
 				res.locals.Result = result
 				next()
@@ -365,6 +384,8 @@ sssInit(SubSystems).then(sss => {
 		}
 
 		res.locals.Schema = sel[sName]
+		res.locals.kind = sName
+
 		if (! res.locals.Schema ) {
 			next(Error(`Undefined Schema: ${sName}`))
 			return
