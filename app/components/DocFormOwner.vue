@@ -27,7 +27,14 @@
 						@click.prevent="listClose"
 					) ︿
 
-			div(:class="[ 'list-container', { active: list.length } ]")
+			div(:class="[ 'list-container', { active: isOpen } ]")
+				input(
+					ref="filter"
+					type="text"
+					class="filter"
+					:value="search"
+					@input="onFilterInput"
+				)/
 				div(class="list" ref="list")
 					a(
 						v-for="(item) in list"
@@ -77,13 +84,17 @@
 
 		methods: {
 
+			onFilterInput (event) {
+				console.log(event.target.value)
+				this.search = event.target.value
+				this.makeSearch()
+			},
+
 			selectedClear () {
 				this.listSelect(null)
 			},
 
-			listOpen () {
-
-				this.isOpen = true
+			makeSearch () {
 
 				this.$http.post('/s',
 					{
@@ -107,7 +118,7 @@
 					if (this.list.length) {
 						this.$nextTick(() => {
 							console.log(this)
-							this.$refs.list.firstChild.focus()
+							this.$refs.filter.focus()
 						})
 					}
 				})
@@ -115,6 +126,12 @@
 					console.error(err)
 				})
 
+			},
+
+			listOpen () {
+
+				this.isOpen = true
+				this.makeSearch()
 			},
 
 			listClose () {
@@ -255,6 +272,12 @@ div.list-container {
 
 div.list-container.active {
 	display: block;
+}
+
+div.list-container input.filter {
+	border: 1px solid var(--border-color);
+	margin: 0;
+	width: 100%;
 }
 
 div.list-container div.list {
