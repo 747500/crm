@@ -36,8 +36,7 @@
 			Modal,
 			TabView,
 			DocEdit,
-			filesPanel,
-			PersonSelect
+			filesPanel
 		},
 
 		data () {
