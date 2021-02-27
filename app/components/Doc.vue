@@ -130,7 +130,7 @@
 
 			onUpdate (doc) {
 
-				console.log('<Doc.vue> onUpdate', doc)
+				//console.log('<Doc.vue> onUpdate', doc)
 
 				var ok
 

@@ -85,7 +85,7 @@ export default {
 		},
 
 		editDoc(item) {
-			console.log('<DocList.vue> on editDoc', item)
+			// console.log('<DocList.vue> on editDoc', item)
 
 			this.$router.push({
 				path: `${this.kind}/${item}`

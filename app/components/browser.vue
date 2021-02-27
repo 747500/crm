@@ -146,7 +146,7 @@ export default {
 				this.kind = [ 'person', 'property', 'contract' ]
 			}
 
-			console.log(this.kind)
+			//console.log(this.kind)
 			this.searchInput()
 		}
 

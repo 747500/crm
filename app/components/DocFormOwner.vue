@@ -85,7 +85,7 @@
 		methods: {
 
 			onFilterInput (event) {
-				console.log(event.target.value)
+				//console.log('<DocFormOwner.vue> onFilterInput', event.target.value)
 				this.search = event.target.value
 				this.makeSearch()
 			},
@@ -117,7 +117,7 @@
 
 					if (this.list.length) {
 						this.$nextTick(() => {
-							console.log(this)
+							//console.log('<DocFormOwner.vue> makeSearch', this)
 							this.$refs.filter.focus()
 						})
 					}
