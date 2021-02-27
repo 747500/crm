@@ -1,39 +1,38 @@
-<template>
+<template lang="pug">
 
-	<div class="search">
+	div(class="search")
+		div(class="query")
+			div(class="label prefix") 🔍
 
-		<div class="query">
-
-			<div class="label prefix">🔍</div>
-
-			<input ref="searchInput"
+			input(
+				ref="searchInput"
 				tabindex="1"
 				class="query"
 				type="text"
 				@input="handleSearchInput"
 				@focus="handleSearchFocus"
 				@blur="handleSearchFocus"
-				/>
+			)/
 
-			<a role="button"
+			a(
+				role="button"
 				href=""
 				class="label suffix"
-				@click.prevent="searchQueryClean">🗙</a>
+				@click.prevent="searchQueryClean"
+			)
+				| 🗙
 
-		</div>
-
-		<div :class="[ 'result', { active: searchResults.length } ]">
-			<ul tabindex="2"
+		div(:class="[ 'result', { active: searchResults.length } ]")
+			ul(
+				tabindex="2"
 				@focus="handleSearchFocus"
 				@blur="handleSearchFocus"
-				>
-				<li v-for="(item, n) in searchResults" :key="item.id">
-					<SDoc :oid="item.oid" />
-				</li>
-			</ul>
-		</div>
-
-	</div>
+			)
+				li(
+					v-for="(item, n) in searchResults"
+					:key="item.id"
+				)
+					SDoc(:oid="item.oid")/
 
 </template>
 

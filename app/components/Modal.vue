@@ -1,25 +1,24 @@
-<template>
+<template lang="pug">
 
-	<!--
-		https://itchief.ru/lessons/html-and-css/how-to-create-simple-modal-window-in-css
-	-->
+	//	https://itchief.ru/lessons/html-and-css/how-to-create-simple-modal-window-in-css
 
-	<div class="crm-modal">
-		<div class="crm-modal-dialog">
-			<div class="crm-modal-content">
-				<div class="crm-modal-header">
-					<slot name="title"></slot>
-					<!-- h3 class="crm-modal-title"></h3 -->
-					<a v-if="$listeners.close" href="#close" @click.prevent="() => { $emit('close') }" title="Close" class="crm-modal-close">×</a>
-				</div>
+	div(class="crm-modal")
+		div(class="crm-modal-dialog")
+			div(class="crm-modal-content")
+				div(class="crm-modal-header")
+					slot(name="title")
+					// h3 class="crm-modal-title"></h3
+					a(
+						v-if="$listeners.close"
+						href="#close"
+						@click.prevent="() => { $emit('close') }"
+						title="Close"
+						class="crm-modal-close"
+					)
+						| ×
 
-				<div class="crm-modal-body">
-					<slot></slot>
-				</div>
-			</div>
-		</div>
-	</div>
-
+				div(class="crm-modal-body")
+					slot
 
 </template>
 

@@ -1,8 +1,21 @@
-<template>
-	<span class="confirm" :class="{ active: null !== confirm }">
-		<a v-if="confirm" href="" @click.prevent="onCancel">{{ $props.message || 'Cancel' }}</a>
-		<a href="" @click.prevent="onClick"><slot></slot></a>
-	</span>
+<template lang="pug">
+
+	span(
+		:class="[ 'confirm', { active: null !== confirm } ]"
+	)
+		a(
+			v-if="confirm"
+			href=""
+			@click.prevent="onCancel"
+		)
+			| {{ $props.message || 'Cancel' }}
+
+		a(
+			href=""
+			@click.prevent="onClick"
+		)
+			slot
+
 </template>
 
 <style>

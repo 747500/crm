@@ -1,5 +1,11 @@
-<template>
-	<iimg :src="src" :alt="alt" :key="key"/>
+<template lang="pug">
+
+	iimg(
+		:src="src"
+		:alt="alt"
+		:key="key"
+	)/
+
 </template>
 
 <script>

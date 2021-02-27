@@ -126,6 +126,8 @@ export default {
 
 .s-doc {
 	display: flex;
+	height: 6rem;
+	overflow: hidden;
 }
 
 .s-doc.clickable {

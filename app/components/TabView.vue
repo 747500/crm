@@ -1,19 +1,19 @@
-<template>
+<template lang="pug">
 
-	<ul class="tab-view">
-		<li v-for="(item, n) in $props.schema" :key="item.component"
+	ul(class="tab-view")
+		li(
+			v-for="(item, n) in $props.schema"
+			:key="item.component"
 			class="tab"
 			role="tab"
-			>
-			<a href=""
+		)
+			a(
+				href=""
 				:class="{ active: currentTab.component === item.component }"
 				:data-n="n"
 				@click.prevent="clickTab"
-				>
-				{{ item.title }}
-			</a>
-		</li>
-	</ul>
+				)
+				| {{ item.title }}
 
 </template>
 
