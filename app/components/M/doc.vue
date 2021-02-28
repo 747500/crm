@@ -125,6 +125,8 @@ export default {
 
 .m-doc {
 	display: flex;
+	height: 9rem;
+	overflow: hidden;
 }
 
 .m-doc .mainPicture {
