@@ -34,6 +34,7 @@
 	background: rgba(0, 0, 0, 0.5);
 	/* цвет фона */
 	z-index: 1050;
+	display: flex;
 
 	/* opacity: 0; */
 	/* по умолчанию модальное окно прозрачно */
@@ -50,7 +51,11 @@
 .crm-modal-dialog {
 	position: relative;
 	width: auto;
-	margin: 10px;
+	margin: auto;
+	max-width: 75rem;
+	min-width: 50rem;
+	justify-content: space-between;
+	align-items: center;
 }
 
 .crm-modal-header {
