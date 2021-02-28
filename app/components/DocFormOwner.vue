@@ -13,19 +13,20 @@
 				div(class="controls")
 					button(
 						class="clear"
-						:disabled="!selectedClear"
+						:disabled="!selected"
 						@click="selectedClear"
 					) 🗙
 					button(
 						v-if="false === isOpen"
 						class="open"
 						@click.prevent="listOpen"
-					) ﹀
+					) &#709;
 					button(
 						v-if="true === isOpen"
 						class="close"
 						@click.prevent="listClose"
-					) ︿
+					) &#708;
+			// ︿ ﹀
 
 			div(:class="[ 'list-container', { active: isOpen } ]")
 				input(
@@ -34,6 +35,7 @@
 					class="filter"
 					:value="search"
 					@input="onFilterInput"
+					@keydown="onFilterKeydown"
 				)/
 				div(class="list" ref="list")
 					a(
@@ -85,9 +87,16 @@
 		methods: {
 
 			onFilterInput (event) {
-				//console.log('<DocFormOwner.vue> onFilterInput', event.target.value)
+				//console.log('<DocFormOwner.vue> onFilterInput', event)
 				this.search = event.target.value
 				this.makeSearch()
+			},
+
+			onFilterKeydown (event) {
+				if ('Escape' === event.key) {
+					event.preventDefault()
+					this.listClose()
+				}
 			},
 
 			selectedClear () {
@@ -157,7 +166,7 @@
                         this.$refs.list.lastChild.focus()
                     }
                 }
-
+				else
                 if ('ArrowDown' === event.key) {
                     event.preventDefault()
 
@@ -168,26 +177,32 @@
                         this.$refs.list.firstChild.focus()
                     }
                 }
-
+				else
                 if ('Home' == event.key) {
                     event.preventDefault()
                     this.$refs.list.firstChild.focus()
                 }
-
+				else
                 if ('End' == event.key) {
                     event.preventDefault()
                     this.$refs.list.lastChild.focus()
                 }
-
+				else
                 if ('Enter' == event.key) {
                     event.preventDefault()
 					this.listSelect(item._id)
                 }
-
+				else
                 if ('Tab' === event.key) {
                     event.preventDefault()
-                    this.$refs.input.focus()
+                    this.$refs.filter.focus()
                 }
+				else
+				if ('Escape' === event.key) {
+					event.preventDefault()
+					this.listClose()
+				}
+
             },
 
             onItemClick (event, item) {
@@ -249,6 +264,14 @@
 	border: none;
 }
 
+.doc-form-owner .select .container .controls button.open,button.close {
+	transform: scale(2.0,1.0);
+}
+
+.doc-form-owner .select .container .controls button:hover:enabled {
+	color: darkred;
+}
+
 /*
 .doc-form-owner .select .container .controls a.close {
 	background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
@@ -263,24 +286,24 @@
 	height: 6em;
 }
 
-div.list-container {
+.list-container {
 	position: relative;
 	height: 0px;
 	width: 100%;
 	display: none;
 }
 
-div.list-container.active {
+.list-container.active {
 	display: block;
 }
 
-div.list-container input.filter {
+.list-container input.filter {
 	border: 1px solid var(--border-color);
 	margin: 0;
 	width: 100%;
 }
 
-div.list-container div.list {
+.list-container .list {
 	max-height: 33vh;
 	position: absolute;
 	left: 0;
@@ -288,16 +311,17 @@ div.list-container div.list {
 	overflow-y: scroll;
 	background-color: #fff;
 	border: 1px solid var(--border-color);
+	box-shadow: 3px 6px 6px rgba(0, 0, 0, 0.15);
 }
 
-div.list-container .list > a.item {
+.list-container .list > a.item {
 	display: block;
 	margin: 1px;
 	padding: 0;
 	border: 1px solid var(--border-color);
 }
 
-div.list-container .list > a.item.active * {
+.list-container .list > a.item.active * {
 	background-color: var(--bs-primary);
 	color: var(--bs-white);
 }
