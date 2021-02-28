@@ -32,7 +32,6 @@ const SubSystems = [
 					connectionLimit: 1,
 			    	localAddress: '127.0.0.1',
 			    	port: '9306',
-					//timeout: 60 * 60 * 1000
 			    })
 
 				resolve(pool)
@@ -97,11 +96,18 @@ const SubSystems = [
 
 				resolve(ok)
 			})
-		}
+		},
 	},
 
 	// ----------------------------------------------------------------------
 
+	{
+		name: 'events',
+		init () {
+
+			return Promise.resolve()
+		},
+	},
 ]
 
 // --------------------------------------------------------------------------
@@ -206,7 +212,7 @@ sssInit(SubSystems).then(sss => {
 
 		res.locals.Result = doc.toObject()
 
-		delete res.locals.Result.__v
+		// delete res.locals.Result.__v
 
 		next()
 	}
