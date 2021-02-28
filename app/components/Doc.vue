@@ -1,6 +1,6 @@
 <template lang="pug">
 
-	Modal(@close="closeEdit")
+	Modal(@close="closeEdit" :class="this.model.kind")
 
 		template(v-slot:title)
 			TabView(
@@ -153,4 +153,20 @@
 </script>
 
 <style>
+
+.crm-modal .crm-modal-dialog {
+	max-height: 95vh;
+}
+
+.crm-modal.person .crm-modal-dialog {
+	width: 55rem;
+	min-height: 75vh;
+}
+
+.crm-modal.property .crm-modal-dialog {
+	width: 75rem;
+	height: 75vh;
+}
+
+
 </style>
