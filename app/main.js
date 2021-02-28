@@ -34,6 +34,7 @@ import router from './router.js'
 
 // --------------------------------------------------------------------------
 
+/*
 import Vuex from 'vuex'
 Vue.use(Vuex)
 
@@ -47,6 +48,17 @@ const store = new Vuex.Store({
 		}
 	}
 })
+*/
+
+// --------------------------------------------------------------------------
+
+/*
+Vue.use(VueGlobalVariable, {
+	globals: {
+		user: new User(‘user1’),
+	},
+});
+*/
 
 // --------------------------------------------------------------------------
 
@@ -58,22 +70,16 @@ new Vue({
 
 	router,
 
-	store,
+	// store,
 
 	data: {
 	},
 
 	methods: {
-		haveMessage (message) {
-			this.messages.push({
-				ts: new Date(),
-				text: message
-			})
-		}
 	},
 
 	created () {
-		console.log('Created')
+		console.log('<main.js> Created')
 	},
 
 	mounted () {
