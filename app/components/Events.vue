@@ -8,11 +8,14 @@
 
 				FormulateInput(
 					class="selector"
+					inputClass="form-control"
 					type="month"
 					name="sample"
 					v-model="focus"
 					@input="loadEvents"
 				)/
+
+				br/
 
 				Calendar(
 					:now="focus"
