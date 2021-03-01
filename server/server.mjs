@@ -3,11 +3,7 @@
 import querystring from 'querystring'
 
 import moment from 'moment'
-
-import express from 'express'
-import morgan from 'morgan'
-import bodyParser from 'body-parser'
-
+import sharp from 'sharp'
 
 import mongoose from 'mongoose'
 mongoose.Promise = global.Promise
@@ -17,7 +13,20 @@ import SphinxClient from 'sphinxapi'
 
 import mysql from 'mysql'
 
-import sharp from 'sharp'
+import express from 'express'
+import session from 'express-session'
+import morgan from 'morgan'
+morgan.token('session', req => {
+	return `[${req.sessionID}]`
+})
+
+import bodyParser from 'body-parser'
+import cookieParser from 'cookie-parser'
+
+import connectMongo from 'connect-mongo'
+const MongoStore = connectMongo.default
+
+import CONFIG from './config.js'
 
 // ==========================================================================
 
@@ -30,9 +39,11 @@ const SubSystems = [
 
 				var pool = mysql.createPool({
 					connectionLimit: 1,
-			    	localAddress: '127.0.0.1',
-			    	port: '9306',
+			    	localAddress: CONFIG.SphinQL.address,
+			    	port: CONFIG.SphinQL.port,
 			    })
+
+				pool.on('error', err => reject(err))
 
 				resolve(pool)
 			})
@@ -42,15 +53,61 @@ const SubSystems = [
 	// --------------------------------------------------------------------------
 
 	{
+		name: 'docs',
+		init () {
+			return mongoose.connect(
+				CONFIG.MongoDB.URI,
+				CONFIG.MongoDB.options
+			)
+		}
+
+	},
+
+	// --------------------------------------------------------------------------
+
+	{
 		name: 'web',
 		init () {
 			return new Promise((resolve, reject) => {
 				const app = express()
-				const port = 3000
-				app.use(morgan('dev'))
+				const port = CONFIG.Express.port
+				app.use(cookieParser(CONFIG.Express.Session.secret))
+				//app.use(morgan('dev'))
+				app.use(morgan(':session :method :url :status :response-time ms - :res[content-length]'))
 				app.use(bodyParser.text())
 				app.use(express.json())
 				app.use(bodyParser.json())
+
+				const sessionStore = new MongoStore({
+					mongoUrl: CONFIG.MongoDB.URI,
+					collectionName: 'sessions',
+					touchAfter: 600,
+					//crypto: {
+					//	secret: 'blah'
+					//}
+				})
+
+				/*
+				sessionStore.on('create', (... args) => console.log('* Session create', args))
+				sessionStore.on('touch', (... args) => console.log('* Session touch', args))
+				sessionStore.on('update', (... args) => console.log('* Session update', args))
+				sessionStore.on('set', (... args) => console.log('* Session set', args))
+				sessionStore.on('destroy', (... args) => console.log('* Session destroy', args))
+				*/
+
+				app.set('trust proxy', 1) // trust first proxy
+				app.use(session({
+					secret: CONFIG.Express.Session.secret,
+					resave: true,
+					saveUninitialized: true,
+					cookie: {
+						secure: false,
+						maxAge: CONFIG.Express.Session.maxAge
+					},
+					genid: () => mongoose.Types.ObjectId().toString(),
+					store: sessionStore,
+					//unset: // 'keep' | 'destroy'
+				}))
 
 				app
 				.listen(port, () => {
@@ -61,21 +118,6 @@ const SubSystems = [
 
 			})
 		}
-	},
-	// --------------------------------------------------------------------------
-
-	{
-		name: 'docs',
-		init () {
-			return mongoose.connect(
-				'mongodb://127.0.0.1:27017/crm',
-				{
-					useNewUrlParser: true,
-					useUnifiedTopology: true
-				}
-			)
-		}
-
 	},
 
 	// ----------------------------------------------------------------------

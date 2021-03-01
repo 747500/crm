@@ -70,6 +70,14 @@ new Vue({
 
 	router,
 
+	http: {
+		//root: '/api/0',
+		options: {
+			xhr: {
+				withCredentials: true,
+			}
+		}
+	},
 	// store,
 
 	data: {
