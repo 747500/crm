@@ -2,16 +2,21 @@
 
 	div
 		div(class="account btn-toolbar" role="toolbar")
-			//table(class="sessions")
-			//	tr(v-for="s in sessions" :key="s._id" :class="{'current': s.current }")
-			//		td {{ s._id }}
-			//		td {{ s.ip }}
 
-			div(class="input-group me-2" role="group")
-				label(class="input-group-text" id="basic-addon1") Пользователи
+			div(
+				class="input-group me-2"
+				role="group"
+			)
+				label(
+					class="input-group-text"
+					id="basic-addon1"
+					for="select-or-create-user"
+				)
+					| Пользователь
 				select(
 					@change="onUserChange"
 					class="form-select"
+					id="select-or-create-user"
 					aria-describedby="basic-addon1"
 				)
 					option(value="new")
@@ -27,15 +32,24 @@
 			form(
 				v-if="createUser"
 				@submit.prevent="onUserCreate"
+				class="input-group me-2"
+				role="group"
 			)
-				div(class="input-group me-2" role="group")
-					label(class="input-group-text" id="basic-addon2") Имя
-					input(
-						type="text"
-						class="form-control"
-						aria-describedby="basic-addon2"
-						)
-					button(class="btn btn-primary" type="submit") Ok
+				label(
+					class="input-group-text"
+					id="basic-addon2"
+					for="input-new-user-name"
+				) Имя
+				input(
+					id="input-new-user-name"
+					type="text"
+					class="form-control"
+					aria-describedby="basic-addon2"
+				)/
+				button(
+					class="btn btn-primary"
+					type="submit"
+				) Ok
 
 		div(class="hr")
 
@@ -103,7 +117,7 @@
 						_id: userId
 					}
 				)
-				.then(response => {
+				.then(() => {
 					//console.log('<Accounts.vue> set user', response)
 					return this.loadUsers()
 				})
@@ -121,7 +135,7 @@
 						name: newUserName
 					}
 				)
-				.then(response => {
+				.then(() => {
 					document.location.reload()
 				})
 				.catch(err => console.error(err))
