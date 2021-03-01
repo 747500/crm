@@ -17,12 +17,31 @@ import express from 'express'
 import session from 'express-session'
 import morgan from 'morgan'
 morgan.token('session', req => {
-	return `[${req.sessionID}]`
+	return `${req.sessionID}`
+})
+
+morgan.token('user', req => {
+	const haveUser =
+		'object' === typeof req.User
+
+	if (haveUser) {
+		return req.User.name
+	}
+
+	const haveSession =
+		'object' === typeof req.session
+
+	if (haveSession) {
+		return req.session.user
+	}
+
+	return '-'
 })
 
 import bodyParser from 'body-parser'
 import cookieParser from 'cookie-parser'
 
+// https://github.com/jdesboeufs/connect-mongo
 import connectMongo from 'connect-mongo'
 const MongoStore = connectMongo.default
 
@@ -73,18 +92,21 @@ const SubSystems = [
 				const port = CONFIG.Express.port
 				app.use(cookieParser(CONFIG.Express.Session.secret))
 				//app.use(morgan('dev'))
-				app.use(morgan(':session :method :url :status :response-time ms - :res[content-length]'))
+				app.use(morgan('[:session :user] :method :url :status :response-time ms - :res[content-length]'))
 				app.use(bodyParser.text())
 				app.use(express.json())
 				app.use(bodyParser.json())
 
-				const sessionStore = new MongoStore({
+				console.log('>>>', MongoStore.create);
+
+				const sessionStore = MongoStore.create({
 					mongoUrl: CONFIG.MongoDB.URI,
 					collectionName: 'sessions',
-					touchAfter: 600,
+					//touchAfter: 600,
 					//crypto: {
 					//	secret: 'blah'
-					//}
+					//},
+					stringify: false,
 				})
 
 				/*
@@ -108,6 +130,13 @@ const SubSystems = [
 					store: sessionStore,
 					//unset: // 'keep' | 'destroy'
 				}))
+
+				app.use((req, res, next) => {
+					if (req.session.ip !== req.ip){
+						req.session.ip = req.ip
+					}
+					next()
+				})
 
 				app
 				.listen(port, () => {
@@ -191,15 +220,21 @@ sssInit(SubSystems).then(sss => {
 // ==========================================================================
 
 	const search = (req, res, next) => {
+		const userId = mongoose.Types.ObjectId(req.session.user)
 
 		console.log('<search>', req.body)
 
 		const searchString = req.body.q
 
-		const queryArgs = [req.body.q]
-		var query = 'SELECT * FROM testrt WHERE MATCH(?)'
+		const queryArgs = []
+		var query = 'SELECT * FROM testrt WHERE user = ? AND MATCH(?)'
+
+		queryArgs.push(userId.toString())
+		queryArgs.push(req.body.q)
 
 		if (req.body.kind) {
+			let n = queryArgs.length
+
 			if ((req.body.kind instanceof Array) && req.body.kind.length) {
 				queryArgs.push(req.body.kind)
 			}
@@ -208,21 +243,26 @@ sssInit(SubSystems).then(sss => {
 				queryArgs.push(req.body.kind)
 			}
 
-			if (queryArgs.length === 2) {
+			if (queryArgs.length !== n) {
 				query += ' AND kind IN (?)'
 			}
 		}
+
+		console.log('###', {
+			q: query,
+			a: queryArgs
+		})
 
 		sss.sphinxql.query(
 			query, queryArgs,
 			(err, rows, fields) => {
 
 				if (err) {
-					console.error(err)
+					next(err)
 					return
 				}
 
-				console.log('* Sphinx SELECT', rows)
+				console.log('* Sphinx SELECT', rows.length)
 
 				sss.sphinxql.query(
 					'SHOW META LIKE ?',
@@ -265,8 +305,13 @@ sssInit(SubSystems).then(sss => {
 
 	// TODO validation
 	const docList = (req, res, next) => {
+		const userId = mongoose.Types.ObjectId(req.session.user)
 
-		var ok = res.locals.Schema.find()
+		var ok = res.locals.Schema.find(
+			{
+				user: userId
+			}
+		)
 
 		switch (res.locals.kind) {
 
@@ -298,8 +343,10 @@ sssInit(SubSystems).then(sss => {
 
 	// TODO validation
 	const docEvents = (req, res, next) => {
+		const userId = mongoose.Types.ObjectId(req.session.user)
 
 		console.log('* docEvents\n', req.query)
+
 
 		const month = parseInt(moment(req.query.yearmonth).format('MM'))
 		console.log('* docEvents\n', month)
@@ -309,6 +356,7 @@ sssInit(SubSystems).then(sss => {
 				$project: {
 					_id: true,
 					kind: true,
+					user: true,
 					firstName: '$person.firstName',
 					middleName: '$person.middleName',
 					lastName: '$person.lastName',
@@ -320,6 +368,7 @@ sssInit(SubSystems).then(sss => {
 			},
 			{
 				$match: {
+					user: userId,
 					kind: 'person',
 					month: month
 				}
@@ -349,8 +398,12 @@ sssInit(SubSystems).then(sss => {
 
 	// TODO validation
 	const docLoad = (req, res, next) => {
+		const userId = mongoose.Types.ObjectId(req.session.user)
 
-		models.Doc.findById(req.params.id)
+		models.Doc.findOne({
+			_id: req.params.id,
+			user: userId,
+		})
 		.then(result => {
 
 			if (null === result) {
@@ -387,10 +440,7 @@ sssInit(SubSystems).then(sss => {
 			'ctime': true,
 		}
 
-		console.log('-------------------------------------')
 		console.log('* docUpdate', req.body)
-
-		console.log('-------------------------------------')
 
 		var fieldsUpdated = 0
 
@@ -408,10 +458,6 @@ sssInit(SubSystems).then(sss => {
 			}
 
 		})
-		console.log('-------------------------------------')
-
-		console.log('* docUpdate', res.locals.Doc)
-		console.log('-------------------------------------')
 
 		if (0 === fieldsUpdated) {
 			res.status(400).send('Can\'t find fields to update')
@@ -443,9 +489,12 @@ sssInit(SubSystems).then(sss => {
 	}
 
 	const docNew = (req, res, next) => {
+		const userId = mongoose.Types.ObjectId(req.session.user)
 
 		try {
-			res.locals.Doc = new res.locals.Schema()
+			res.locals.Doc = new res.locals.Schema({
+				user: userId
+			})
 		}
 		catch (err) {
 			next(err)
@@ -471,6 +520,7 @@ sssInit(SubSystems).then(sss => {
 	}
 
 	const fileUpload = (req, res, next) => {
+		const userId = mongoose.Types.ObjectId(req.session.user)
 
 		const doc = res.locals.Doc
 		const filename = req.params.filename
@@ -482,6 +532,7 @@ sssInit(SubSystems).then(sss => {
 			{
 				contentType: mimetype,
 				metadata: {
+					user: userId,
 					docId: mongoose.Types.ObjectId(doc.id),
 					lastModified: new Date(req.headers['last-modified']),
 					caption: querystring.unescape(caption)
@@ -505,14 +556,18 @@ sssInit(SubSystems).then(sss => {
 	}
 
 	const getThumbnail = (req, res, next) => {
+		const userId = mongoose.Types.ObjectId(req.session.user)
 
 		const oid = mongoose.Types.ObjectId(req.params.id)
 
-		sss.files.collection.findOne({ _id: oid })
+		sss.files.collection.findOne({
+			_id: oid,
+			'metadata.user': userId,
+		})
 		.then(fileinfo => {
 
 			if (null === fileinfo) { // 404
-				next()
+				res.status(404).send('File Not Found')
 				return;
 			}
 
@@ -553,14 +608,18 @@ sssInit(SubSystems).then(sss => {
 	}
 
 	const getFile = (req, res, next) => {
+		const userId = mongoose.Types.ObjectId(req.session.user)
 
-		const oid = mongoose.Types.ObjectId(req.params.id)
+		const fileId = mongoose.Types.ObjectId(req.params.id)
 
-		sss.files.collection.findOne({ _id: oid })
+		sss.files.collection.findOne({
+			_id: fileId,
+			'metadata.user': userId,
+		})
 		.then(fileinfo => {
 
 			if (null === fileinfo) { // 404
-				next()
+				res.status(404).send('File Not Found')
 				return;
 			}
 
@@ -601,15 +660,39 @@ sssInit(SubSystems).then(sss => {
 	}
 
 	const docDeleteFile = (req, res, next) => {
-		const file_id = mongoose.Types.ObjectId(req.params.id)
+		const userId = mongoose.Types.ObjectId(req.session.user)
+		const fileId = mongoose.Types.ObjectId(req.params.id)
 
-		sss.files.bucket.delete(file_id, next)
+		sss.files.collection.findOne({
+			_id: fileId,
+			'metadata.user': userId,
+		})
+		.then(result => {
+			if (null === result) { // 404
+				res.status(404).send('File Not Found')
+				return;
+			}
+
+			sss.files.bucket.delete(fileId, (err, result) => {
+				if (err) {
+					next(err)
+					return
+				}
+
+				console.log('* docDeleteFile result', result)
+				res.send(result)
+			})
+
+		})
+		.catch(next)
+
 
 	}
 
 	const postFileMeta = (req, res, next) => {
+		const userId = mongoose.Types.ObjectId(req.session.user)
 
-		const oid = mongoose.Types.ObjectId(req.params.id)
+		const fileId = mongoose.Types.ObjectId(req.params.id)
 		const fieldName = 'caption' //req.params.field
 
 		const allowed = {
@@ -641,7 +724,8 @@ sssInit(SubSystems).then(sss => {
 
 		sss.files.collection.updateOne(
 			{
-				_id: oid
+				_id: fileId,
+				'metadata.user': userId
 			},
 			{
 				$set: set
@@ -650,7 +734,7 @@ sssInit(SubSystems).then(sss => {
 		.then(result => {
 
 			if (null === result) { // 404
-				next()
+				res.status(404).send('File Not Found')
 				return;
 			}
 
@@ -663,9 +747,11 @@ sssInit(SubSystems).then(sss => {
 	}
 
 	const getFilesList = (req, res, next) => {
+		const userId = mongoose.Types.ObjectId(req.session.user)
 
 		sss.files.collection.find(
 			{
+				'metadata.user': userId,
 				'metadata.docId': res.locals.Doc._id
 			}
 		)
@@ -683,19 +769,19 @@ sssInit(SubSystems).then(sss => {
 	}
 
 	const fulltextAdd = (req, res, next) => {
-
 		const doc = res.locals.Doc
 		const id = doc.ctime.getTime()
-		const docFts = doc.fts.join(' ')
+		const docFts = doc.fts
 
 		console.log('* fulltextAdd:', docFts)
 
 		sss.sphinxql.query(
 			//'UPDATE testrt SET content = ?, kind = ?, oid = ? WHERE id = ?',
-			'INSERT INTO testrt (id, content, oid, kind) VALUES (?, ?, ?, ?)',
+			'INSERT INTO testrt (id, content, user, oid, kind) VALUES (?, ?, ?, ?, ?)',
 			[
 				id,
-				docFts,
+				docFts.join(' '),
+				doc.user.toString(),
 				doc._id.toString(),
 				doc.kind
 			],
@@ -718,7 +804,16 @@ sssInit(SubSystems).then(sss => {
 		const id = doc.ctime.getTime()
 		const docFts = doc.fts
 
-		console.log('* fulltextUpdate:', docFts)
+		console.log(
+			'* fulltextUpdate:',
+			{
+				user: doc.user,
+				_id: doc._id,
+				kind: doc.kind,
+				fts: docFts,
+				sphinxId: id,
+			}
+		)
 
 		sss.sphinxql.query(
 			'DELETE FROM testrt WHERE oid = ?',
@@ -729,11 +824,14 @@ sssInit(SubSystems).then(sss => {
 					return
 				}
 
+				console.log('* fulltextUpdate deleted:', row.affectedRows)
+
 				sss.sphinxql.query(
-					'REPLACE INTO testrt (id, content, oid, kind) VALUES (?, ?, ?, ?)',
+					'REPLACE INTO testrt (id, content, user, oid, kind) VALUES (?, ?, ?, ?, ?)',
 					[
 						id,
 						docFts.join(' '),
+						doc.user.toString(),
 						doc._id.toString(),
 						doc.kind
 					],
@@ -755,6 +853,95 @@ sssInit(SubSystems).then(sss => {
 
 	}
 
+// ==========================================================================
+
+	const users = (req, res, next) => {
+
+		models.User.find()
+		.then(result => {
+			res.send(result.map(user => {
+				return {
+					_id: user._id,
+					name: user.name,
+					current: req.session.user === user._id.toString(),
+				}
+			}))
+		})
+		.catch(next)
+
+	}
+
+	const usersSet = (req, res, next) => {
+
+		req.session.user = req.body._id
+
+		console.log('* usersSet', req.session.user)
+
+		res.send('Ok')
+	}
+
+	const usersCreate = (req, res, next) => {
+
+		const haveUser =
+			'string' === typeof req.body.name &&
+			0 < req.body.name.length
+
+		if (!haveUser) {
+			res.status(400).send('Invalid or empty user name')
+			return
+		}
+
+		const user = new models.User({
+			name: req.body.name
+		})
+
+		user.save()
+		.then(result => {
+			res.send(result)
+		})
+		.catch(err => next(err))
+	}
+
+	const loadUser = (req, res, next) => {
+		const userId = mongoose.Types.ObjectId(req.session.user)
+
+		models.User.findOne(
+			{ _id: userId }
+		)
+		.then(result => {
+			if (null === result) {
+				res.status(401).send('Access Denied')
+				return
+			}
+			req.User = result
+
+			//console.log('* loadUser', req.User)
+
+			next()
+
+		})
+		.catch(err => next(err))
+
+	}
+
+// ==========================================================================
+
+	sss.web.post('/u/set',
+		usersSet
+	)
+
+	sss.web.get('/u',
+		users
+	)
+
+	sss.web.put('/u',
+		usersCreate
+	)
+
+	sss.web.use(loadUser)
+
+// ==========================================================================
+// AUTHENICATED ZONE BELOW
 // ==========================================================================
 
 	sss.web.post('/s',

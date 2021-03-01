@@ -1,32 +1,40 @@
 <template lang="pug">
 
 	div
-		header
-			nav
-				div(v-for="r in $router.options.routes[0].children" :key="r.name")
-					router-link(:to="r.path")
-						| {{ r.meta.icon }}
-						| {{ r.meta.title }}
+		Accounts/
 
-				//div
-					//SearchDropdown()/
+		div
+			header
+				nav
+					div(v-for="r in $router.options.routes[0].children" :key="r.name")
+						router-link(:to="r.path")
+							| {{ r.meta.icon }}
+							| {{ r.meta.title }}
 
-		content
-			router-view()/
+					//div
+						//SearchDropdown()/
+
+			content
+				router-view()/
 
 </template>
 
 
 <script>
 
-	import SearchDropdown from './SearchDropdown.vue'
+	import Accounts from './Accounts.vue'
 
 	export default {
 
 		name: 'Nav',
 
 		components: {
-			SearchDropdown
+			Accounts
+		},
+
+		data () {
+			return {
+			}
 		},
 
 		watch: {
@@ -34,6 +42,12 @@
 				document.title = to.meta.title || 'CRM'
 			}
 	    },
+
+		created () {
+		},
+
+		methods: {
+		}
 	}
 
 </script>
@@ -75,5 +89,4 @@ nav a.router-link-active {
 nav a.router-link-active:hover {
 	border-bottom-color: gray;
 }
-
 </style>

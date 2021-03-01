@@ -21,6 +21,26 @@ mongoose.Schema.Types.Text = Text;
 
 // --------------------------------------------------------------------------
 
+const UserSchemaOptions = {
+	discriminatorKey: 'kind',
+    timestamps: {
+        createdAt: 'ctime',
+        updatedAt: 'mtime'
+    }
+}
+
+
+const UserSchema = new mongoose.Schema(
+	{
+		name: String
+	},
+	UserSchemaOptions
+);
+
+const User = mongoose.model('User', UserSchema)
+
+// --------------------------------------------------------------------------
+
 const docSchemaOptions = {
 	discriminatorKey: 'kind',
     timestamps: {
@@ -31,7 +51,7 @@ const docSchemaOptions = {
 
 const DocSchema = new mongoose.Schema(
 	{
-		time: Date
+		user: mongoose.Types.ObjectId
 	},
 	docSchemaOptions
 );
@@ -154,6 +174,7 @@ const Contract = Doc.discriminator(
 //console.log(mongoose.modelSchemas)
 
 export default {
+    User,
 	Doc,
 	Person,
 	Property,
