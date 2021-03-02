@@ -84,6 +84,7 @@ const routes = [
 				meta: {
 					title: 'Сделки',
 					icon: '⇄',
+					kind: 'contract',
 				},
 				children: [
 					{
@@ -107,6 +108,7 @@ const routes = [
 				meta: {
 					title: 'Объекты',
 					icon: '🏠',
+					kind: 'property',
 				},
 				children: [
 					{
@@ -131,6 +133,7 @@ const routes = [
 				meta: {
 					title: 'Контакты',
 					icon: '👤',
+					kind: 'person',
 				},
 				children: [
 					{
