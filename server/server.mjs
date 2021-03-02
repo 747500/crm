@@ -5,230 +5,20 @@ import querystring from 'querystring'
 import moment from 'moment'
 import sharp from 'sharp'
 
+import express from 'express'
 import mongoose from 'mongoose'
-mongoose.Promise = global.Promise
+//mongoose.Promise = global.Promise
+
 import models from './db_schema.mjs'
 
-import SphinxClient from 'sphinxapi'
-
-import mysql from 'mysql'
-
-import express from 'express'
-import session from 'express-session'
-import morgan from 'morgan'
-morgan.token('session', req => {
-	return `${req.sessionID}`
-})
-
-morgan.token('user', req => {
-	const haveUser =
-		'object' === typeof req.User
-
-	if (haveUser) {
-		return req.User.name
-	}
-
-	const haveSession =
-		'object' === typeof req.session
-
-	if (haveSession) {
-		return req.session.user
-	}
-
-	return '-'
-})
-
-import bodyParser from 'body-parser'
-import cookieParser from 'cookie-parser'
-
-// https://github.com/jdesboeufs/connect-mongo
-import connectMongo from 'connect-mongo'
-const MongoStore = connectMongo.default
+import SubSystems from './subsystems/index.mjs'
 
 import CONFIG from './config.js'
 
 // ==========================================================================
 
-const SubSystems = [
-
-	{
-		name: 'sphinxql',
-		init () {
-			return new Promise((resolve, reject) => {
-
-				var pool = mysql.createPool({
-					connectionLimit: 1,
-			    	localAddress: CONFIG.SphinxQL.address,
-			    	port: CONFIG.SphinxQL.port,
-			    })
-
-				pool.on('error', err => reject(err))
-
-				process.on('SIGTERM', () => {
-					pool.end()
-					console.log('Sphinx disconnected')
-				})
-
-				resolve(pool)
-			})
-		}
-	},
-
-	// --------------------------------------------------------------------------
-
-	{
-		name: 'docs',
-		init () {
-			process.on('SIGTERM', () => {
-				mongoose.disconnect()
-				console.log('MongoDB disconnected')
-			})
-
-			return mongoose.connect(
-				CONFIG.MongoDB.URI,
-				CONFIG.MongoDB.options
-			)
-		}
-
-	},
-
-	// --------------------------------------------------------------------------
-
-	{
-		name: 'web',
-		init () {
-			return new Promise((resolve, reject) => {
-				const app = express()
-				const port = CONFIG.Express.port
-				app.use(cookieParser(CONFIG.Express.Session.secret))
-				//app.use(morgan('dev'))
-				app.use(morgan('[:session :user] :method :url :status :response-time ms - :res[content-length]'))
-				app.use(bodyParser.text())
-				app.use(express.json())
-				app.use(bodyParser.json())
-
-				const sessionStore = MongoStore.create({
-					mongoUrl: CONFIG.MongoDB.URI,
-					collectionName: 'sessions',
-					//touchAfter: 600,
-					//crypto: {
-					//	secret: 'blah'
-					//},
-					stringify: false,
-				})
-
-				/*
-				sessionStore.on('create', (... args) => console.log('* Session create', args))
-				sessionStore.on('touch', (... args) => console.log('* Session touch', args))
-				sessionStore.on('update', (... args) => console.log('* Session update', args))
-				sessionStore.on('set', (... args) => console.log('* Session set', args))
-				sessionStore.on('destroy', (... args) => console.log('* Session destroy', args))
-				*/
-
-				app.set('trust proxy', 1) // trust first proxy
-				app.use(session({
-					secret: CONFIG.Express.Session.secret,
-					resave: true,
-					saveUninitialized: true,
-					cookie: {
-						secure: false,
-						maxAge: CONFIG.Express.Session.maxAge
-					},
-					genid: () => mongoose.Types.ObjectId().toString(),
-					store: sessionStore,
-					//unset: // 'keep' | 'destroy'
-				}))
-
-				app.use((req, res, next) => {
-					if (req.session.ip !== req.ip){
-						req.session.ip = req.ip
-					}
-					next()
-				})
-
-				const server = app.listen(port, () => {
-					resolve(app)
-					console.log(`\tlistening at http://localhost:${port}`)
-
-					process.on('SIGTERM', () => {
-						server.close(() => {
-							console.log('Express terminated')
-						})
-					})
-				})
-				.on('error', reject)
-
-			})
-		}
-	},
-
-	// ----------------------------------------------------------------------
-
-	{
-		name: 'files',
-		init () {
-			return new Promise((resolve, reject) => {
-				const connection = this.docs.connection
-
-				const collection = connection.collection('fs.files')
-				const bucket = new mongoose.mongo.GridFSBucket(connection.db)
-
-				const ok = collection.createIndex('metadata.docId')
-					.then(() => {
-						return { collection, bucket }
-					})
-
-				resolve(ok)
-			})
-		},
-	},
-
-	// ----------------------------------------------------------------------
-
-	{
-		name: 'events',
-		init () {
-
-			return Promise.resolve()
-		},
-	},
-]
-
-// --------------------------------------------------------------------------
-
-function runService (service) {
-
-	console.log(`sss init "${service.name}"`)
-
-	return service.init.bind(this)().then(
-		result => {
-			console.log('\tok')
-			service.endpoint = result
-			return result
-		}
-	)
-}
-
-function sssInit (arg) {
-	const sss = {}
-
-	return arg.reduce(
-		(ok, s) => ok.then(() => {
-			return runService.bind(sss)(s).then(() => {
-				sss[s.name] = s.endpoint
-			})
-		}),
-		Promise.resolve()
-	)
-	.then(result => {
-		console.log('sss init ok:', Object.keys(sss))
-		return sss;
-	})
-}
-
-// ==========================================================================
-
-sssInit(SubSystems).then(sss => {
+SubSystems.init()
+.then(sss => {
 
 // ==========================================================================
 
@@ -277,7 +67,7 @@ sssInit(SubSystems).then(sss => {
 					return
 				}
 
-				console.log('* Sphinx SELECT', rows.length)
+				console.log('* Sphinx SELECT rows:', rows.length)
 
 				sss.sphinxql.query(
 					'SHOW META LIKE ?',
@@ -290,7 +80,6 @@ sssInit(SubSystems).then(sss => {
 						}
 
 						console.log('* Sphinx total_found:', meta[0].Value)
-						//res.send(rows)
 
 						res.send({
 							total_found: meta[0].Value,
