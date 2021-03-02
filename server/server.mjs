@@ -303,7 +303,6 @@ sssInit(SubSystems).then(sss => {
 		res.send(res.locals.Result)
 	}
 
-	// TODO validation
 	const docList = (req, res, next) => {
 		const userId = mongoose.Types.ObjectId(req.session.user)
 
@@ -341,7 +340,6 @@ sssInit(SubSystems).then(sss => {
 
 	}
 
-	// TODO validation
 	const docEvents = (req, res, next) => {
 		const userId = mongoose.Types.ObjectId(req.session.user)
 
@@ -395,8 +393,6 @@ sssInit(SubSystems).then(sss => {
 		.catch(next)
 	}
 
-
-	// TODO validation
 	const docLoad = (req, res, next) => {
 		const userId = mongoose.Types.ObjectId(req.session.user)
 
