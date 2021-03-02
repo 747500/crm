@@ -68,14 +68,17 @@ export default {
 	methods: {
 
 		updateDoc(doc) {
-			console.log('<DocList.vue> on updateDoc', doc)
 			var flag = true
+
+			//console.log('* <DocList.vue> on updateDoc', doc)
+
 			this.model.forEach(item => {
 				if (item._id === doc._id) {
 					const ts = new Date(doc.mtime).getTime()
 					const key = `${doc._id}-${ts}`
 					flag = false
 					item.key = key
+					//console.log('* <DocList.vue>', item.key, '>', key)
 				}
 			})
 
@@ -86,7 +89,7 @@ export default {
 
 		createDoc() {
 			const kind = this.$route.meta.kind
-			console.log('<DocList.vue> on createDoc')
+			//console.log('<DocList.vue> on createDoc')
 			this.$router.push({
 				path: `${kind}/new`,
 				props: {
