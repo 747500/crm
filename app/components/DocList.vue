@@ -1,8 +1,8 @@
-<template>
+<template lang="pug">
 
-	<div>
+	div
 
-		<List
+		List(
 			:key="modelKey"
 			class="list"
 			v-model="model"
@@ -11,15 +11,10 @@
 			@open="openDoc"
 			@edit="editDoc"
 			@remove="removeDoc"
-			>
+		)
+			MDoc(:oid="props.item._id" :key="props.item.key")
 
-			<MDoc :oid="props.item" />
-
-		</List>
-
-		<router-view :key="$route.fullPath" />
-
-	</div>
+		router-view(:key="$route.fullPath" @update="updateDoc")/
 
 </template>
 
@@ -43,7 +38,6 @@ export default {
 
 	data () {
 		return  {
-			kind: null,
 			model: [],
 			modelKey: null,
 		}
@@ -52,7 +46,7 @@ export default {
 	on: {
 		listChange (event) {
 			console.log('<DocList.vue> on listChange', event)
-		}
+		},
 	},
 
 	beforeRouteEnter (to, from, next) {
@@ -61,34 +55,52 @@ export default {
 		})
 	},
 
+	/*
 	beforeRouteUpdate (to, from, next) {
-		this.$nextTick(() => {
-			this.updateModel(to, from)
-		})
 		next()
 	},
+	*/
 
 	created () {
-		this.kind = this.$route.path.split('/')[1]
+		// this.kind = this.$route.path.split('/')[1]
 	},
 
 	methods: {
 
+		updateDoc(doc) {
+			console.log('<DocList.vue> on updateDoc', doc)
+			var flag = true
+			this.model.forEach(item => {
+				if (item._id === doc._id) {
+					const ts = new Date(doc.mtime).getTime()
+					const key = `${doc._id}-${ts}`
+					flag = false
+					item.key = key
+				}
+			})
+
+			if (flag) {
+				this.updateModel()
+			}
+		},
+
 		createDoc() {
+			const kind = this.$route.meta.kind
 			console.log('<DocList.vue> on createDoc')
 			this.$router.push({
-				path: `${this.kind}/new`,
+				path: `${kind}/new`,
 				props: {
-					model: this.kind
+					model: kind
 				}
 			})
 		},
 
 		editDoc(item) {
+			const kind = this.$route.meta.kind
 			// console.log('<DocList.vue> on editDoc', item)
 
 			this.$router.push({
-				path: `${this.kind}/${item}`
+				path: `${kind}/${item._id}`
 			})
 		},
 
@@ -101,15 +113,18 @@ export default {
 		},
 
 		updateModel () {
-			// magic
-			this.kind = this.$route.path.split('/')[1]
+			const kind = this.$route.meta.kind
 
 			this.$http
-			.get(`/list/${this.kind}`)
+			.get(`/list/${kind}`)
 			.then(response => {
 				this.modelKey = Date.now()
 				this.model = response.body.map(item => {
-					return item._id
+					const ts = new Date(item.mtime).getTime()
+					return {
+						_id: item._id,
+						key: `${item._id}-${ts}`,
+					}
 				})
 			})
 			.catch(err => {
