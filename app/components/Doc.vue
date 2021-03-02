@@ -120,12 +120,13 @@
 					this.key = `${doc._id}-${doc.mtime}`
 				}
 
+				this.$emit('update', doc)
+
 			},
 
 			closeEdit () {
 				//this.$router.push('.')
 				this.$router.go(-1)
-				this.$emit('updateDoc')
 			},
 
 			onUpdate (doc) {
