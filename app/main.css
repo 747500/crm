@@ -40,7 +40,7 @@ a:visited {
 
 a:hover {
 	color: darkred;
-	text-decoration: underline;
+	text-decoration: none;
 }
 
 a[role=button] {
