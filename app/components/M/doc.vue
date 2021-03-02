@@ -1,22 +1,23 @@
-<template>
-	<div
+<template lang="pug">
+
+	div(
 		:id="model._id"
-		:class="[ 'm-doc', model.kind ]"
 		:key="model._id"
+		:class="[ 'm-doc', model.kind ]"
 		v-on="$listeners.open ? { click: () => $emit('open', model._id) } : {}"
-		>
-
-		<div v-for="(s) in kindSchema" :key="s.model" :class="s.model">
-
-			<component
-				v-if="model[s.model]"
+	)
+		div(
+			v-for="(s) in kindSchema"
+			:key="s.model"
+			:class="s.model"
+		)
+			// v-if="model[s.model]"
+			component(
 				:is="s.component"
 				:model="'contract' == s.model ? model : model[s.model]"
-				/>
+				:placeholder="s.placeholder"
+			)/
 
-		</div>
-
-	</div>
 </template>
 
 <script>
@@ -31,6 +32,7 @@ const KindSchema = {
 		{
 			model: 'mainPicture',
 			component: 'MPicture',
+			placeholder: '👤',
 		},
 		{
 			model: 'person',
@@ -56,11 +58,7 @@ const KindSchema = {
 			model: 'contract',
 			component: 'MContract',
 			icon: '📄'
-		},
-		{
-			model: 'mainPicture',
-			component: 'MPicture',
-		},
+		}
 	],
 }
 
@@ -130,7 +128,11 @@ export default {
 }
 
 .m-doc .mainPicture {
-	flex: initial;
+	flex: 0 0 9rem;
+	width: 9rem;
+	height: 9rem;
+	overflow: hidden;
+	border-right: 1px solid var(--border-color);
 }
 
 .m-doc .property {
@@ -152,6 +154,21 @@ export default {
 	object-fit: cover;
 	width: 9rem;
 	height: 9rem;
+}
+
+.m-doc .mainPicture .placeholder {
+	line-height: 1.5em;
+	font-size: 6rem;
+	text-align: center;
+	display: block;
+}
+
+.m-doc .m-person {
+	display: flex;
+}
+
+.m-doc .m-person > * {
+	flex: 1;
 }
 
 </style>

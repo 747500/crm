@@ -1,9 +1,9 @@
-<template>
-	<div class="s-picture">
+<template lang="pug">
 
-		<oidImage  v-if="model" :oid="model" />
+	div(class="s-picture")
+		oidImage(v-if="model" :oid="model")/
+		div(v-else class="placeholder") {{ placeholder || ' ' }}
 
-	</div>
 </template>
 
 <script>
@@ -19,6 +19,7 @@
 
 		props: {
 			model: String,
+			placeholder: String,
 		},
 
 		data () {

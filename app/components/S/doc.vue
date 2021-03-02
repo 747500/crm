@@ -13,9 +13,9 @@
 			:class="s.model"
 		)
 			component(
-				v-if="model[s.model]"
 				:is="s.component"
 				:model="'contract' == s.model ? model : model[s.model]"
+				:placeholder="s.placeholder"
 				)/
 
 </template>
@@ -32,6 +32,7 @@ const KindSchema = {
 		{
 			model: 'mainPicture',
 			component: 'SPicture',
+			placeholder: '👤',
 		},
 		{
 			model: 'person',
@@ -136,6 +137,10 @@ export default {
 
 .s-doc .mainPicture {
 	flex: initial;
+	width: 6rem;
+	height: 6rem;
+	overflow: hidden;
+	border-right: 1px solid var(--border-color);
 }
 
 .s-doc .property {
@@ -157,6 +162,17 @@ export default {
 	object-fit: cover;
 	width: 6rem;
 	height: 6rem;
+}
+
+.s-doc .mainPicture .placeholder {
+	line-height: 1.5em;
+	font-size: 4rem;
+	text-align: center;
+	display: block;
+}
+
+.s-doc .mainPicture .placeholder:hover {
+	text-decoration: none;
 }
 
 </style>

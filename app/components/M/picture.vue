@@ -1,9 +1,9 @@
-<template>
-	<div class="m-picture">
+<template lang="pug">
 
-		<oidImage  v-if="model" :oid="model" />
+	div(class="m-picture")
+		oidImage(v-if="model" :oid="model")/
+		div(v-else class="placeholder") {{ placeholder || ' ' }}
 
-	</div>
 </template>
 
 <script>
@@ -19,6 +19,7 @@
 
 		props: {
 			model: String,
+			placeholder: String,
 		},
 
 		data () {
@@ -27,8 +28,11 @@
 		},
 
 		created () {
-			//console.log('<M/person.vue> created', this.model)
+			//console.log('<M/picture.vue> created', this)
 		}
 	}
 
 </script>
+
+<style>
+</style>

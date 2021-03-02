@@ -1,19 +1,19 @@
-<template>
-	<div class="m-person">
+<template lang="pug">
 
-		<div class="names">
-			{{ person.lastName }}
-			{{ person.firstName }}
-			{{ person.middleName }}
-		</div>
+	div(class="m-person")
+		div
+			div(class="names")
+				| {{ person.lastName }}
+				| {{ person.firstName }}
+				| {{ person.middleName }}
 
-		<ul class="contacts">
-			<li v-for="c in person.contact" :key="c._id">
-				{{ c.data }}
-				<span v-if="c.description">({{ c.description }})</span>
-			</li>
-		</ul>
-	</div>
+			ul(class="contacts")
+				li(v-for="c in person.contact" :key="c._id")
+					span {{ c.data }}
+					span(v-if="c.description") ({{ c.description }})
+		div
+			span {{ person.comments }}
+
 </template>
 
 <script>
