@@ -934,37 +934,39 @@ sssInit(SubSystems).then(sss => {
 		usersCreate
 	)
 
-	sss.web.use(loadUser)
-
 // ==========================================================================
 // AUTHENICATED ZONE BELOW
 // ==========================================================================
 
-	sss.web.post('/s',
+	const router = express.Router()
+
+	router.use(loadUser)
+
+	router.post('/s',
 		search
 	)
 
 // --------------------------------------------------------------------------
 
-	sss.web.get('/t/:id',
+	router.get('/t/:id',
 		getThumbnail
 	)
 
-	sss.web.get('/f/:id',
+	router.get('/f/:id',
 		getFile
 	)
 
-	sss.web.post('/f/:id',
+	router.post('/f/:id',
 		postFileMeta
 	)
 
-	sss.web.delete('/f/:id',
+	router.delete('/f/:id',
 		docDeleteFile,
 		sendResultJSON
 	)
 
 	// FIXME change POST to PUT, :filename to header
-	sss.web.post('/f/:id/upload/:filename',
+	router.post('/f/:id/upload/:filename',
 		docLoad,
 		fileUpload,
 		sendResultJSON
@@ -972,14 +974,14 @@ sssInit(SubSystems).then(sss => {
 
 	// --------------------------------------------------------------------------
 
-	sss.web.get('/person/events',
+	router.get('/person/events',
 		docEvents,
 		sendResultJSON
 	)
 
 	// --------------------------------------------------------------------------
 
-	sss.web.get('/list/:schema',
+	router.get('/list/:schema',
 		schemaResolve,
 		docList,
 		sendResultJSON
@@ -987,19 +989,19 @@ sssInit(SubSystems).then(sss => {
 
 	// --------------------------------------------------------------------------
 
-	sss.web.get('/doc/:id',
+	router.get('/doc/:id',
 		docLoad,
 		docAsResult,
 		sendResultJSON
 	)
 
-	sss.web.get('/doc/:id/files',
+	router.get('/doc/:id/files',
 		docLoad,
 		getFilesList,
 		sendResultJSON
 	)
 
-	sss.web.post('/doc/:id',
+	router.post('/doc/:id',
 		docLoad,
 		docUpdate,
 		docSave,
@@ -1008,7 +1010,7 @@ sssInit(SubSystems).then(sss => {
 		sendResultJSON
 	)
 
-	sss.web.put('/doc',
+	router.put('/doc',
 		schemaResolve,
 		docNew,
 		docUpdate,
@@ -1018,6 +1020,9 @@ sssInit(SubSystems).then(sss => {
 		sendResultJSON
 	)
 
+	// --------------------------------------------------------------------------
+
+	sss.web.use('/', router)
 	sss.web.use(express.static('public'))
 
 // ==========================================================================
