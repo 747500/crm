@@ -14,6 +14,7 @@
 				)
 					| Пользователь
 				select(
+					:key="selectUserKey"
 					@change="onUserChange"
 					class="form-select"
 					id="select-or-create-user"
@@ -30,7 +31,7 @@
 						| {{ u.name }}
 
 			form(
-				v-if="createUser"
+				v-if="createUserShow"
 				@submit.prevent="onUserCreate"
 				class="input-group me-2"
 				role="group"
@@ -45,11 +46,18 @@
 					type="text"
 					class="form-control"
 					aria-describedby="basic-addon2"
+					@input="onCreateUserChange"
 				)/
 				button(
 					class="btn btn-primary"
 					type="submit"
+					:disabled="createUserOk"
 				) Ok
+				button(
+					class="btn btn-outline-primary"
+					type="button"
+					@click="onCreateUserCancel"
+				) Cancel
 
 		div(class="hr")
 
@@ -68,7 +76,9 @@
 			return {
 				users: [],
 				user: null,
-				createUser: false,
+				createUserShow: false,
+				createUserOk: true,
+				selectUserKey: null,
 			}
 		},
 
@@ -92,6 +102,7 @@
 								this.user = u._id
 							}
 						})
+						this.selectUserKey = Date.now()
 					})
 					.catch(err => console.error(err))
 
@@ -101,12 +112,12 @@
 				const userId = event.target.value
 
 				if ('new' === userId) {
-					this.createUser = true
+					this.createUserShow = true
 					return
 				}
 
 				if (this.user === userId) {
-					this.createUser = false
+					this.createUserShow = false
 					return
 				}
 
@@ -139,6 +150,17 @@
 					document.location.reload()
 				})
 				.catch(err => console.error(err))
+			},
+
+			onCreateUserChange (event) {
+				const username = event.target.value
+
+				this.createUserOk = username ? false : true
+			},
+
+			onCreateUserCancel () {
+				this.createUserShow = false
+				this.selectUserKey = Date.now()
 			}
 		}
 	}
