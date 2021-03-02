@@ -934,95 +934,95 @@ sssInit(SubSystems).then(sss => {
 		usersCreate
 	)
 
-// ==========================================================================
-// AUTHENICATED ZONE BELOW
-// ==========================================================================
+// --------------------------------------------------------------------------
 
-	const router = express.Router()
+	const apiRouter = express.Router()
 
-	router.use(loadUser)
+	apiRouter.use(loadUser) // AUTHENICATED ZONE BELOW
 
-	router.post('/s',
+	apiRouter.post('/s',
 		search
 	)
 
 // --------------------------------------------------------------------------
 
-	router.get('/t/:id',
+	apiRouter.get('/t/:id',
 		getThumbnail
 	)
 
-	router.get('/f/:id',
+	apiRouter.get('/f/:id',
 		getFile
 	)
 
-	router.post('/f/:id',
+	apiRouter.post('/f/:id',
 		postFileMeta
 	)
 
-	router.delete('/f/:id',
+	apiRouter.delete('/f/:id',
 		docDeleteFile,
 		sendResultJSON
 	)
 
 	// FIXME change POST to PUT, :filename to header
-	router.post('/f/:id/upload/:filename',
+	apiRouter.post('/f/:id/upload/:filename',
 		docLoad,
 		fileUpload,
 		sendResultJSON
 	)
 
-	// --------------------------------------------------------------------------
+// --------------------------------------------------------------------------
 
-	router.get('/person/events',
+	apiRouter.get('/person/events',
 		docEvents,
 		sendResultJSON
 	)
 
-	// --------------------------------------------------------------------------
+// --------------------------------------------------------------------------
 
-	router.get('/list/:schema',
+	apiRouter.get('/list/:schema',
 		schemaResolve,
 		docList,
 		sendResultJSON
 	)
 
-	// --------------------------------------------------------------------------
+// --------------------------------------------------------------------------
 
-	router.get('/doc/:id',
+	const docRouter = express.Router()
+
+	docRouter.get('/:id',
 		docLoad,
-		docAsResult,
-		sendResultJSON
+		docAsResult
 	)
 
-	router.get('/doc/:id/files',
+	docRouter.get('/:id/files',
 		docLoad,
-		getFilesList,
-		sendResultJSON
+		getFilesList
 	)
 
-	router.post('/doc/:id',
+	docRouter.post('/:id',
 		docLoad,
 		docUpdate,
 		docSave,
 		docAsResult,
-		fulltextUpdate,
-		sendResultJSON
+		fulltextUpdate
 	)
 
-	router.put('/doc',
+	docRouter.put('/',
 		schemaResolve,
 		docNew,
 		docUpdate,
 		docSave,
 		docAsResult,
-		fulltextAdd,
-		sendResultJSON
+		fulltextAdd
 	)
 
-	// --------------------------------------------------------------------------
+	docRouter.use(sendResultJSON)
 
-	sss.web.use('/', router)
+	apiRouter.use('/doc', docRouter)
+
+// --------------------------------------------------------------------------
+
+	sss.web.use('/', apiRouter)
 	sss.web.use(express.static('public'))
 
 // ==========================================================================
