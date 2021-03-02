@@ -116,7 +116,7 @@ const PersonSchema = new mongoose.Schema(
             lastName: String,
             middleName: String,
             birthDay: Date,
-            passport: String,
+            comments: String,
             contact: [ContactSchema],
         },
         mainPicture: mongoose.Types.ObjectId,

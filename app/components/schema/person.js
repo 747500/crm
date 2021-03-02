@@ -37,9 +37,9 @@ export default [
                         inputClass: 'form-control',
                     },
                     {
-                        name: 'passport',
+                        name: 'comments',
                         type: 'textarea',
-                        label: 'Паспорт',
+                        label: 'Коментарии',
                         labelClass: 'form-label',
                         inputClass: 'form-control',
                     },
