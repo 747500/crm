@@ -64,6 +64,11 @@ const SubSystems = [
 
 				pool.on('error', err => reject(err))
 
+				process.on('SIGTERM', () => {
+					pool.end()
+					console.log('Sphinx disconnected')
+				})
+
 				resolve(pool)
 			})
 		}
@@ -74,6 +79,11 @@ const SubSystems = [
 	{
 		name: 'docs',
 		init () {
+			process.on('SIGTERM', () => {
+				mongoose.disconnect()
+				console.log('MongoDB disconnected')
+			})
+
 			return mongoose.connect(
 				CONFIG.MongoDB.URI,
 				CONFIG.MongoDB.options
@@ -136,10 +146,15 @@ const SubSystems = [
 					next()
 				})
 
-				app
-				.listen(port, () => {
+				const server = app.listen(port, () => {
 					resolve(app)
 					console.log(`\tlistening at http://localhost:${port}`)
+
+					process.on('SIGTERM', () => {
+						server.close(() => {
+							console.log('Express terminated')
+						})
+					})
 				})
 				.on('error', reject)
 
@@ -1034,4 +1049,6 @@ sssInit(SubSystems).then(sss => {
 
 }).catch(err => {
 	console.error('FATAL:', err)
+
+	process.kill(process.pid, SIGTERM)
 })
