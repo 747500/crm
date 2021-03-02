@@ -58,8 +58,8 @@ const SubSystems = [
 
 				var pool = mysql.createPool({
 					connectionLimit: 1,
-			    	localAddress: CONFIG.SphinQL.address,
-			    	port: CONFIG.SphinQL.port,
+			    	localAddress: CONFIG.SphinxQL.address,
+			    	port: CONFIG.SphinxQL.port,
 			    })
 
 				pool.on('error', err => reject(err))
@@ -96,8 +96,6 @@ const SubSystems = [
 				app.use(bodyParser.text())
 				app.use(express.json())
 				app.use(bodyParser.json())
-
-				console.log('>>>', MongoStore.create);
 
 				const sessionStore = MongoStore.create({
 					mongoUrl: CONFIG.MongoDB.URI,
@@ -227,7 +225,9 @@ sssInit(SubSystems).then(sss => {
 		const searchString = req.body.q
 
 		const queryArgs = []
-		var query = 'SELECT * FROM testrt WHERE user = ? AND MATCH(?)'
+		var query = 'SELECT *' +
+			` FROM ${CONFIG.SphinxQL.indexName}` +
+			' WHERE user = ? AND MATCH(?)'
 
 		queryArgs.push(userId.toString())
 		queryArgs.push(req.body.q)
@@ -436,7 +436,7 @@ sssInit(SubSystems).then(sss => {
 			'ctime': true,
 		}
 
-		console.log('* docUpdate', req.body)
+		//console.log('* docUpdate', req.body)
 
 		var fieldsUpdated = 0
 
@@ -446,7 +446,7 @@ sssInit(SubSystems).then(sss => {
 				return
 			}
 
-			console.log('>>>', k, req.body[k])
+			//console.log('>>>', k, req.body[k])
 
 			if (k in req.body) {
 				fieldsUpdated ++;
@@ -772,8 +772,9 @@ sssInit(SubSystems).then(sss => {
 		console.log('* fulltextAdd:', docFts)
 
 		sss.sphinxql.query(
-			//'UPDATE testrt SET content = ?, kind = ?, oid = ? WHERE id = ?',
-			'INSERT INTO testrt (id, content, user, oid, kind) VALUES (?, ?, ?, ?, ?)',
+			`INSERT INTO ${CONFIG.SphinxQL.indexName}` +
+			' (id, content, user, oid, kind)' +
+			' VALUES (?, ?, ?, ?, ?)',
 			[
 				id,
 				docFts.join(' '),
@@ -812,8 +813,10 @@ sssInit(SubSystems).then(sss => {
 		)
 
 		sss.sphinxql.query(
-			'DELETE FROM testrt WHERE oid = ?',
-			[ doc._id.toString() ],
+			`DELETE FROM ${CONFIG.SphinxQL.indexName} WHERE oid = ?`,
+			[
+				doc._id.toString()
+			],
 			(err, row, fields) => {
 				if (err) {
 					next(err)
@@ -823,7 +826,9 @@ sssInit(SubSystems).then(sss => {
 				console.log('* fulltextUpdate deleted:', row.affectedRows)
 
 				sss.sphinxql.query(
-					'REPLACE INTO testrt (id, content, user, oid, kind) VALUES (?, ?, ?, ?, ?)',
+					`REPLACE INTO ${CONFIG.SphinxQL.indexName}`+
+					' (id, content, user, oid, kind)' +
+					' VALUES (?, ?, ?, ?, ?)',
 					[
 						id,
 						docFts.join(' '),

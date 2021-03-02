@@ -1,9 +1,10 @@
 
 module.exports = {
 
-	SphinQL: {
+	SphinxQL: {
 		address: '127.0.0.1',
 		port: '9306',
+		indexName: 'testrt',
 	},
 
 	MongoDB: {
