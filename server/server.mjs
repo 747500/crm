@@ -1002,8 +1002,8 @@ sssInit(SubSystems).then(sss => {
 	sss.web.post('/doc/:id',
 		docLoad,
 		docUpdate,
-		docAsResult,
 		docSave,
+		docAsResult,
 		fulltextUpdate,
 		sendResultJSON
 	)
@@ -1012,8 +1012,8 @@ sssInit(SubSystems).then(sss => {
 		schemaResolve,
 		docNew,
 		docUpdate,
-		docAsResult,
 		docSave,
+		docAsResult,
 		fulltextAdd,
 		sendResultJSON
 	)
