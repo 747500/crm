@@ -2,21 +2,17 @@
 
 	div(
 		:id="model._id"
-		:key="model._id"
 		:class="[ 'm-doc', model.kind ]"
 		v-on="$listeners.open ? { click: () => $emit('open', model._id) } : {}"
 	)
-		div(
+		component(
 			v-for="(s) in kindSchema"
 			:key="s.model"
 			:class="s.model"
-		)
-			// v-if="model[s.model]"
-			component(
-				:is="s.component"
-				:model="'contract' == s.model ? model : model[s.model]"
-				:placeholder="s.placeholder"
-			)/
+			:is="s.component"
+			:model="'contract' == s.model ? model : model[s.model]"
+			:placeholder="s.placeholder"
+		)/
 
 </template>
 
@@ -85,7 +81,7 @@ export default {
 
 	data () {
 		return {
-			model: {}
+			model: {},
 		}
 	},
 
