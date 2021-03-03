@@ -1,12 +1,12 @@
 
 import mongoose from 'mongoose'
 
-import Models from '../../db_schema.mjs'
+import model from '../../model/index.mjs'
 
 const docLoad = (req, res, next) => {
 	const userId = mongoose.Types.ObjectId(req.session.user)
 
-	Models.Doc.findOne({
+	model.Doc.findOne({
 		_id: req.params.id,
 		user: userId,
 	})

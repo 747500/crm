@@ -1,7 +1,11 @@
 
-import Models from '../../db_schema.mjs'
+import mongoose from 'mongoose'
+
+import model from '../../model/index.mjs'
+
 
 const Create = (req, res, next) => {
+	const userId = mongoose.Types.ObjectId()
 
 	const haveUser =
 		'string' === typeof req.body.name &&
@@ -12,8 +16,9 @@ const Create = (req, res, next) => {
 		return
 	}
 
-	const user = new Models.User({
-		name: req.body.name
+	const user = new model.User({
+		_id: userId,
+		name: req.body.name,
 	})
 
 	user.save()
