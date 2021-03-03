@@ -17,11 +17,14 @@ const docLoad = (req, res, next) => {
 			return
 		}
 
-		//console.log('* docLoad:\n', result.toObject())
+		//console.log('* mw.doc.Load:\n', result.toObject())
+
 		res.locals.Doc = result
 		next()
 	})
 	.catch(err => {
+
+		//console.log('* mw.doc.Load:', err)
 
 		if (err instanceof mongoose.Error.CastError) {
 			res.status(400).send(err.toString())

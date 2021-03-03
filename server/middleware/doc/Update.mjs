@@ -13,8 +13,6 @@ const skip = {
 
 const docUpdate = (req, res, next) => {
 
-	//console.log('* docUpdate', req.body)
-
 	var fieldsUpdated = 0
 
 	Object.keys(res.locals.Doc.schema.tree).forEach(k => {
@@ -23,7 +21,7 @@ const docUpdate = (req, res, next) => {
 			return
 		}
 
-		//console.log('>>>', k, req.body[k])
+		// console.log('\t|', k, req.body[k])
 
 		if (k in req.body) {
 			fieldsUpdated ++;
@@ -31,6 +29,8 @@ const docUpdate = (req, res, next) => {
 		}
 
 	})
+
+	// console.log('* mw.doc.Update fieldsUpdated:', fieldsUpdated)
 
 	if (0 === fieldsUpdated) {
 		res.status(400).send('Can\'t find fields to update')
