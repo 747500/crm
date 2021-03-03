@@ -17,13 +17,9 @@ import CONFIG from './config.js'
 
 import mw from './middleware/index.mjs'
 
-// ==========================================================================
 
-ServicesRun.then(sss => {
 
-// ==========================================================================
-
-// --------------------------------------------------------------------------
+ServicesRun.then(services => {
 
 	const docEvents = (req, res, next) => {
 		const userId = mongoose.Types.ObjectId(req.session.user)
@@ -86,7 +82,7 @@ ServicesRun.then(sss => {
 		const mimetype = req.headers['content-type']
 		const caption = req.headers['x-meta-caption']
 
-		var stream = sss.files.bucket.openUploadStream(
+		var stream = services.files.bucket.openUploadStream(
 			filename,
 			{
 				contentType: mimetype,
@@ -119,7 +115,7 @@ ServicesRun.then(sss => {
 
 		const oid = mongoose.Types.ObjectId(req.params.id)
 
-		sss.files.collection.findOne({
+		services.files.collection.findOne({
 			_id: oid,
 			'metadata.user': userId,
 		})
@@ -149,7 +145,7 @@ ServicesRun.then(sss => {
 				'X-Meta-Caption': caption
 			})
 
-			const stream = sss.files.bucket.openDownloadStream(oid)
+			const stream = services.files.bucket.openDownloadStream(oid)
 
 			stream.once('error', next)
 
@@ -171,7 +167,7 @@ ServicesRun.then(sss => {
 
 		const fileId = mongoose.Types.ObjectId(req.params.id)
 
-		sss.files.collection.findOne({
+		services.files.collection.findOne({
 			_id: fileId,
 			'metadata.user': userId,
 		})
@@ -208,7 +204,7 @@ ServicesRun.then(sss => {
 				'X-Meta-Caption': caption
 			})
 
-			const stream = sss.files.bucket.openDownloadStream(oid)
+			const stream = services.files.bucket.openDownloadStream(oid)
 
 			stream.once('error', next)
 
@@ -222,7 +218,7 @@ ServicesRun.then(sss => {
 		const userId = mongoose.Types.ObjectId(req.session.user)
 		const fileId = mongoose.Types.ObjectId(req.params.id)
 
-		sss.files.collection.findOne({
+		services.files.collection.findOne({
 			_id: fileId,
 			'metadata.user': userId,
 		})
@@ -232,7 +228,7 @@ ServicesRun.then(sss => {
 				return;
 			}
 
-			sss.files.bucket.delete(fileId, (err) => {
+			services.files.bucket.delete(fileId, (err) => {
 				if (err) {
 					next(err)
 					return
@@ -282,7 +278,7 @@ ServicesRun.then(sss => {
 			set[`metadata.${k}`] = v
 		}
 
-		sss.files.collection.updateOne(
+		services.files.collection.updateOne(
 			{
 				_id: fileId,
 				'metadata.user': userId
@@ -309,7 +305,7 @@ ServicesRun.then(sss => {
 	const getFilesList = (req, res, next) => {
 		const userId = mongoose.Types.ObjectId(req.session.user)
 
-		sss.files.collection.find(
+		services.files.collection.find(
 			{
 				'metadata.user': userId,
 				'metadata.docId': res.locals.Doc._id
@@ -330,15 +326,15 @@ ServicesRun.then(sss => {
 
 // ==========================================================================
 
-	sss.web.post('/u/set',
+	services.web.post('/u/set',
 		mw.user.Set
 	)
 
-	sss.web.get('/u',
+	services.web.get('/u',
 		mw.user.List
 	)
 
-	sss.web.put('/u',
+	services.web.put('/u',
 		mw.user.Create
 	)
 
@@ -432,13 +428,13 @@ ServicesRun.then(sss => {
 
 // --------------------------------------------------------------------------
 
-	sss.web.use('/', apiRouter)
-	sss.web.use(express.static('public'))
+	services.web.use('/', apiRouter)
+	services.web.use(express.static('public'))
 
 // ==========================================================================
 
 }).catch(err => {
 	console.error('FATAL:', err)
 
-	process.kill(process.pid, SIGTERM)
+	process.kill(process.pid, 'SIGTERM')
 })
