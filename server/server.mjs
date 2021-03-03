@@ -1,9 +1,6 @@
 'use strict'
 
-import querystring from 'querystring'
-
 import moment from 'moment'
-import sharp from 'sharp'
 
 import express from 'express'
 import mongoose from 'mongoose'
@@ -16,7 +13,6 @@ import ServicesRun from './services/index.mjs'
 import CONFIG from './config.js'
 
 import mw from './middleware/index.mjs'
-
 
 
 ServicesRun.then(services => {
@@ -74,115 +70,6 @@ ServicesRun.then(services => {
 		.catch(next)
 	}
 
-	const getThumbnail = (req, res, next) => {
-		const userId = mongoose.Types.ObjectId(req.session.user)
-
-		const oid = mongoose.Types.ObjectId(req.params.id)
-
-		services.files.collection.findOne({
-			_id: oid,
-			'metadata.user': userId,
-		})
-		.then(fileinfo => {
-
-			if (null === fileinfo) { // 404
-				res.status(404).send('File Not Found')
-				return;
-			}
-
-			const hasLastModified =
-					'object' === typeof fileinfo.metadata &&
-					fileinfo.metadata.lastModified instanceof Date
-
-			const lastModified =
-					hasLastModified ?
-					fileinfo.metadata.lastModified :
-					fileinfo.uploadDate
-
-			const caption =
-					querystring.escape(fileinfo.metadata.caption || '')
-
-			res.set({
-				//'Content-Length': fileinfo.length,
-				'Content-Type': 'image/jpeg',
-				'Last-Modified': lastModified.toISOString(),
-				'X-Meta-Caption': caption
-			})
-
-			const stream = services.files.bucket.openDownloadStream(oid)
-
-			stream.once('error', next)
-
-			const resize = sharp({
-				pages: 1
-			}).resize(350).jpeg()
-
-			resize.once('error', next)
-
-			stream.pipe(resize).pipe(res)
-
-		})
-		.catch(next)
-
-	}
-
-	const postFileMeta = (req, res, next) => {
-		const userId = mongoose.Types.ObjectId(req.session.user)
-
-		const fileId = mongoose.Types.ObjectId(req.params.id)
-		const fieldName = 'caption' //req.params.field
-
-		const allowed = {
-			'caption': String
-		}
-
-		const contentType = req.headers['content-type']
-
-		if ('application/json' !== contentType) {
-			next(TypeError(`Invalid 'Content-Type': ${contentType}`))
-			return;
-		}
-
-		for (const [k, v] of Object.entries(req.body)) {
-			if (!allowed[k]) {
-				next(RangeError(`Field '${k}' is not allowed`))
-				return;
-			}
-		}
-
-		req.body['lastModified'] = new Date()
-
-		console.log('metadata::', req.body);
-
-		const set = {}
-		for (let [k, v] of Object.entries(req.body)) {
-			set[`metadata.${k}`] = v
-		}
-
-		services.files.collection.updateOne(
-			{
-				_id: fileId,
-				'metadata.user': userId
-			},
-			{
-				$set: set
-			}
-		)
-		.then(result => {
-
-			if (null === result) { // 404
-				res.status(404).send('File Not Found')
-				return;
-			}
-
-			console.log('modifiedCount', result.modifiedCount)
-
-			res.send('ok')
-
-		})
-		.catch(next)
-	}
-
 // ==========================================================================
 
 	services.web.post('/u/set',
@@ -199,6 +86,8 @@ ServicesRun.then(services => {
 
 // --------------------------------------------------------------------------
 
+	services.web.use(express.static('public'))
+
 	const apiRouter = express.Router()
 
 	apiRouter.use(mw.user.Load) // AUTHENICATED ZONE BELOW
@@ -206,7 +95,7 @@ ServicesRun.then(services => {
 // --------------------------------------------------------------------------
 
 	apiRouter.get('/t/:id',
-		getThumbnail
+		mw.files.thumbnails.StreamContent
 	)
 
 	apiRouter.get('/f/:id',
@@ -214,7 +103,7 @@ ServicesRun.then(services => {
 	)
 
 	apiRouter.post('/f/:id',
-		postFileMeta
+		mw.files.meta.Save
 	)
 
 	apiRouter.delete('/f/:id',
@@ -288,7 +177,6 @@ ServicesRun.then(services => {
 // --------------------------------------------------------------------------
 
 	services.web.use('/', apiRouter)
-	services.web.use(express.static('public'))
 
 // ==========================================================================
 
