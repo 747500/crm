@@ -9,7 +9,7 @@ Users.post('/set',
 	mw.user.Set
 )
 
-Users.get('/',
+Users.get('/list',
 	mw.user.List
 )
 

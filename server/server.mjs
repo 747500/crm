@@ -9,7 +9,7 @@ import ServicesRun from './services/index.mjs'
 ServicesRun.then(services => {
 
 	services.web.use(express.static('public'))
-	services.web.use('/', api)
+	services.web.use('/api/v0', api)
 
 }).catch(err => {
 	console.error('FATAL:', err)

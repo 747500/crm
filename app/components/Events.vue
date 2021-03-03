@@ -99,7 +99,7 @@
 				//console.log("<calendar.vue> updateModel")
 
 				this.$http.get(
-					'/doc/events/person',
+					'doc/events/person',
 					{
 						params: {
 							yearmonth: this.focus

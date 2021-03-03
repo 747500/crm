@@ -49,7 +49,7 @@
 
 			if ('string' === typeof this.$props.model) {
 
-				this.$http.get(`/doc/${this.$props.model}`)
+				this.$http.get(`doc/${this.$props.model}`)
 				.then(response => {
 					//console.log('<M/person.vue>', response)
 					this.person = response.body.person

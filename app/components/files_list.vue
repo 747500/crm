@@ -106,7 +106,7 @@ export default {
 		saveText (file) {
 
 			this.$http.post(
-				`/f/${file.oid}`,
+				`f/${file.oid}`,
 				{
 					caption: file.caption
 				},
@@ -126,7 +126,7 @@ export default {
 
 			file.busy = true
 
-			this.$http.delete(`/f/${file._id}`)
+			this.$http.delete(`f/${file._id}`)
 			.then(() => {
 
 				this.files = this.files.filter(item => {
@@ -155,7 +155,7 @@ export default {
 		}
 
 		return this.$http
-			.get(`/doc/${docId}/files`)
+			.get(`doc/${docId}/files`)
 			.then(response => {
 
 				//console.log('<files_list> created:', response)
@@ -173,7 +173,7 @@ export default {
 						return file
 					}
 
-					return this.$http.get(`/f/${file._id}/t`, {
+					return this.$http.get(`f/${file._id}/t`, {
 						responseType: 'blob'
 					})
 					.then(response => {

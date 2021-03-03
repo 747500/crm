@@ -95,7 +95,7 @@
 			}
 
 			this.$http
-			.get(`/doc/${this.$route.params.id}`)
+			.get(`doc/${this.$route.params.id}`)
 			.then(response => this.setDocData(response.body))
 			.catch(console.error)
 
@@ -136,10 +136,10 @@
 				var ok
 
 				if (doc._id) {
-					ok = this.$http.post(`/doc/${doc._id}`, doc)
+					ok = this.$http.post(`doc/${doc._id}`, doc)
 				}
 				else {
-					ok = this.$http.put('/doc', doc)
+					ok = this.$http.put('doc', doc)
 				}
 
 				ok = ok.then(response => this.setDocData(response.body))

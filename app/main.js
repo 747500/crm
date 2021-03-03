@@ -20,8 +20,11 @@ Vue.component('raw-view', rawView)
 
 import VueResource from 'vue-resource';
 Vue.use(VueResource);
+Vue.http.options.root = '/api/v0'
+Vue.http.options.credentials = true
 
 // --------------------------------------------------------------------------
+
 import VueFormulate from '@braid/vue-formulate'
 Vue.use(VueFormulate)
 
@@ -70,14 +73,6 @@ new Vue({
 
 	router,
 
-	http: {
-		//root: '/api/0',
-		options: {
-			xhr: {
-				withCredentials: true,
-			}
-		}
-	},
 	// store,
 
 	data: {

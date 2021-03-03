@@ -92,7 +92,7 @@
 			loadUsers () {
 
 				return this.$http
-					.get('/u')
+					.get('u/list')
 					.then(response => {
 						// console.log('<Accounts.vue> users', response.body)
 						this.users = response.body
@@ -123,7 +123,7 @@
 
 				this.user = userId
 
-				this.$http.post('/u/set',
+				this.$http.post('u/set',
 					{
 						_id: userId
 					}
@@ -141,7 +141,7 @@
 			onUserCreate (event) {
 				const newUserName = event.target[0].value
 
-				this.$http.put('/u',
+				this.$http.put('u',
 					{
 						name: newUserName
 					}

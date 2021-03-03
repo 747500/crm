@@ -117,7 +117,7 @@ export default {
 		searchInput () {
 			this.result = []
 
-			this.$http.post('/doc/s',
+			this.$http.post('doc/s',
 				{
 					q: this.search,
 					kind: this.kind

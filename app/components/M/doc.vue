@@ -93,7 +93,7 @@ export default {
 		}
 
 		this.$http
-		.get(`/doc/${docId}`)
+		.get(`doc/${docId}`)
 		.then(response => {
 			//console.log(response.body)
 			this.model = response.body

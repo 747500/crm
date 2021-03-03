@@ -117,7 +117,7 @@ export default {
 				}
 
 				this.$http.post(
-					`/f/${docId}/upload/${task.file.name}`,
+					`f/${docId}/upload/${task.file.name}`,
 					task.file,
 					{
 						headers: {

@@ -45,7 +45,7 @@
 			var path = 'full' === this.$props.size ? '' : '/t'
 
 			this.$http.get(
-				`/f/${this.$props.oid}${path}`,
+				`f/${this.$props.oid}${path}`,
 				{
 					responseType: 'blob'
 				}

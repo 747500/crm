@@ -66,7 +66,7 @@
 
 			/*
 			if (this.$props.model.owner) {
-				this.$http.get(`/doc/${this.$props.model.owner}`)
+				this.$http.get(`doc/${this.$props.model.owner}`)
 				.then(response => {
 					this.owner = response.body
 				})
@@ -127,7 +127,7 @@
 					return
 				}
 
-				this.$http.post('/s',
+				this.$http.post('s',
 					{
 						q: event.target.value,
 						kind: 'person'
