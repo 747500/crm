@@ -351,94 +351,23 @@ ServicesRun.then(sss => {
 
 // ==========================================================================
 
-	const users = (req, res, next) => {
-
-		models.User.find()
-		.then(result => {
-			res.send(result.map(user => {
-				return {
-					_id: user._id,
-					name: user.name,
-					current: req.session.user === user._id.toString(),
-				}
-			}))
-		})
-		.catch(next)
-
-	}
-
-	const usersSet = (req, res, next) => {
-
-		req.session.user = req.body._id
-
-		console.log('* usersSet', req.session.user)
-
-		res.send('Ok')
-	}
-
-	const usersCreate = (req, res, next) => {
-
-		const haveUser =
-			'string' === typeof req.body.name &&
-			0 < req.body.name.length
-
-		if (!haveUser) {
-			res.status(400).send('Invalid or empty user name')
-			return
-		}
-
-		const user = new models.User({
-			name: req.body.name
-		})
-
-		user.save()
-		.then(result => {
-			res.send(result)
-		})
-		.catch(err => next(err))
-	}
-
-	const loadUser = (req, res, next) => {
-		const userId = mongoose.Types.ObjectId(req.session.user)
-
-		models.User.findOne(
-			{ _id: userId }
-		)
-		.then(result => {
-			if (null === result) {
-				res.status(401).send('Access Denied')
-				return
-			}
-			req.User = result
-
-			//console.log('* loadUser', req.User)
-
-			next()
-
-		})
-		.catch(err => next(err))
-
-	}
-
-	// ==========================================================================
-
 	sss.web.post('/u/set',
-		usersSet
+		mw.user.Set
 	)
 
 	sss.web.get('/u',
-		users
+		mw.user.List
 	)
 
 	sss.web.put('/u',
-		usersCreate
+		mw.user.Create
 	)
 
 // --------------------------------------------------------------------------
 
 	const apiRouter = express.Router()
 
-	apiRouter.use(loadUser) // AUTHENICATED ZONE BELOW
+	apiRouter.use(mw.user.Load) // AUTHENICATED ZONE BELOW
 
 // --------------------------------------------------------------------------
 
