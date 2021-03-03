@@ -105,7 +105,7 @@
 
 			makeSearch () {
 
-				this.$http.post('/s',
+				this.$http.post('/doc/s',
 					{
 						q: this.search,
 						kind: 'person'

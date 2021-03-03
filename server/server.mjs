@@ -5,355 +5,27 @@ import querystring from 'querystring'
 import moment from 'moment'
 import sharp from 'sharp'
 
+import express from 'express'
 import mongoose from 'mongoose'
-mongoose.Promise = global.Promise
+//mongoose.Promise = global.Promise
+
 import models from './db_schema.mjs'
 
-import SphinxClient from 'sphinxapi'
-
-import mysql from 'mysql'
-
-import express from 'express'
-import session from 'express-session'
-import morgan from 'morgan'
-morgan.token('session', req => {
-	return `${req.sessionID}`
-})
-
-morgan.token('user', req => {
-	const haveUser =
-		'object' === typeof req.User
-
-	if (haveUser) {
-		return req.User.name
-	}
-
-	const haveSession =
-		'object' === typeof req.session
-
-	if (haveSession) {
-		return req.session.user
-	}
-
-	return '-'
-})
-
-import bodyParser from 'body-parser'
-import cookieParser from 'cookie-parser'
-
-// https://github.com/jdesboeufs/connect-mongo
-import connectMongo from 'connect-mongo'
-const MongoStore = connectMongo.default
+import ServicesRun from './services/index.mjs'
 
 import CONFIG from './config.js'
 
+import sendResultJSON from './middleware/sendResultJSON.mjs'
+
+import mw from './middleware/index.mjs'
+
 // ==========================================================================
 
-const SubSystems = [
+ServicesRun.then(sss => {
 
-	{
-		name: 'sphinxql',
-		init () {
-			return new Promise((resolve, reject) => {
-
-				var pool = mysql.createPool({
-					connectionLimit: 1,
-			    	localAddress: CONFIG.SphinxQL.address,
-			    	port: CONFIG.SphinxQL.port,
-			    })
-
-				pool.on('error', err => reject(err))
-
-				process.on('SIGTERM', () => {
-					pool.end()
-					console.log('Sphinx disconnected')
-				})
-
-				resolve(pool)
-			})
-		}
-	},
-
-	// --------------------------------------------------------------------------
-
-	{
-		name: 'docs',
-		init () {
-			process.on('SIGTERM', () => {
-				mongoose.disconnect()
-				console.log('MongoDB disconnected')
-			})
-
-			return mongoose.connect(
-				CONFIG.MongoDB.URI,
-				CONFIG.MongoDB.options
-			)
-		}
-
-	},
-
-	// --------------------------------------------------------------------------
-
-	{
-		name: 'web',
-		init () {
-			return new Promise((resolve, reject) => {
-				const app = express()
-				const port = CONFIG.Express.port
-				app.use(cookieParser(CONFIG.Express.Session.secret))
-				//app.use(morgan('dev'))
-				app.use(morgan('[:session :user] :method :url :status :response-time ms - :res[content-length]'))
-				app.use(bodyParser.text())
-				app.use(express.json())
-				app.use(bodyParser.json())
-
-				const sessionStore = MongoStore.create({
-					mongoUrl: CONFIG.MongoDB.URI,
-					collectionName: 'sessions',
-					//touchAfter: 600,
-					//crypto: {
-					//	secret: 'blah'
-					//},
-					stringify: false,
-				})
-
-				/*
-				sessionStore.on('create', (... args) => console.log('* Session create', args))
-				sessionStore.on('touch', (... args) => console.log('* Session touch', args))
-				sessionStore.on('update', (... args) => console.log('* Session update', args))
-				sessionStore.on('set', (... args) => console.log('* Session set', args))
-				sessionStore.on('destroy', (... args) => console.log('* Session destroy', args))
-				*/
-
-				app.set('trust proxy', 1) // trust first proxy
-				app.use(session({
-					secret: CONFIG.Express.Session.secret,
-					resave: true,
-					saveUninitialized: true,
-					cookie: {
-						secure: false,
-						maxAge: CONFIG.Express.Session.maxAge
-					},
-					genid: () => mongoose.Types.ObjectId().toString(),
-					store: sessionStore,
-					//unset: // 'keep' | 'destroy'
-				}))
-
-				app.use((req, res, next) => {
-					if (req.session.ip !== req.ip){
-						req.session.ip = req.ip
-					}
-					next()
-				})
-
-				const server = app.listen(port, () => {
-					resolve(app)
-					console.log(`\tlistening at http://localhost:${port}`)
-
-					process.on('SIGTERM', () => {
-						server.close(() => {
-							console.log('Express terminated')
-						})
-					})
-				})
-				.on('error', reject)
-
-			})
-		}
-	},
-
-	// ----------------------------------------------------------------------
-
-	{
-		name: 'files',
-		init () {
-			return new Promise((resolve, reject) => {
-				const connection = this.docs.connection
-
-				const collection = connection.collection('fs.files')
-				const bucket = new mongoose.mongo.GridFSBucket(connection.db)
-
-				const ok = collection.createIndex('metadata.docId')
-					.then(() => {
-						return { collection, bucket }
-					})
-
-				resolve(ok)
-			})
-		},
-	},
-
-	// ----------------------------------------------------------------------
-
-	{
-		name: 'events',
-		init () {
-
-			return Promise.resolve()
-		},
-	},
-]
+// ==========================================================================
 
 // --------------------------------------------------------------------------
-
-function runService (service) {
-
-	console.log(`sss init "${service.name}"`)
-
-	return service.init.bind(this)().then(
-		result => {
-			console.log('\tok')
-			service.endpoint = result
-			return result
-		}
-	)
-}
-
-function sssInit (arg) {
-	const sss = {}
-
-	return arg.reduce(
-		(ok, s) => ok.then(() => {
-			return runService.bind(sss)(s).then(() => {
-				sss[s.name] = s.endpoint
-			})
-		}),
-		Promise.resolve()
-	)
-	.then(result => {
-		console.log('sss init ok:', Object.keys(sss))
-		return sss;
-	})
-}
-
-// ==========================================================================
-
-sssInit(SubSystems).then(sss => {
-
-// ==========================================================================
-
-	const search = (req, res, next) => {
-		const userId = mongoose.Types.ObjectId(req.session.user)
-
-		console.log('<search>', req.body)
-
-		const searchString = req.body.q
-
-		const queryArgs = []
-		var query = 'SELECT *' +
-			` FROM ${CONFIG.SphinxQL.indexName}` +
-			' WHERE user = ? AND MATCH(?)'
-
-		queryArgs.push(userId.toString())
-		queryArgs.push(req.body.q)
-
-		if (req.body.kind) {
-			let n = queryArgs.length
-
-			if ((req.body.kind instanceof Array) && req.body.kind.length) {
-				queryArgs.push(req.body.kind)
-			}
-			else
-			if ('string' === typeof req.body.kind) {
-				queryArgs.push(req.body.kind)
-			}
-
-			if (queryArgs.length !== n) {
-				query += ' AND kind IN (?)'
-			}
-		}
-
-		console.log('###', {
-			q: query,
-			a: queryArgs
-		})
-
-		sss.sphinxql.query(
-			query, queryArgs,
-			(err, rows, fields) => {
-
-				if (err) {
-					next(err)
-					return
-				}
-
-				console.log('* Sphinx SELECT', rows.length)
-
-				sss.sphinxql.query(
-					'SHOW META LIKE ?',
-					[ 'total_found' ],
-					(err, meta, fields) => {
-
-						if (err) {
-							console.error(err)
-							return
-						}
-
-						console.log('* Sphinx total_found:', meta[0].Value)
-						//res.send(rows)
-
-						res.send({
-							total_found: meta[0].Value,
-							result: rows
-						})
-					}
-				)
-			}
-		)
-	}
-
-// --------------------------------------------------------------------------
-
-	const docAsResult = (req, res, next) => {
-		var doc = res.locals.Doc
-
-		res.locals.Result = doc.toObject()
-
-		// delete res.locals.Result.__v
-
-		next()
-	}
-
-	const sendResultJSON = (req, res) => {
-		res.send(res.locals.Result)
-	}
-
-	const docList = (req, res, next) => {
-		const userId = mongoose.Types.ObjectId(req.session.user)
-
-		var ok = res.locals.Schema.find(
-			{
-				user: userId
-			}
-		)
-
-		switch (res.locals.kind) {
-
-			case 'person':
-				ok = ok.sort({
-					'person.lastName': 1,
-					'person.firstName': 1,
-					'person.middleName': 1,
-				})
-				break;
-
-			case 'property':
-				ok = ok.sort({
-					'mtime': -1,
-				})
-				break;
-
-		}
-
-		ok.then(
-			result => {
-				res.locals.Result = result
-				next()
-			}
-		)
-		.catch(next)
-
-	}
 
 	const docEvents = (req, res, next) => {
 		const userId = mongoose.Types.ObjectId(req.session.user)
@@ -408,76 +80,6 @@ sssInit(SubSystems).then(sss => {
 		.catch(next)
 	}
 
-	const docLoad = (req, res, next) => {
-		const userId = mongoose.Types.ObjectId(req.session.user)
-
-		models.Doc.findOne({
-			_id: req.params.id,
-			user: userId,
-		})
-		.then(result => {
-
-			if (null === result) {
-				res.status(404).send('Doc not found')
-				return
-			}
-
-			//console.log('* docLoad:\n', result.toObject())
-			res.locals.Doc = result
-			next()
-		})
-		.catch(err => {
-
-			if (err instanceof mongoose.Error.CastError) {
-				res.status(400).send(err.toString())
-				return
-			}
-
-			next(err)
-		})
-
-	}
-
-	const docUpdate = (req, res, next) => {
-
-		const skip = {
-			'_id': true,
-			'__v': true,
-			'kind': true,
-			'id': true,
-			'fts': true,
-			'time': true,
-			'mtime': true,
-			'ctime': true,
-		}
-
-		//console.log('* docUpdate', req.body)
-
-		var fieldsUpdated = 0
-
-		Object.keys(res.locals.Doc.schema.tree).forEach(k => {
-
-			if (skip[k]) {
-				return
-			}
-
-			//console.log('>>>', k, req.body[k])
-
-			if (k in req.body) {
-				fieldsUpdated ++;
-				res.locals.Doc[k] = req.body[k]
-			}
-
-		})
-
-		if (0 === fieldsUpdated) {
-			res.status(400).send('Can\'t find fields to update')
-			return;
-		}
-
-		next()
-	}
-
 	const schemaResolve = (req, res, next) => {
 
 		const sName = req.params.schema || req.body.kind
@@ -497,37 +99,6 @@ sssInit(SubSystems).then(sss => {
 		}
 
 		next()
-	}
-
-	const docNew = (req, res, next) => {
-		const userId = mongoose.Types.ObjectId(req.session.user)
-
-		try {
-			res.locals.Doc = new res.locals.Schema({
-				user: userId
-			})
-		}
-		catch (err) {
-			next(err)
-			return
-		}
-
-		next()
-	}
-
-	const docSave = (req, res, next) => {
-
-		const doc = res.locals.Doc
-
-		//console.log('* docSave input\n', doc.toObject())
-
-		doc.save()
-		.then((result) => {
-			//console.log('* docSave result\n', result)
-			next()
-		})
-		.catch(next)
-
 	}
 
 	const fileUpload = (req, res, next) => {
@@ -696,8 +267,6 @@ sssInit(SubSystems).then(sss => {
 
 		})
 		.catch(next)
-
-
 	}
 
 	const postFileMeta = (req, res, next) => {
@@ -779,96 +348,6 @@ sssInit(SubSystems).then(sss => {
 
 	}
 
-	const fulltextAdd = (req, res, next) => {
-		const doc = res.locals.Doc
-		const id = doc.ctime.getTime()
-		const docFts = doc.fts
-
-		console.log('* fulltextAdd:', docFts)
-
-		sss.sphinxql.query(
-			`INSERT INTO ${CONFIG.SphinxQL.indexName}` +
-			' (id, content, user, oid, kind)' +
-			' VALUES (?, ?, ?, ?, ?)',
-			[
-				id,
-				docFts.join(' '),
-				doc.user.toString(),
-				doc._id.toString(),
-				doc.kind
-			],
-			(err, row, fields) => {
-				if (err) {
-					next(err)
-					return
-				}
-
-				console.log('* fulltextAdd:', row)
-
-				next()
-
-			}
-		)
-	}
-
-	const fulltextUpdate = (req, res, next) => {
-		const doc = res.locals.Doc
-		const id = doc.ctime.getTime()
-		const docFts = doc.fts
-
-		console.log(
-			'* fulltextUpdate:',
-			{
-				user: doc.user,
-				_id: doc._id,
-				kind: doc.kind,
-				fts: docFts,
-				sphinxId: id,
-			}
-		)
-
-		sss.sphinxql.query(
-			`DELETE FROM ${CONFIG.SphinxQL.indexName} WHERE oid = ?`,
-			[
-				doc._id.toString()
-			],
-			(err, row, fields) => {
-				if (err) {
-					next(err)
-					return
-				}
-
-				console.log('* fulltextUpdate deleted:', row.affectedRows)
-
-				sss.sphinxql.query(
-					`REPLACE INTO ${CONFIG.SphinxQL.indexName}`+
-					' (id, content, user, oid, kind)' +
-					' VALUES (?, ?, ?, ?, ?)',
-					[
-						id,
-						docFts.join(' '),
-						doc.user.toString(),
-						doc._id.toString(),
-						doc.kind
-					],
-					(err, row, fields) => {
-						if (err) {
-							next(err)
-							return
-						}
-
-						console.log('* fulltextUpdate:', row.affectedRows)
-
-						next()
-
-					}
-				)
-
-			}
-		)
-
-	}
-
 // ==========================================================================
 
 	const users = (req, res, next) => {
@@ -940,7 +419,7 @@ sssInit(SubSystems).then(sss => {
 
 	}
 
-// ==========================================================================
+	// ==========================================================================
 
 	sss.web.post('/u/set',
 		usersSet
@@ -959,10 +438,6 @@ sssInit(SubSystems).then(sss => {
 	const apiRouter = express.Router()
 
 	apiRouter.use(loadUser) // AUTHENICATED ZONE BELOW
-
-	apiRouter.post('/s',
-		search
-	)
 
 // --------------------------------------------------------------------------
 
@@ -985,7 +460,7 @@ sssInit(SubSystems).then(sss => {
 
 	// FIXME change POST to PUT, :filename to header
 	apiRouter.post('/f/:id/upload/:filename',
-		docLoad,
+		mw.doc.Load,
 		fileUpload,
 		sendResultJSON
 	)
@@ -1001,7 +476,7 @@ sssInit(SubSystems).then(sss => {
 
 	apiRouter.get('/list/:schema',
 		schemaResolve,
-		docList,
+		mw.doc.List,
 		sendResultJSON
 	)
 
@@ -1009,31 +484,35 @@ sssInit(SubSystems).then(sss => {
 
 	const docRouter = express.Router()
 
+	docRouter.post('/s',
+		mw.doc.Search.Query
+	)
+
 	docRouter.get('/:id',
-		docLoad,
-		docAsResult
+		mw.doc.Load,
+		mw.doc.AsResult
 	)
 
 	docRouter.get('/:id/files',
-		docLoad,
+		mw.doc.Load,
 		getFilesList
 	)
 
 	docRouter.post('/:id',
-		docLoad,
-		docUpdate,
-		docSave,
-		docAsResult,
-		fulltextUpdate
+		mw.doc.Load,
+		mw.doc.Update,
+		mw.doc.Save,
+		mw.doc.AsResult,
+		mw.doc.Search.Update
 	)
 
 	docRouter.put('/',
 		schemaResolve,
-		docNew,
-		docUpdate,
-		docSave,
-		docAsResult,
-		fulltextAdd
+		mw.doc.New,
+		mw.doc.Update,
+		mw.doc.Save,
+		mw.doc.AsResult,
+		mw.doc.Search.Add
 	)
 
 	docRouter.use(sendResultJSON)
