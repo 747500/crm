@@ -32,8 +32,16 @@ const Contract = Doc.discriminator('contract', schema.Contract)
 
 export {
     User,
-	Doc,
-	Person,
-	Property,
-	Contract
+    Doc,
+    Person,
+    Property,
+    Contract,
+}
+
+export default {
+    User,
+    Doc,
+    Person,
+    Property,
+    Contract,
 }
