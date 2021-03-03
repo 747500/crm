@@ -78,27 +78,6 @@ ServicesRun.then(sss => {
 		.catch(next)
 	}
 
-	const schemaResolve = (req, res, next) => {
-
-		const sName = req.params.schema || req.body.kind
-
-		const sel = {
-			'person': models.Person,
-			'property': models.Property,
-			'contract': models.Contract
-		}
-
-		res.locals.Schema = sel[sName]
-		res.locals.kind = sName
-
-		if (! res.locals.Schema ) {
-			next(Error(`Undefined Schema: ${sName}`))
-			return
-		}
-
-		next()
-	}
-
 	const fileUpload = (req, res, next) => {
 		const userId = mongoose.Types.ObjectId(req.session.user)
 
@@ -405,7 +384,7 @@ ServicesRun.then(sss => {
 // --------------------------------------------------------------------------
 
 	apiRouter.get('/list/:schema',
-		schemaResolve,
+		mw.doc.ResolveSchema,
 		mw.doc.List,
 		mw.sendResultJSON
 	)
@@ -437,7 +416,7 @@ ServicesRun.then(sss => {
 	)
 
 	docRouter.put('/',
-		schemaResolve,
+		mw.doc.ResolveSchema,
 		mw.doc.New,
 		mw.doc.Update,
 		mw.doc.Save,
