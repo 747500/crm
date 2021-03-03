@@ -119,7 +119,7 @@ export default {
 			const kind = this.$route.meta.kind
 
 			this.$http
-			.get(`/list/${kind}`)
+			.get(`/doc/list/${kind}`)
 			.then(response => {
 				this.modelKey = Date.now()
 				this.model = response.body.map(item => {

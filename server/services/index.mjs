@@ -6,7 +6,7 @@ import Files from './files.mjs'
 import Web from './web.mjs'
 import Events from './events.mjs'
 
-const SubSystems = [
+const Services = [
 	Sphinx,
 	Docs,
 	Web,
@@ -30,7 +30,7 @@ function run (service) {
 function init () {
 	const sss = {}
 
-	return SubSystems.reduce(
+	return Services.reduce(
 		(ok, service) => ok.then(() => {
 			return run.bind(sss)(service).then(() => {
 				sss[service.name] = service.endpoint
@@ -44,4 +44,4 @@ function init () {
 	})
 }
 
-export default init()
+export default init() // promise-singleton

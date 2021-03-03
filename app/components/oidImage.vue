@@ -42,10 +42,10 @@
 				return
 			}
 
-			var path = 'full' === this.$props.size ? 'f' : 't'
+			var path = 'full' === this.$props.size ? '' : '/t'
 
 			this.$http.get(
-				`/${path}/${this.$props.oid}`,
+				`/f/${this.$props.oid}${path}`,
 				{
 					responseType: 'blob'
 				}

@@ -10,6 +10,16 @@ docs.post('/s',
 	mw.doc.Search.Query
 )
 
+docs.get('/events/:schema',
+	mw.doc.ResolveSchema,
+	mw.doc.Events
+)
+
+docs.get('/list/:schema',
+	mw.doc.ResolveSchema,
+	mw.doc.List
+)
+
 docs.get('/:id',
 	mw.doc.Load,
 	mw.doc.AsResult
