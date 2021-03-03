@@ -14,7 +14,7 @@ const SubSystems = [
 	Events,
 ]
 
-function runService (service) {
+function run (service) {
 
 	console.log(`sss init "${service.name}"`)
 
@@ -31,9 +31,9 @@ function init () {
 	const sss = {}
 
 	return SubSystems.reduce(
-		(ok, s) => ok.then(() => {
-			return runService.bind(sss)(s).then(() => {
-				sss[s.name] = s.endpoint
+		(ok, service) => ok.then(() => {
+			return run.bind(sss)(service).then(() => {
+				sss[service.name] = service.endpoint
 			})
 		}),
 		Promise.resolve()
