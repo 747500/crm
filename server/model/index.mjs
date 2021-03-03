@@ -4,7 +4,7 @@ import mongoose from 'mongoose'
 
 import * as types from './types/index.mjs'
 import * as schema from './schema/index.mjs'
-import * as virtual from './virtuals/index.mjs'
+import * as virtuals from './virtuals/index.mjs'
 
 
 //
@@ -16,7 +16,7 @@ mongoose.Schema.Types.Text = types.Text;
 //
 //  Virtuals
 //
-schema.Doc.virtual('fts').get(virtual.fts)
+schema.Doc.virtual('fts').get(virtuals.fts)
 
 
 //
