@@ -11,7 +11,7 @@ const docSearchAdd = (req, res, next) => {
 	const id = doc.ctime.getTime()
 	const docFts = doc.fts
 
-	console.log('* fulltextAdd:', docFts)
+	console.log('* mw.doc.Search.Add:', docFts)
 
 	ServicesRun.then(service => {
 
@@ -32,7 +32,7 @@ const docSearchAdd = (req, res, next) => {
 					return
 				}
 
-				console.log('* fulltextAdd:', row)
+				console.log('* mw.doc.Search.Add:', row)
 
 				next()
 

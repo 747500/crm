@@ -12,7 +12,7 @@ const docSearchUpdate = (req, res, next) => {
 	const docFts = doc.fts
 
 	console.log(
-		'* fulltextUpdate:',
+		'* mw.doc.Search.Update:',
 		{
 			user: doc.user,
 			_id: doc._id,
@@ -35,7 +35,7 @@ const docSearchUpdate = (req, res, next) => {
 					return
 				}
 
-				console.log('* docSearchUpdate deleted:', row.affectedRows)
+				console.log('* mw.doc.Search.Update deleted:', row.affectedRows)
 
 				services.sphinxql.query(
 					`REPLACE INTO ${CONFIG.SphinxQL.indexName}`+
@@ -54,7 +54,7 @@ const docSearchUpdate = (req, res, next) => {
 							return
 						}
 
-						console.log('* docSearchUpdate replaced:', row.affectedRows)
+						console.log('* mw.doc.Search.Update replaced:', row.affectedRows)
 
 						next()
 

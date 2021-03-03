@@ -9,7 +9,7 @@ const docSearchQuery = (req, res, next) => {
 
 	const userId = mongoose.Types.ObjectId(req.session.user)
 
-	console.log('<search>', req.body)
+	console.log('* mw.doc.Search.Query:', req.body)
 
 	const searchString = req.body.q
 
@@ -37,7 +37,7 @@ const docSearchQuery = (req, res, next) => {
 		}
 	}
 
-	console.log('###', {
+	console.log('* mw.doc.Search.Query:', {
 		q: query,
 		a: queryArgs
 	})
@@ -53,7 +53,7 @@ const docSearchQuery = (req, res, next) => {
 					return
 				}
 
-				console.log('* Sphinx SELECT rows:', rows.length)
+				console.log('* mw.doc.Search.Query SELECT rows:', rows.length)
 
 				services.sphinxql.query(
 					'SHOW META LIKE ?',
@@ -65,7 +65,7 @@ const docSearchQuery = (req, res, next) => {
 							return
 						}
 
-						console.log('* Sphinx total_found:', meta[0].Value)
+						console.log('* mw.doc.Search.Query total_found:', meta[0].Value)
 
 						res.send({
 							total_found: meta[0].Value,
