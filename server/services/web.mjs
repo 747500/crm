@@ -36,7 +36,7 @@ const MongoStore = connectMongo.default
 import CONFIG from '../config.js'
 
 
-const subsystem = {
+const service = {
 
 	name: 'web',
 
@@ -106,4 +106,4 @@ const subsystem = {
 	}
 }
 
-export default subsystem
+export default service

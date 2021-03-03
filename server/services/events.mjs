@@ -2,13 +2,14 @@
 import CONFIG from '../config.js'
 
 
-const subsystem = {
+const service = {
 
 	name: 'events',
 
 	init () {
+		// no-op
 		return Promise.resolve()
 	},
 }
 
-export default subsystem
+export default service

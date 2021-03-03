@@ -3,7 +3,7 @@ import mongoose from 'mongoose'
 
 import CONFIG from '../config.js'
 
-const subsystem = {
+const service = {
 
 	name: 'docs',
 
@@ -21,4 +21,4 @@ const subsystem = {
 
 }
 
-export default subsystem
+export default service

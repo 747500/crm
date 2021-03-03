@@ -5,7 +5,7 @@
 import mysql from 'mysql'
 import CONFIG from '../config.js'
 
-const subsystem = {
+const service = {
 
 	name: 'sphinxql',
 
@@ -30,4 +30,4 @@ const subsystem = {
 	}
 }
 
-export default subsystem
+export default service
