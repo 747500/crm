@@ -173,7 +173,7 @@ export default {
 						return file
 					}
 
-					return this.$http.get('/t/' + file._id, {
+					return this.$http.get(`/f/${file._id}/t`, {
 						responseType: 'blob'
 					})
 					.then(response => {
