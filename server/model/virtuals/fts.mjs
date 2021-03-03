@@ -1,21 +1,5 @@
 
-import mongoose from 'mongoose'
-
-
-const DocSchema = new mongoose.Schema(
-	{
-		user: mongoose.Types.ObjectId
-	},
-	{
-		discriminatorKey: 'kind',
-	    timestamps: {
-	        createdAt: 'ctime',
-	        updatedAt: 'mtime'
-	 	}
-	}
-);
-
-DocSchema.virtual('fts').get(function (a) {
+function fts (a) {
     const fts = []
 
     //console.log('* FTS Doc:', this._doc)
@@ -55,6 +39,6 @@ DocSchema.virtual('fts').get(function (a) {
     //console.log('* fts:', fts)
 
     return fts
-})
+}
 
-export default DocSchema
+export default fts

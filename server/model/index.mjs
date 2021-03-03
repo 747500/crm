@@ -1,36 +1,36 @@
 
 import mongoose from 'mongoose'
 
-//mongoose.Promise = global.Promise
 
-// --------------------------------------------------------------------------
+import * as types from './types/index.mjs'
+import * as schema from './schema/index.mjs'
+import * as virtual from './virtuals/index.mjs'
 
-class Text extends mongoose.SchemaType {
-    constructor(key, options) {
-        super(key, options, 'Text');
-    }
 
-    // `cast()` takes a parameter that can be anything. You need to
-    // validate the provided `val` and throw a `CastError` if you
-    // can't convert it.
-    cast(val) {
-        let _val = String(val);
-        return _val;
-    }
-}
+//
+//  Types
+//
+mongoose.Schema.Types.Text = types.Text;
 
-// Don't forget to add `Int8` to the type registry
-mongoose.Schema.Types.Text = Text;
 
-// --------------------------------------------------------------------------
+//
+//  Virtuals
+//
+schema.Doc.virtual('fts').get(virtual.fts)
 
-import User from './User.mjs'
 
-import { Doc, Person, Property, Contract } from './Doc/index.mjs'
+//
+//  Models
+//
+const User = mongoose.model('User', schema.User)
 
-// --------------------------------------------------------------------------
+const Doc = mongoose.model('Doc', schema.Doc)
+const Person = Doc.discriminator('person', schema.Person)
+const Property = Doc.discriminator('property', schema.Property)
+const Contract = Doc.discriminator('contract', schema.Contract)
 
-export default {
+
+export {
     User,
 	Doc,
 	Person,

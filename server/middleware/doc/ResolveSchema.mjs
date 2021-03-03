@@ -1,14 +1,14 @@
 
-import model from '../../model/index.mjs'
+import { Person, Property, Contract } from '../../model/index.mjs'
 
 const ResolveSchema = (req, res, next) => {
 
 	const sName = req.params.schema || req.body.kind
 
 	const sel = {
-		'person': model.Person,
-		'property': model.Property,
-		'contract': model.Contract
+		'person': Person,
+		'property': Property,
+		'contract': Contract
 	}
 
 	res.locals.Schema = sel[sName]

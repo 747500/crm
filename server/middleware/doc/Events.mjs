@@ -2,7 +2,7 @@
 import moment from 'moment'
 import mongoose from 'mongoose'
 
-import model from '../../model/index.mjs'
+import { Doc } from '../../model/index.mjs'
 
 const Events = (req, res, next) => {
 	const userId = mongoose.Types.ObjectId(req.session.user)
@@ -11,7 +11,7 @@ const Events = (req, res, next) => {
 	const month = parseInt(moment(req.query.yearmonth).format('MM'))
 	console.log('* mw.doc.Events month:', month)
 
-	model.Doc.aggregate([
+	Doc.aggregate([
 		{
 			$project: {
 				_id: true,

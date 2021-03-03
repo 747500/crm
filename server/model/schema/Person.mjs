@@ -1,15 +1,10 @@
 
 import mongoose from 'mongoose'
 
+import Contact from './Contact.mjs'
 
-const ContactSchema = new mongoose.Schema(
-    {
-        data: String,
-        description: String
-    }
-)
 
-const PersonSchema = new mongoose.Schema(
+const schema = new mongoose.Schema(
     {
         person: {
             firstName: String,
@@ -17,10 +12,10 @@ const PersonSchema = new mongoose.Schema(
             middleName: String,
             birthDay: Date,
             comments: String,
-            contact: [ ContactSchema ],
+            contact: [ Contact ],
         },
         mainPicture: mongoose.Types.ObjectId,
     },
 )
 
-export default PersonSchema
+export default schema

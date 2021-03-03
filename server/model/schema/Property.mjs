@@ -2,7 +2,7 @@
 import mongoose from 'mongoose'
 
 
-const PropertySchema = new mongoose.Schema(
+const schema = new mongoose.Schema(
 	{
         property: {
             address: String,
@@ -14,4 +14,4 @@ const PropertySchema = new mongoose.Schema(
 	}
 )
 
-export default PropertySchema
+export default schema

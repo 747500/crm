@@ -1,7 +1,7 @@
 
 import mongoose from 'mongoose'
 
-import model from '../../model/index.mjs'
+import { User } from '../../model/index.mjs'
 
 
 const Create = (req, res, next) => {
@@ -16,7 +16,7 @@ const Create = (req, res, next) => {
 		return
 	}
 
-	const user = new model.User({
+	const user = new User({
 		_id: userId,
 		name: req.body.name,
 	})

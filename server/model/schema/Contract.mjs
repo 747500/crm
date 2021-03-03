@@ -2,7 +2,7 @@
 import mongoose from 'mongoose'
 
 
-const ContractSchema = new mongoose.Schema(
+const schema = new mongoose.Schema(
     {
         contract: {
             title: String,
@@ -14,4 +14,4 @@ const ContractSchema = new mongoose.Schema(
     //docSchemaOptions
 )
 
-export default ContractSchema
+export default schema

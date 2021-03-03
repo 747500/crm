@@ -1,9 +1,9 @@
 
-import model from '../../model/index.mjs'
+import { User } from '../../model/index.mjs'
 
 const List = (req, res, next) => {
 
-	model.User.find()
+	User.find()
 	.then(result => {
 		res.send(result.map(user => {
 			const userId = user._id.toString()
