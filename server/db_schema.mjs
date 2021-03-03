@@ -1,5 +1,7 @@
 import mongoose from 'mongoose'
 
+//mongoose.Promise = global.Promise
+
 // --------------------------------------------------------------------------
 
 class Text extends mongoose.SchemaType {

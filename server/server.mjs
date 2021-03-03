@@ -1,12 +1,6 @@
 'use strict'
 
-import moment from 'moment'
-
 import express from 'express'
-import mongoose from 'mongoose'
-//mongoose.Promise = global.Promise
-
-import models from './db_schema.mjs'
 
 import ServicesRun from './services/index.mjs'
 
@@ -14,61 +8,7 @@ import CONFIG from './config.js'
 
 import mw from './middleware/index.mjs'
 
-
 ServicesRun.then(services => {
-
-	const docEvents = (req, res, next) => {
-		const userId = mongoose.Types.ObjectId(req.session.user)
-
-		console.log('* docEvents\n', req.query)
-
-
-		const month = parseInt(moment(req.query.yearmonth).format('MM'))
-		console.log('* docEvents\n', month)
-
-		models.Doc.aggregate([
-			{
-				$project: {
-					_id: true,
-					kind: true,
-					user: true,
-					firstName: '$person.firstName',
-					middleName: '$person.middleName',
-					lastName: '$person.lastName',
-					birthDay: '$person.birthDay',
-					month: {
-						$month: '$person.birthDay'
-					}
-				}
-			},
-			{
-				$match: {
-					user: userId,
-					kind: 'person',
-					month: month
-				}
-			}
-		])
-		.then(result => {
-			console.log('* docEvents\n', result)
-
-			res.locals.Result = result.map(i => {
-
-				const birthDate = moment(i.birthDay).format('DD-MM-YYYY')
-				const day = moment(i.birthDay).format('DD')
-				const eventDate = `${req.query.yearmonth}-${day}`
-				const age = 1 + moment(eventDate).diff(i.birthDay, 'years');
-
-				return {
-					eventAt: eventDate,
-					eventTitle: `ДР - ${age}`,
-					subjectId: i._id.toString(),
-				}
-			})
-			next()
-		})
-		.catch(next)
-	}
 
 // ==========================================================================
 
@@ -121,7 +61,7 @@ ServicesRun.then(services => {
 // --------------------------------------------------------------------------
 
 	apiRouter.get('/person/events',
-		docEvents,
+		mw.doc.Events,
 		mw.sendResultJSON
 	)
 
