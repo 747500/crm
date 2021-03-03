@@ -15,8 +15,6 @@ import ServicesRun from './services/index.mjs'
 
 import CONFIG from './config.js'
 
-import sendResultJSON from './middleware/sendResultJSON.mjs'
-
 import mw from './middleware/index.mjs'
 
 // ==========================================================================
@@ -255,13 +253,16 @@ ServicesRun.then(sss => {
 				return;
 			}
 
-			sss.files.bucket.delete(fileId, (err, result) => {
+			sss.files.bucket.delete(fileId, (err) => {
 				if (err) {
 					next(err)
 					return
 				}
 
-				console.log('* docDeleteFile result', result)
+				console.log('* docDeleteFile deleted:', {
+					user: userId,
+					file: fileId,
+				})
 				res.send(result)
 			})
 
@@ -455,21 +456,21 @@ ServicesRun.then(sss => {
 
 	apiRouter.delete('/f/:id',
 		docDeleteFile,
-		sendResultJSON
+		mw.sendResultJSON
 	)
 
 	// FIXME change POST to PUT, :filename to header
 	apiRouter.post('/f/:id/upload/:filename',
 		mw.doc.Load,
 		fileUpload,
-		sendResultJSON
+		mw.sendResultJSON
 	)
 
 // --------------------------------------------------------------------------
 
 	apiRouter.get('/person/events',
 		docEvents,
-		sendResultJSON
+		mw.sendResultJSON
 	)
 
 // --------------------------------------------------------------------------
@@ -477,7 +478,7 @@ ServicesRun.then(sss => {
 	apiRouter.get('/list/:schema',
 		schemaResolve,
 		mw.doc.List,
-		sendResultJSON
+		mw.sendResultJSON
 	)
 
 // --------------------------------------------------------------------------
@@ -515,7 +516,9 @@ ServicesRun.then(sss => {
 		mw.doc.Search.Add
 	)
 
-	docRouter.use(sendResultJSON)
+	docRouter.use(
+		mw.sendResultJSON
+	)
 
 	apiRouter.use('/doc', docRouter)
 
