@@ -7,42 +7,42 @@ import CONFIG from '../../../config.js'
 
 const docSearchQuery = (req, res, next) => {
 
-	ServicesRun.then(services => {
+	const userId = mongoose.Types.ObjectId(req.session.user)
 
-		const userId = mongoose.Types.ObjectId(req.session.user)
+	console.log('<search>', req.body)
 
-		console.log('<search>', req.body)
+	const searchString = req.body.q
 
-		const searchString = req.body.q
+	const queryArgs = []
+	var query = 'SELECT *' +
+		` FROM ${CONFIG.SphinxQL.indexName}` +
+		' WHERE user = ? AND MATCH(?)'
 
-		const queryArgs = []
-		var query = 'SELECT *' +
-			` FROM ${CONFIG.SphinxQL.indexName}` +
-			' WHERE user = ? AND MATCH(?)'
+	queryArgs.push(userId.toString())
+	queryArgs.push(req.body.q)
 
-		queryArgs.push(userId.toString())
-		queryArgs.push(req.body.q)
+	if (req.body.kind) {
+		let n = queryArgs.length
 
-		if (req.body.kind) {
-			let n = queryArgs.length
-
-			if ((req.body.kind instanceof Array) && req.body.kind.length) {
-				queryArgs.push(req.body.kind)
-			}
-			else
-			if ('string' === typeof req.body.kind) {
-				queryArgs.push(req.body.kind)
-			}
-
-			if (queryArgs.length !== n) {
-				query += ' AND kind IN (?)'
-			}
+		if ((req.body.kind instanceof Array) && req.body.kind.length) {
+			queryArgs.push(req.body.kind)
+		}
+		else
+		if ('string' === typeof req.body.kind) {
+			queryArgs.push(req.body.kind)
 		}
 
-		console.log('###', {
-			q: query,
-			a: queryArgs
-		})
+		if (queryArgs.length !== n) {
+			query += ' AND kind IN (?)'
+		}
+	}
+
+	console.log('###', {
+		q: query,
+		a: queryArgs
+	})
+
+	ServicesRun.then(services => {
 
 		services.sphinxql.query(
 			query, queryArgs,
