@@ -74,42 +74,6 @@ ServicesRun.then(services => {
 		.catch(next)
 	}
 
-	const fileUpload = (req, res, next) => {
-		const userId = mongoose.Types.ObjectId(req.session.user)
-
-		const doc = res.locals.Doc
-		const filename = req.params.filename
-		const mimetype = req.headers['content-type']
-		const caption = req.headers['x-meta-caption']
-
-		var stream = services.files.bucket.openUploadStream(
-			filename,
-			{
-				contentType: mimetype,
-				metadata: {
-					user: userId,
-					docId: mongoose.Types.ObjectId(doc.id),
-					lastModified: new Date(req.headers['last-modified']),
-					caption: querystring.unescape(caption)
-				}
-			}
-		);
-
-		stream.once('finish', () => {
-			res.locals.Result = {
-				file_id: stream.id
-			}
-			next()
-		})
-
-		stream.once('error', next)
-
-//		console.log('* after docUploadFile:', doc);
-
-		req.pipe(stream)
-
-	}
-
 	const getThumbnail = (req, res, next) => {
 		const userId = mongoose.Types.ObjectId(req.session.user)
 
@@ -160,89 +124,6 @@ ServicesRun.then(services => {
 		})
 		.catch(next)
 
-	}
-
-	const getFile = (req, res, next) => {
-		const userId = mongoose.Types.ObjectId(req.session.user)
-
-		const fileId = mongoose.Types.ObjectId(req.params.id)
-
-		services.files.collection.findOne({
-			_id: fileId,
-			'metadata.user': userId,
-		})
-		.then(fileinfo => {
-
-			if (null === fileinfo) { // 404
-				res.status(404).send('File Not Found')
-				return;
-			}
-
-			const hasLastModified =
-					'object' === typeof fileinfo.metadata &&
-					fileinfo.metadata.lastModified instanceof Date
-
-			const lastModified =
-					hasLastModified ?
-					fileinfo.metadata.lastModified :
-					fileinfo.uploadDate
-
-			const caption =
-					querystring.escape(fileinfo.metadata.caption || '')
-
-			const contentDisposition =
-					'inline;' + // or 'attachment' for downloads
-					'filename=' +
-					querystring.escape(fileinfo.filename)
-
-			res.set({
-				'Content-Length': fileinfo.length,
-				'Content-Type': fileinfo.contentType,
-				'Last-Modified': lastModified.toISOString(),
-				'Content-Disposition': contentDisposition,
-				//'ETag': 'W/' + oid.toString(),
-				'X-Meta-Caption': caption
-			})
-
-			const stream = services.files.bucket.openDownloadStream(oid)
-
-			stream.once('error', next)
-
-			stream.pipe(res)
-
-		})
-		.catch(next)
-	}
-
-	const docDeleteFile = (req, res, next) => {
-		const userId = mongoose.Types.ObjectId(req.session.user)
-		const fileId = mongoose.Types.ObjectId(req.params.id)
-
-		services.files.collection.findOne({
-			_id: fileId,
-			'metadata.user': userId,
-		})
-		.then(result => {
-			if (null === result) { // 404
-				res.status(404).send('File Not Found')
-				return;
-			}
-
-			services.files.bucket.delete(fileId, (err) => {
-				if (err) {
-					next(err)
-					return
-				}
-
-				console.log('* docDeleteFile deleted:', {
-					user: userId,
-					file: fileId,
-				})
-				res.send(result)
-			})
-
-		})
-		.catch(next)
 	}
 
 	const postFileMeta = (req, res, next) => {
@@ -302,28 +183,6 @@ ServicesRun.then(services => {
 		.catch(next)
 	}
 
-	const getFilesList = (req, res, next) => {
-		const userId = mongoose.Types.ObjectId(req.session.user)
-
-		services.files.collection.find(
-			{
-				'metadata.user': userId,
-				'metadata.docId': res.locals.Doc._id
-			}
-		)
-		.toArray()
-		.then(
-			result => {
-
-				res.locals.Result =
-						result.map(el => { return el._id })
-
-				next()
-			}
-		).catch(next)
-
-	}
-
 // ==========================================================================
 
 	services.web.post('/u/set',
@@ -351,7 +210,7 @@ ServicesRun.then(services => {
 	)
 
 	apiRouter.get('/f/:id',
-		getFile
+		mw.files.StreamContent
 	)
 
 	apiRouter.post('/f/:id',
@@ -359,14 +218,14 @@ ServicesRun.then(services => {
 	)
 
 	apiRouter.delete('/f/:id',
-		docDeleteFile,
+		mw.files.Delete,
 		mw.sendResultJSON
 	)
 
 	// FIXME change POST to PUT, :filename to header
 	apiRouter.post('/f/:id/upload/:filename',
 		mw.doc.Load,
-		fileUpload,
+		mw.files.Upload,
 		mw.sendResultJSON
 	)
 
@@ -400,7 +259,7 @@ ServicesRun.then(services => {
 
 	docRouter.get('/:id/files',
 		mw.doc.Load,
-		getFilesList
+		mw.files.List
 	)
 
 	docRouter.post('/:id',
