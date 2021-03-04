@@ -1,17 +1,19 @@
-<template>
-	<div class="files-panel">
-		<filesUpload class="queue"
+<template lang="pug">
+
+	div(class="files-panel")
+		filesUpload(
+			class="queue"
 			:oid="$props.model._id"
 			@active="uploadActive"
-			/>
+		)/
 
-		<filesList class="list"
+		filesList(
+			class="list"
 			v-if="showFilesList"
 			:oid="$props.model._id"
 			:avatar="$props.model.mainPicture"
 			@setMain="setAsMain"
-			/>
-	</div>
+		)/
 
 </template>
 
