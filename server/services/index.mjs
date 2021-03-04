@@ -27,21 +27,21 @@ function run (service) {
 	)
 }
 
-function init () {
-	const sss = {}
+function start () {
+	const s = {}
 
 	return Services.reduce(
-		(ok, service) => ok.then(() => {
-			return run.bind(sss)(service).then(() => {
-				sss[service.name] = service.endpoint
+		(ok, service) => ok.then(
+			() => run.bind(s)(service).then(() => {
+				return s[service.name] = service.endpoint
 			})
-		}),
+		),
 		Promise.resolve()
 	)
-	.then(result => {
-		console.log('sss init ok:', Object.keys(sss))
-		return sss;
+	.then(() => {
+		console.log('* Services started:', Object.keys(s))
+		return s;
 	})
 }
 
-export default init() // promise-singleton
+export default { start }

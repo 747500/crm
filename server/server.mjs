@@ -3,10 +3,11 @@ import express from 'express'
 
 import api from './routes/index.mjs'
 
-import ServicesRun from './services/index.mjs'
+import Services from './services/index.mjs'
 
 
-ServicesRun.then(services => {
+Services.start()
+.then(services => {
 
 	services.express.use(express.static('public'))
 	services.express.use('/api/v0', api)
