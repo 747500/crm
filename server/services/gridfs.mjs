@@ -5,11 +5,11 @@ import CONFIG from '../config.js'
 
 const service = {
 
-	name: 'files',
+	name: 'gridfs',
 
 	init () {
 		return new Promise((resolve, reject) => {
-			const connection = this.docs.connection
+			const connection = this.mongodb.connection
 
 			const collection = connection.collection('fs.files')
 			const bucket = new mongoose.mongo.GridFSBucket(connection.db)

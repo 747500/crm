@@ -5,7 +5,7 @@ import CONFIG from '../config.js'
 
 const service = {
 
-	name: 'docs',
+	name: 'mongodb',
 
 	init () {
 		process.on('SIGTERM', () => {

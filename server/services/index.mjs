@@ -1,17 +1,17 @@
 
 
-import Sphinx from './sphinx.mjs'
-import Docs from './docs.mjs'
-import Files from './files.mjs'
-import Web from './web.mjs'
-import Events from './events.mjs'
+import sphinx from './sphinx.mjs'
+import mongodb from './mongodb.mjs'
+import gridfs from './gridfs.mjs'
+import express from './express.mjs'
+import events from './events.mjs'
 
 const Services = [
-	Sphinx,
-	Docs,
-	Web,
-	Files,
-	Events,
+	sphinx,
+	mongodb,
+	gridfs,
+	events,
+	express,
 ]
 
 function run (service) {

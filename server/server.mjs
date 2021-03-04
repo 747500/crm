@@ -8,10 +8,12 @@ import ServicesRun from './services/index.mjs'
 
 ServicesRun.then(services => {
 
-	services.web.use(express.static('public'))
-	services.web.use('/api/v0', api)
+	services.express.use(express.static('public'))
+	services.express.use('/api/v0', api)
 
-}).catch(err => {
+})
+.catch(err => {
 	console.error('FATAL:', err)
 	process.kill(process.pid, 'SIGTERM')
+	setTimeout(() => process.kill(process.pid, 'SIGKILL'), 3000)
 })

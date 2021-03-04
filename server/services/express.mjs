@@ -38,7 +38,7 @@ import CONFIG from '../config.js'
 
 const service = {
 
-	name: 'web',
+	name: 'express',
 
 	init () {
 		return new Promise((resolve, reject) => {
