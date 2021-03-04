@@ -1,7 +1,7 @@
 
 import mongoose from 'mongoose'
 
-import ServicesRun from '../../../services/index.mjs'
+import Services from '../../../services/index.mjs'
 
 import CONFIG from '../../../config.js'
 
@@ -22,7 +22,8 @@ const docSearchUpdate = (req, res, next) => {
 		}
 	)
 
-	ServicesRun.then(services =>{
+	Services.Run()
+	.then(services =>{
 
 		services.sphinxql.query(
 			`DELETE FROM ${CONFIG.SphinxQL.indexName} WHERE oid = ?`,
@@ -65,6 +66,7 @@ const docSearchUpdate = (req, res, next) => {
 		)
 
 	})
+	.catch(next)
 
 }
 

@@ -27,7 +27,7 @@ function run (service) {
 	)
 }
 
-function start () {
+function init () {
 	const s = {}
 
 	return Services.reduce(
@@ -44,4 +44,10 @@ function start () {
 	})
 }
 
-export default { start }
+const ok = init() // promise-singleton
+
+export default {
+	Run () {
+		return ok
+	}
+}

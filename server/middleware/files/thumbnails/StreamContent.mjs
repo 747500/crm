@@ -3,16 +3,17 @@ import querystring from 'querystring'
 import mongoose from 'mongoose'
 import sharp from 'sharp'
 
-import ServicesRun from '../../../services/index.mjs'
+import Services from '../../../services/index.mjs'
 
 
 const StreamContent = (req, res, next) => {
 	const userId = mongoose.Types.ObjectId(req.session.user)
 	const fileId = mongoose.Types.ObjectId(req.params.id)
 
-	ServicesRun.then(services => {
+	Services.Run()
+	.then(services => {
 
-		return services.files.collection.findOne({
+		return services.gridfs.collection.findOne({
 			_id: fileId,
 			'metadata.user': userId,
 		})
@@ -42,7 +43,7 @@ const StreamContent = (req, res, next) => {
 				'X-Meta-Caption': caption
 			})
 
-			const stream = services.files.bucket.openDownloadStream(fileId)
+			const stream = services.gridfs.bucket.openDownloadStream(fileId)
 
 			stream.once('error', next)
 

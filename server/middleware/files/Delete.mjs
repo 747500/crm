@@ -1,19 +1,20 @@
 
 import mongoose from 'mongoose'
 
-import ServicesRun from '../../services/index.mjs'
+import Services from '../../services/index.mjs'
 
 
 const Delete = (req, res, next) => {
 	const userId = mongoose.Types.ObjectId(req.session.user)
 	const fileId = mongoose.Types.ObjectId(req.params.id)
 
-	ServicesRun
+	Services.Run()
 	.then(services => {
 
-		return services.files.collection.findOne({
+		return services.gridfs.collection.findOne({
 			_id: fileId,
 			'metadata.user': userId,
+
 		})
 		.then(result => {
 			if (null === result) { // 404
@@ -21,7 +22,7 @@ const Delete = (req, res, next) => {
 				return;
 			}
 
-			services.files.bucket.delete(fileId, (err) => {
+			services.gridfs.bucket.delete(fileId, (err) => {
 				if (err) {
 					next(err)
 					return

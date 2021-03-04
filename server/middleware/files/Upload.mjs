@@ -3,7 +3,7 @@
 import querystring from 'querystring'
 import mongoose from 'mongoose'
 
-import ServicesRun from '../../services/index.mjs'
+import Services from '../../services/index.mjs'
 
 
 const Upload = (req, res, next) => {
@@ -14,9 +14,10 @@ const Upload = (req, res, next) => {
 	const mimetype = req.headers['content-type']
 	const caption = req.headers['x-meta-caption']
 
-	ServicesRun.then(services => {
+	Services.Run()
+	.then(services => {
 
-		var stream = services.files.bucket.openUploadStream(
+		var stream = services.gridfs.bucket.openUploadStream(
 			filename,
 			{
 				contentType: mimetype,

@@ -1,7 +1,7 @@
 
 import mongoose from 'mongoose'
 
-import ServicesRun from '../../../services/index.mjs'
+import Services from '../../../services/index.mjs'
 
 const Save = (req, res, next) => {
 	const userId = mongoose.Types.ObjectId(req.session.user)
@@ -35,8 +35,9 @@ const Save = (req, res, next) => {
 		set[`metadata.${k}`] = v
 	}
 
-	ServicesRun.then(services => {
-		return services.files.collection.updateOne(
+	Services.Run()
+	.then(services => {
+		return services.gridfs.collection.updateOne(
 			{
 				_id: fileId,
 				'metadata.user': userId

@@ -1,7 +1,7 @@
 
 import mongoose from 'mongoose'
 
-import ServicesRun from '../../../services/index.mjs'
+import Services from '../../../services/index.mjs'
 
 import CONFIG from '../../../config.js'
 
@@ -13,7 +13,8 @@ const docSearchAdd = (req, res, next) => {
 
 	console.log('* mw.doc.Search.Add:', docFts)
 
-	ServicesRun.then(service => {
+	Services.Run()
+	.then(service => {
 
 		services.sphinxql.query(
 			`INSERT INTO ${CONFIG.SphinxQL.indexName}` +
@@ -40,6 +41,7 @@ const docSearchAdd = (req, res, next) => {
 		)
 
 	})
+	.catch(next)
 }
 
 export default docSearchAdd

@@ -1,7 +1,7 @@
 
 import mongoose from 'mongoose'
 
-import ServicesRun from '../../../services/index.mjs'
+import Services from '../../../services/index.mjs'
 
 import CONFIG from '../../../config.js'
 
@@ -42,7 +42,8 @@ const docSearchQuery = (req, res, next) => {
 		a: queryArgs
 	})
 
-	ServicesRun.then(services => {
+	Services.Run()
+	.then(services => {
 
 		services.sphinxql.query(
 			query, queryArgs,
@@ -76,6 +77,8 @@ const docSearchQuery = (req, res, next) => {
 			}
 		)
 	})
+	.catch(next)
+
 }
 
 export default docSearchQuery

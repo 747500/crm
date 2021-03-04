@@ -6,7 +6,7 @@ import api from './routes/index.mjs'
 import Services from './services/index.mjs'
 
 
-Services.start()
+Services.Run()
 .then(services => {
 
 	services.express.use(express.static('public'))
