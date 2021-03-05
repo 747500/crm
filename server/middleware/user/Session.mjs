@@ -1,14 +1,14 @@
 
 import mongoose from 'mongoose'
 
-const Set = (req, res, next) => {
+const Session = (req, res, next) => {
 	const userId = mongoose.Types.ObjectId(req.body._id)
 
 	req.session.user = userId.toString()
 
-	console.log('* user/Set', req.session.user)
+	console.log('* user/Session', req.session.user)
 
 	res.send('Ok')
 }
 
-export default Set
+export default Session

@@ -1,12 +1,12 @@
 
 import List from './List.mjs'
-import Set from './Set.mjs'
+import Session from './Session.mjs'
 import Create from './Create.mjs'
 import Load from './Load.mjs'
 
 export default {
 	List,
-	Set,
+	Session,
 	Create,
 	Load,
 }

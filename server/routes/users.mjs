@@ -6,7 +6,7 @@ import mw from '../middleware/index.mjs'
 const Users = express.Router()
 
 Users.post('/set',
-	mw.user.Set
+	mw.user.Session
 )
 
 Users.get('/list',
