@@ -1,20 +1,17 @@
 
+import '../node_modules/bootstrap/dist/css/bootstrap.css'
+
 import './main.css'
 
 // --------------------------------------------------------------------------
 
 import Vue from 'vue'
 
+import UniqueId from 'vue-unique-id'
+Vue.use(UniqueId)
+
 import Vue2Filters from 'vue2-filters'
 Vue.use(Vue2Filters)
-
-//import { BIconHouseDoor } from 'bootstrap-icons-vue'
-//Vue.component(BIconHouseDoor)
-
-// --------------------------------------------------------------------------
-
-import rawView from './components/raw-view.vue'
-Vue.component('raw-view', rawView)
 
 // --------------------------------------------------------------------------
 
