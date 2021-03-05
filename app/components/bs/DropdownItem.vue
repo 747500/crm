@@ -1,8 +1,13 @@
-
 <template lang="pug">
 
-	li()
-		a(:class="classList" href="#" @click.prevent @mouseup="event => $emit('select', event)")
+	li
+		a(
+			class="dropdown-item"
+			href="#"
+			@mouseup="onMouseup"
+			@mousedown="event => $emit('mousedown', event)"
+			@click.prevent
+		)
 			slot/
 
 </template>
@@ -17,12 +22,15 @@ export default {
 	data () {
 		return {
 			//id: 'button-123',
-			classList: [
-				'dropdown-item',
-			]
 		}
 	},
 
+	methods: {
+		onMouseup (event) {
+			//console.log('* DropdownItem onMouseup', event)
+			this.$emit('select', event)
+		}
+	}
 }
 
 </script>

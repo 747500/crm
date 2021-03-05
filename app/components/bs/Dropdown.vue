@@ -11,14 +11,14 @@
 			:class="buttonClassList"
 		)
 			| {{ schema.text }}
-		//	slot(name="button")/
 
 		bsDropdownMenu(
 			:aria-labelledby="id"
 			ref="menu"
-			:schema="schema.menu"
-			)/
-		//	slot(name="menu")/
+			:menu="$props.schema.menu"
+			@select="onSelect"
+			@mousedown="onMousedown"
+		)/
 
 </template>
 
@@ -46,14 +46,29 @@ export default {
 	data () {
 		return {
 			id: `dropdown-${this.uid}`,
-			buttonClassList: [
-			],
+			buttonClassList: [],
 			popper: null,
-			expadned: false
+			expadned: false,
+			mouseActive: false,
 		}
 	},
 
 	methods: {
+		onSelect (event) {
+			console.log('* Dropdown onSelect', event)
+
+			if (false === event) {
+				this.hideDropdown()
+				return
+			}
+
+			this.$emit('select', event)
+		},
+
+		onMousedown () {
+			this.mouseActive = true
+		},
+
 		onClick (event) {
 			//console.log('Dropdown onClick', event)
 
@@ -74,15 +89,22 @@ export default {
 		},
 
 		onBlur () {
-			//console.log('onBlur target', event.relatedTarget)
-			//console.log('onBlur related', event.relatedTarget)
+			if (this.mouseActive) {
+				return
+			}
 
+			this.hideDropdown()
+		},
+
+		hideDropdown () {
 			setTimeout(() => {
+				this.mouseActive = false
 				this.expadned = false
 				this.$refs.button.$el.classList.remove('show')
 				this.$refs.menu.$el.classList.remove('show')
 			}, 75)
-		},
+
+		}
 	},
 
 	created () {

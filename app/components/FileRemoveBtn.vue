@@ -1,6 +1,9 @@
 <template lang="pug">
 
-	bsDropdown(:schema="schema")/
+	bsDropdown(
+		:schema="schema"
+		@select="onSelect"
+	)/
 
 </template>
 
@@ -27,35 +30,34 @@
 					text: '🗑',
 					class: [
 						'btn-sm',
-						//'btn-danger',
 						'btn-outline-danger',
 					],
 					menu: [
 						{
 							text: 'Cancel',
-							handler: this.onCancel
+							value: false,
 						},
 						{
 							text: 'Ok',
-							handler: this.onConfirm
+							value: true,
 						}
-					]
+					],
 				},
 			}
 		},
 
 		methods: {
-			onConfirm() {
-				this.$emit('remove', this.$props.item)
+			onSelect(value) {
+				console.log('* FileRemoveBtn onSelect', value)
+				if (value) {
+					this.$emit('remove', this.$props.item)
+				}
 			},
-
-			onCancel() {
-				// no-op
-				//console.log('onCancel', args)
-			},
-
 		},
 
+		created () {
+			console.log('* FileRemoveBtn created', this);
+		}
 	}
 
 </script>

@@ -106,15 +106,17 @@
 
 .files-list .item .toolbar {
 	position: absolute;
-	width: 100%;
+	width: 12em;
+	height: 12em;
 	top: 0px;
 	left: 0px;
 	right: 0px;
-	/*height: 5em;*/
+	overflow: hidden;
 }
 
 .files-list .item .tools > *{
 	display: block;
+	margin: 0.25em;
 }
 
 .files-list .item .toolbar:hover {
@@ -124,11 +126,9 @@
 .files-list .item .toolbar .tools {
 	text-align: center;
 	margin: 0.33em;
-	/*
-	text-shadow: 0 0 1px #fff, 0 0 1px #fff, 0 0 1px #fff, 0 0 1px #fff;
-	*/
 	text-shadow: 1px 0px 3px #fff, -1px 0px 3px #fff, 0px 1px 3px #fff, 0px -1px 3px #fff;
 	visibility: hidden;
+	display: flex;
 }
 
 .files-list .item .toolbar:hover .tools {

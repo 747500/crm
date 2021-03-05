@@ -1,14 +1,13 @@
 
 <template lang="pug">
 
-	ul(
-		:class="classList"
-		role="menu"
-	)
+	ul(class="dropdown-menu" role="menu")
 		bsDropdownItem(
-			v-for="item in schema"
+			v-for="item in menu"
 			:key="item.text"
-			@select="item.handler") {{ item.text }}
+			@select="() => $emit('select', item.value)"
+			@mousedown="event => $emit('mousedown', event)"
+		) {{ item.text }}
 
 </template>
 
@@ -26,21 +25,8 @@ export default {
 	},
 
 	props: {
-		schema: Array,
+		menu: Array,
 	},
-
-	data () {
-		return {
-			classList: [
-				'dropdown-menu',
-			]
-		}
-	},
-
-	created () {
-		//this.elm.previousSibling
-		console.log(this)
-	}
 
 }
 
