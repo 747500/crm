@@ -6,35 +6,26 @@
 		style="max-height: calc(100vh - 15em); overflow: auto;"
 	)
 
-		bsButton(@click="() => {}")
-
-		div(
+		File(
+			:oid="file._id"
 			v-for="(file) in files.slice().reverse()"
 			:key="file.key"
-			:class="{ busy: true == file.busy, avatar: file._id === $props.avatar }"
-			class="item"
+			:class="[ 'item', { busy: true == file.busy, avatar: file._id === $props.avatar } ]"
+			@click.prevent="onFileClick"
 		)
+			template(slot="toolbar")
+				div(class="toolbar")
+					div(class="tools")
+						FileRemoveBtn(
+							:item="file"
+							@remove="removeFile"
+						)/
 
-			File(:oid="file._id" @click.prevent="onFileClick")
-				template(slot="toolbar")
-					div(class="toolbar")
-						div(class="tools")
-							FileRemoveBtn(
-								:item="file"
-								@remove="removeFile"
-							)/
-
-							bsButton(
-								class="btn-dark btn-sm"
-								:disabled="file._id === $props.avatar"
-								@mouseup.prevent="() => $emit('setMain', file._id)"
-							) 💡
-								//{{ file._id === $props.avatar ? 'Главная' : 'Сделать главной' }}
-
-	//aConfirm(
-	//	class="btn btn-outline-danger btn-sm"
-	//	message="Отмена"
-	//	:onconfirm="() => $emit('remove', file._id)") 🗑
+						bsButton(
+							class="btn-dark btn-sm"
+							:disabled="file._id === $props.avatar"
+							@mouseup.prevent="() => $emit('setMain', file._id)"
+						) 💡
 
 </template>
 
