@@ -14,7 +14,13 @@ const docSearchAdd = (req, res, next) => {
 	console.log('* mw.doc.Search.Add:', docFts)
 
 	Services.Run()
-	.then(service => {
+	.then(services => {
+
+		if (undefined === services.sphinxql) {
+			// NON-FATAL in this middleware
+			next()
+			return
+		}
 
 		services.sphinxql.query(
 			`INSERT INTO ${CONFIG.SphinxQL.indexName}` +

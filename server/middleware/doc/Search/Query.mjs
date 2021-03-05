@@ -45,6 +45,14 @@ const docSearchQuery = (req, res, next) => {
 	Services.Run()
 	.then(services => {
 
+		if (undefined === services.sphinxql) {
+			return new Error('"sphinxql" service is not available')
+		}
+
+		return services
+	})
+	.then(services => {
+
 		services.sphinxql.query(
 			query, queryArgs,
 			(err, rows, fields) => {

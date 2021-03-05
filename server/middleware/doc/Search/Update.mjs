@@ -23,7 +23,13 @@ const docSearchUpdate = (req, res, next) => {
 	)
 
 	Services.Run()
-	.then(services =>{
+	.then(services => {
+
+		if (undefined === services.sphinxql) {
+			// NON-FATAL in this middleware
+			next()
+			return
+		}
 
 		services.sphinxql.query(
 			`DELETE FROM ${CONFIG.SphinxQL.indexName} WHERE oid = ?`,
