@@ -1,47 +1,34 @@
-<template>
+<template lang="pug">
 
-	<ul class="doc-list">
-		<li v-if="$listeners.create" class="create">
-			<div class="btn-group btn-group-sm" role="group" aria-label="">
-				<button @click.prevent="() => $emit('create')" class="btn btn-primary">
-					+
-				</button>
-			</div>
-		</li>
+	ul(class="doc-list")
+		li(v-if="$listeners.create" class="create")
+			div(class="btn-group btn-group-sm" role="group" aria-label="")
+				button(@click.prevent="() => $emit('create')" class="btn btn-primary")
+					| +
 
-		<!-- @click.prevent="(event) => switchView(event, p)" -->
+		// @click.prevent="(event) => switchView(event, p)"
 
-		<li v-for="(item, n) in model" :key="item._id">
-
-			<div
+		li(v-for="(item, n) in model" :key="item._id")
+			div(
 				v-on="$listeners.open ? { click: () => onClick(item) } : {}"
 				:class="[ { 'active': $listeners.open }, 'item' ]"
-				>
-				<slot v-bind:item="item">
-					<pre>{{ n }}: {{ item }}</pre>
-				</slot>
-			</div>
+			)
+				slot(v-bind:item="item")
+					pre {{ n }}: {{ item }}
 
-			<div class="toolbar">
-				<div class="btn-group-vertical btn-group-sm" role="group" aria-label="">
-					<button
+			div(class="toolbar")
+				div(class="btn-group-vertical btn-group-sm" role="group" aria-label="")
+					button(
 						v-if="$listeners.edit"
 						@click.prevent="() => $emit('edit', item)"
-						class="btn btn-secondary">
-						🖉
-					</button>
-					<button
+						class="btn btn-secondary"
+					) 🖉
+
+					button(
 						v-if="$listeners.remove"
 						@click.prevent="() => $emit('remove', item)"
-						class="btn btn-danger">
-						🗑
-					</button>
-				</div>
-			</div>
-
-		</li>
-
-	</ul>
+						class="btn btn-danger"
+					) 🗑
 
 </template>
 
