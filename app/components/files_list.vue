@@ -1,55 +1,48 @@
 
-<template>
+<template lang="pug">
 
-	<div class="files-list" style="max-height: calc(100vh - 15em); overflow: auto;">
+	div(
+		class="files-list"
+		style="max-height: calc(100vh - 15em); overflow: auto;"
+	)
 
+		bsButton(@click="() => {}")
 
-		<div v-for="(file) in files.slice().reverse()"
+		div(
+			v-for="(file) in files.slice().reverse()"
 			:key="file.key"
 			:class="{ busy: true == file.busy, avatar: file._id === $props.avatar }"
 			class="item"
-			>
-			<div class="content">
-				<div class="img">
-					<iimg :src="file.blob"/>
-					<div class="lamp">💡</div>
-				</div>
+		)
 
-				<div class="text">
-					<!--
-					<div class="oid">{{ file._id }}</div>
-					<div style="width: 95%; overflow: hidden;">{{ file.name }}</div>
-					<div>{{ new Date(file.lastModified).toLocaleString() }}</div>
-					<div>{{ file.size }}</div>
-					-->
-					<inplaceTextEdit
-						@savetext="() => saveText({ oid: file._id, caption: file.caption })"
-						v-model="file.caption"
-						label="🖉" />
-				</div>
-			</div>
+			File(:oid="file._id" @click.prevent="onFileClick")
+				template(slot="toolbar")
+					div(class="toolbar")
+						div(class="tools")
+							FileRemoveBtn(
+								:item="file"
+								@remove="removeFile"
+							)/
 
-			<div class="toolbar">
-				<div class="tools">
-					<aConfirm
-						class="btn btn-outline-danger btn-sm"
-						message="Отмена"
-						:onconfirm="() => { removeFile(file) }">️ 🗑 </aConfirm>
-					<button
-						class="btn btn-dark btn-sm"
-						:disabled="file._id === $props.avatar"
-						@click.prevent="() => $emit('setMain', file._id)">
-						{{ file._id === $props.avatar ? 'Главная' : 'Сделать главной' }}
-					</button>
-				</div>
-			</div>
-		</div>
-	</div>
+							bsButton(
+								class="btn-dark btn-sm"
+								:disabled="file._id === $props.avatar"
+								@mouseup.prevent="() => $emit('setMain', file._id)"
+							) 💡
+								//{{ file._id === $props.avatar ? 'Главная' : 'Сделать главной' }}
 
+	//aConfirm(
+	//	class="btn btn-outline-danger btn-sm"
+	//	message="Отмена"
+	//	:onconfirm="() => $emit('remove', file._id)") 🗑
 
 </template>
 
 <style>
+
+.dropdown-menu {
+	margin: 0;
+}
 
 .item .content .img {
 	position: relative;
@@ -76,52 +69,41 @@
 }
 
 </style>
+
 <script>
 
-import iimg from './iimg.vue'
-import inplaceTextEdit from './inplaceTextEdit.vue'
-import aConfirm from './aConfirm.vue'
+import FileRemoveBtn from './FileRemoveBtn.vue'
+import bsButton from './bs/Button.vue'
+
+import File from './File.vue'
 
 export default {
+
 	name: 'filesList',
+
 	components: {
-		iimg,
-		inplaceTextEdit,
-		aConfirm,
+		File,
+		FileRemoveBtn,
+		bsButton,
 	},
+
 	model: {
 		prop: 'oid',
 	},
+
 	props: {
 		oid: [ String, undefined ],
 		avatar: String,
 	},
+
 	data () {
 		return {
-			files: [] //this.$props.files.map(oid => { oid: oid })
+			files: [], //this.$props.files.map(oid => { oid: oid })
 		}
 	},
+
 	methods: {
 
-		saveText (file) {
-
-			this.$http.post(
-				`f/${file.oid}`,
-				{
-					caption: file.caption
-				},
-				{
-					headers: {
-						'Content-Type': 'application/json'
-					}
-				}
-			).then(result => {
-				console.log('saveCaption http result', result)
-
-			}).catch(console.error)
-
-
-		},
 		removeFile (file) {
 
 			file.busy = true
@@ -139,11 +121,17 @@ export default {
 				file.busy = false
 			})
 
-		}
+		},
+
+		onFileClick (event) {
+			console.log('* <files_list.vue> onFileClick', event)
+		},
 	},
+
 	mounted () {
 
 	},
+
 	created () {
 
 		const docId = this.$props.oid
@@ -167,40 +155,6 @@ export default {
 					}
 				})
 
-				this.files.map(file => {
-
-					if (file.blob) {
-						return file
-					}
-
-					return this.$http.get(`f/${file._id}/t`, {
-						responseType: 'blob'
-					})
-					.then(response => {
-
-						var filename = response.headers.get('content-disposition') || ''
-						filename = decodeURIComponent(
-							filename.replace(
-								/^[a-z]+;filename=/,
-								''
-							)
-						)
-
-						var caption = response.headers.get('x-meta-caption') || ''
-
-						file.blob = response.body
-						file.key += '+'
-						file.size = response.body.size
-						file.type = response.headers.get('content-type')
-						file.lastModified = new Date(response.headers.get('last-modified'))
-						file.name = decodeURIComponent(filename || 'blob')
-						file.caption = decodeURIComponent(caption)
-
-					})
-					.catch(err => {
-						console.error(err)
-					})
-				})
 			})
 	}
 }
