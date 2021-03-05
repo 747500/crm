@@ -46,7 +46,7 @@ const docSearchQuery = (req, res, next) => {
 	.then(services => {
 
 		if (undefined === services.sphinxql) {
-			return new Error('"sphinxql" service is not available')
+			throw new Error('"sphinxql" service is not available')
 		}
 
 		return services
