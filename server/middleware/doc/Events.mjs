@@ -6,7 +6,7 @@ import { Doc } from '../../model/index.mjs'
 
 const Events = (req, res, next) => {
 	const userId = mongoose.Types.ObjectId(req.session.user)
-	console.log('* mw.doc.Events\n', req.query)
+	console.log('* mw.doc.Events query:', req.query)
 
 	const month = parseInt(moment(req.query.yearmonth).format('MM'))
 	console.log('* mw.doc.Events month:', month)
@@ -35,7 +35,7 @@ const Events = (req, res, next) => {
 		}
 	])
 	.then(result => {
-		console.log('* mw.doc.Events\n', result)
+		console.log('* mw.doc.Events result:', result)
 
 		res.locals.Result = result.map(i => {
 
