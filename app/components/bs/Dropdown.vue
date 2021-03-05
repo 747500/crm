@@ -81,7 +81,7 @@ export default {
 				this.expadned = false
 				this.$refs.button.$el.classList.remove('show')
 				this.$refs.menu.$el.classList.remove('show')
-			}, 100)
+			}, 75)
 		},
 	},
 
