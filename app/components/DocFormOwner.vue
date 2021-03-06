@@ -229,9 +229,6 @@
 .doc-form-owner {
 	height: 6em;
 }
-
-.doc-form-owner .select {
-}
 */
 
 .doc-form-owner .select {

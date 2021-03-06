@@ -10,13 +10,16 @@
 }
 
 div#app {
-	max-width: 65rem;
-	margin: 0 auto;
+	/*max-width: 65rem;*/
+	margin: 0;
+	padding: 0;
 }
 
+/*
 body {
 	padding: 2rem;
 }
+*/
 
 img {
 	display: block;
@@ -79,4 +82,14 @@ pre {
 .oid input {
 	border: none;
 	color: gray;
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    padding: 48px 0 0;
+    box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
 }

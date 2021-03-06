@@ -59,7 +59,7 @@
 					@click="onCreateUserCancel"
 				) Cancel
 
-		div(class="hr")
+		//div(class="hr")
 
 </template>
 
