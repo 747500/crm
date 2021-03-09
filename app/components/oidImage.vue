@@ -33,7 +33,8 @@
 				src: null,
 				alt: '',
 				key: '',
-				type: ''
+				type: '',
+				isImage: false,
 			}
 		},
 
