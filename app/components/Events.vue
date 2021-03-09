@@ -6,16 +6,27 @@
 
 			div(class="events-calendar")
 
-				FormulateInput(
-					class="selector"
-					inputClass="form-control"
-					type="month"
-					name="sample"
-					v-model="focus"
-					@input="loadEvents"
-				)/
+				div(class="toolbar mb-3")
+					button(
+						class="btn btn-outline-secondary"
+						@click="prevMonth"
+					)
+						| <<
 
-				br/
+					FormulateInput(
+						class="selector mx-3"
+						inputClass="form-control"
+						type="month"
+						name="sample"
+						v-model="focus"
+						@input="loadEvents"
+					)/
+
+					button(
+						class="btn btn-outline-secondary"
+						@click="nextMonth"
+					)
+						| >>
 
 				Calendar(
 					:now="focus"
@@ -86,6 +97,18 @@
 		},
 
 		methods: {
+
+			prevMonth () {
+				this.focus = moment(this.focus)
+						.subtract(1, 'months')
+						.format('YYYY-MM')
+			},
+
+			nextMonth () {
+				this.focus = moment(this.focus)
+						.add(1, 'months')
+						.format('YYYY-MM')
+			},
 
 			onEventClick (oid) {
 				console.log('<Events.vue> onEventClick', oid)
@@ -176,6 +199,18 @@
 </script>
 
 <style>
+
+.events .toolbar {
+	display: flex;
+}
+
+.events .toolbar > .selector {
+	flex: auto;
+}
+
+.events .toolbar > button {
+	flex: initial;
+}
 
 .events .content {
 	display: flex;
