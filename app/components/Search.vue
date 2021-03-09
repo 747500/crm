@@ -49,7 +49,7 @@
 						// @edit="(doc) => $emit('edit', doc)"
 						// @remove="(doc) => $emit('remove', doc)"
 
-						MDoc(:oid="data.item._id")/
+						MDoc(:oid="data.item._id" class="mx-3")/
 
 
 </template>
@@ -138,13 +138,34 @@
 
 		data () { return {
 
-			kind: [ this.$route.meta.kind ],
+			kind: [ ],
 			search: '',
 			result: [],
 			total_found: 0,
 			searchActive: false,
 
 		} },
+
+		/*
+		beforeRouteEnter (to, from, next) {
+			next(vm => {
+				vm.updateModel(to, from)
+			})
+		},
+		*/
+
+		/*
+		beforeRouteUpdate (to, from, next) {
+			to.searchActive = false
+			next()
+		},
+		*/
+
+		created () {
+			if (this.$route.meta.kind) {
+				this.kind = [ this.$route.meta.kind ]
+			}
+		},
 
 		methods: {
 			searchFocus () {
@@ -157,7 +178,7 @@
 
 				this.searchActive = true
 
-				this.searchInput()
+				this.searchFilter()
 			},
 
 			searchFilter () {
