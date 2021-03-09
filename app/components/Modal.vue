@@ -5,17 +5,22 @@
 	div(class="crm-modal")
 		div(class="crm-modal-dialog")
 			div(class="crm-modal-content")
-				div(class="crm-modal-header")
-					slot(name="title")
-					// h3 class="crm-modal-title"></h3
-					a(
-						v-if="$listeners.close"
-						href="#close"
-						@click.prevent="() => { $emit('close') }"
-						title="Close"
-						class="crm-modal-close"
-					)
-						| ×
+
+				div(
+					v-if="$slots.title || $listeners.close"
+					class="crm-modal-header"
+				)
+					div(class="crm-modal-title")
+						slot(name="title")
+
+					div(class="crm-modal-buttons")
+						bsButton(
+							v-if="$listeners.close"
+							@click.prevent="() => { $emit('close') }"
+							class="btn btn-outline-primary"
+						) 🗙
+						//×
+
 
 				div(class="crm-modal-body")
 					slot
@@ -53,7 +58,6 @@
 	width: auto;
 	margin: auto;
 	max-width: 75rem;
-	min-width: 50rem;
 	justify-content: space-between;
 	align-items: center;
 }
@@ -80,23 +84,12 @@
 	line-height: 1.5;
 	font-size: 1.25rem;
 	font-weight: 500;
-	/*width: 100%;*/
+	width: 100%;
+	flex: auto;
 }
 
-.crm-modal-close {
-	float: right;
-	font-family: sans-serif;
-	font-size: 24px;
-	font-weight: 700;
-	line-height: 1;
-	color: #000;
-	text-shadow: 0 1px 0 #fff;
-	opacity: .5;
-	text-decoration: none;
-}
-
-.crm-modal-close:hover {
-	text-decoration: none;
+.crm-modal-buttons {
+	flex: initial;
 }
 
 .crm-modal-body {
@@ -126,14 +119,21 @@
 	border: 1px solid rgba(0, 0, 0, .2);
 	border-radius: .3rem;
 	outline: 0;
+	height: 100%;
 }
 
 </style>
 
 <script>
 
+import bsButton from './bs/Button.vue'
+
 export default {
-	name: 'Modal'
+	name: 'Modal',
+
+	components: {
+		bsButton,
+	}
 }
 
 </script>
