@@ -3,32 +3,34 @@
 	div
 		div(class="account btn-toolbar" role="toolbar")
 
-			div(
-				class="input-group me-2"
-				role="group"
+			//div(
+			//	class="input-group me-2"
+			//	role="group"
+			//)
+			//	label(
+			//		class="input-group-text"
+			//		id="basic-addon1"
+			//		for="select-or-create-user"
+			//	)
+			//		| @
+
+			//	class="form-select"
+			select(
+				:key="selectUserKey"
+				@change="onUserChange"
+				class="btn btn-dark"
+				id="select-or-create-user"
+				aria-describedby="basic-addon1"
 			)
-				label(
-					class="input-group-text"
-					id="basic-addon1"
-					for="select-or-create-user"
+				option(value="new")
+					| <Создать>
+				option(
+					v-for="u in users"
+					:key="u._id"
+					:value="u._id"
+					:selected="u.current ? 'selected' : ''"
 				)
-					| Пользователь
-				select(
-					:key="selectUserKey"
-					@change="onUserChange"
-					class="form-select"
-					id="select-or-create-user"
-					aria-describedby="basic-addon1"
-				)
-					option(value="new")
-						| <Создать>
-					option(
-						v-for="u in users"
-						:key="u._id"
-						:value="u._id"
-						:selected="u.current ? 'selected' : ''"
-					)
-						| {{ u.name }}
+					| {{ u.name }}
 
 			form(
 				v-if="createUserShow"
