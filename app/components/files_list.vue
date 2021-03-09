@@ -6,7 +6,7 @@
 		style="max-height: calc(100vh - 15em); overflow: auto;"
 	)
 
-		FileLoader(
+		FileData(
 			:oid="file._id"
 			v-for="(file) in files.slice().reverse()"
 			:key="file.key"
@@ -66,14 +66,14 @@
 import FileRemoveBtn from './FileRemoveBtn.vue'
 import bsButton from './bs/Button.vue'
 
-import FileLoader from './FileLoader.vue'
+import FileData from './FileData.vue'
 
 export default {
 
 	name: 'filesList',
 
 	components: {
-		FileLoader,
+		FileData,
 		FileRemoveBtn,
 		bsButton,
 	},
@@ -127,7 +127,7 @@ export default {
 
 		const docId = this.$props.oid
 
-		console.log('<file_list.vue> created', docId)
+		//console.log('<file_list.vue> created', docId)
 
 		if (!docId) {
 			return
@@ -137,7 +137,7 @@ export default {
 		.get(`doc/${docId}/files`)
 		.then(response => {
 
-			console.log('<files_list> created:', response)
+			//console.log('<files_list> created:', response)
 
 			this.files = response.body.map(oid => {
 				return {

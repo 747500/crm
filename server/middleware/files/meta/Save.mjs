@@ -48,15 +48,12 @@ const Save = (req, res, next) => {
 		)
 		.then(result => {
 
-			if (null === result) { // 404
+			if (null === result || 0 === result.modifiedCount) { // 404
 				res.status(404).send('File Not Found')
 				return;
 			}
 
-			console.log('modifiedCount', result.modifiedCount)
-
-			res.send('ok')
-
+			next()
 		})
 
 	})

@@ -56,7 +56,7 @@
 		},
 
 		created () {
-			console.log('* FileRemoveBtn created', this);
+			//console.log('* FileRemoveBtn created', this);
 		}
 	}
 

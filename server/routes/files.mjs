@@ -5,16 +5,23 @@ import mw from '../middleware/index.mjs'
 
 const files = express.Router()
 
+files.get('/meta/:id',
+	mw.files.meta.Query,
+	mw.sendResultJSON
+)
+
+files.post('/meta/:id',
+	mw.files.meta.Save,
+	mw.files.meta.Query,
+	mw.sendResultJSON
+)
+
 files.get('/:id/t',
 	mw.files.thumbnails.StreamContent
 )
 
 files.get('/:id',
 	mw.files.StreamContent
-)
-
-files.post('/:id',
-	mw.files.meta.Save
 )
 
 files.delete('/:id',

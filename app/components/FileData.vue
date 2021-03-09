@@ -1,6 +1,6 @@
 <template lang="pug">
 
-	File(
+	FileItem(
 		v-if="null !== model"
 		:model="model"
 		@caption="onCaption"
@@ -13,14 +13,14 @@
 
 <script>
 
-import File from './File.vue'
+import FileItem from './FileItem.vue'
 
 export default {
 
 	name: 'FileLoader',
 
 	components: {
-		File,
+		FileItem,
 	},
 
 	props: {
@@ -44,10 +44,10 @@ export default {
 	methods: {
 
 		onCaption (text) {
-			console.log('* <File.vue> onCaption', text)
+			console.log('* <FileData.vue> onCaption', text)
 
 			this.$http.post(
-				`f/${this.model._id}`,
+				`f/meta/${this.model._id}`,
 				{
 					caption: text
 				},
@@ -72,30 +72,25 @@ export default {
 
 	created () {
 
-		console.log('* FileLoader.vue created')
+		//console.log('* FileData.vue created')
 
 		const file = {
 			_id: this.$props.oid
 		}
 
-		this.$http.get(`f/${file._id}/t`, {
-			responseType: 'blob'
-		})
+		this.$http.get(`f/meta/${file._id}`)
 		.then(response => {
 
-			const contentDisposition = response.headers.get('content-disposition') || 'blob'
-			const filename = contentDisposition.replace(/^.*;filename=/, '' )
-			const lastModified = new Date(response.headers.get('last-modified'))
-			const caption = response.headers.get('x-meta-caption') || ''
+			// console.log('* FileData.vue meta:', response)
 
-			file.blob = response.body
-			file.size = response.body.size
-			file.type = response.headers.get('content-type')
-			file.lastModified = lastModified
-			file.name = decodeURIComponent(filename)
-			file.caption = decodeURIComponent(caption)
+			file.size = response.data.length
+			file.contentType = response.data.contentType
+			file.mtime = response.data.mtime
+			file.name = response.data.filename
+			file.caption = response.data.meta.caption
 
 			this.model = file
+
 		})
 		.catch(err => {
 			console.error(err)

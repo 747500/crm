@@ -17,30 +17,44 @@ const StreamContent = (req, res, next) => {
 			_id: fileId,
 			'metadata.user': userId,
 		})
-		.then(fileinfo => {
+		.then(filemeta => {
 
-			if (null === fileinfo) { // 404
+			if (null === filemeta) { // 404
 				res.status(404).send('File Not Found')
 				return;
 			}
 
+			const [ content, type ] = filemeta.contentType.split('/')
+
 			const hasLastModified =
-					'object' === typeof fileinfo.metadata &&
-					fileinfo.metadata.lastModified instanceof Date
+					'object' === typeof filemeta.metadata &&
+					filemeta.metadata.lastModified instanceof Date
 
 			const lastModified =
 					hasLastModified ?
-					fileinfo.metadata.lastModified :
-					fileinfo.uploadDate
+					filemeta.metadata.lastModified :
+					filemeta.uploadDate
 
 			const caption =
-					querystring.escape(fileinfo.metadata.caption || '')
+					querystring.escape(filemeta.metadata.caption || '')
 
 			res.set({
-				//'Content-Length': fileinfo.length,
-				'Content-Type': 'image/jpeg',
+				//'Content-Length': filemeta.length,
 				'Last-Modified': lastModified.toISOString(),
 				'X-Meta-Caption': caption
+			})
+
+			if ('image' !== content) {
+
+				res.status(400).send({
+					error: 'Bad request: not an "Image"'
+				})
+				return
+			}
+
+			res.set({
+				//'Content-Length': filemeta.length,
+				'Content-Type': 'image/jpeg',
 			})
 
 			const stream = services.gridfs.bucket.openDownloadStream(fileId)
