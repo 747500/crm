@@ -10,7 +10,6 @@ import Nav from './components/nav.vue'
 
 import EnquiryList from './components/EnquiryList.vue'
 
-import Browser from './components/browser.vue'
 import Events from './components/Events.vue'
 
 import DocList from './components/DocList.vue'
@@ -29,17 +28,6 @@ const routes = [
 			title: '⌂',
 		},
 		children: [
-
-			{
-				title: 'Поиск',
-				name: 'browse',
-				path: '/browse',
-				component: Browser,
-				meta: {
-					title: 'Поиск',
-					icon: '🔍',
-				}
-			},
 
 			{
 				title: 'Календарь',
