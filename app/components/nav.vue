@@ -30,8 +30,8 @@
 								:key="r.name"
 							)
 								router-link(class="nav-link" :to="r.path")
-									| {{ r.meta.icon }}
-									| {{ r.meta.title }}
+									span(class="nav-icon") {{ r.meta.icon }}
+									span  {{ r.meta.title }}
 
 
 			main(class="col-md-9 ms-sm-auto col-lg-10 px-md-4")
@@ -75,6 +75,12 @@
 </script>
 
 <style>
+
+.nav-item .nav-link .nav-icon {
+	display: inline-block;
+	width: 2em;
+	text-align: center;
+}
 
 .form-control-dark {
     color: #fff;
