@@ -1,8 +1,9 @@
 <template lang="pug">
 
 	div(:class="[ 'docs', $route.meta.kind ]")
-		div(class="toolbar")
-			div(class="btn-group btn-group-sm" role="group" aria-label="")
+		div(class="toolbar py-3")
+			//btn-group-sm
+			div(class="btn-group" role="group" aria-label="")
 				button(@mouseup="createDoc" class="btn btn-primary")
 					| +
 
