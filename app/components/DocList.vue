@@ -87,7 +87,7 @@ export default {
 				}
 			})
 
-			if (flag) {
+			if (flag) { // update whole list only when new items appear
 				this.updateModel()
 			}
 		},
@@ -133,9 +133,6 @@ export default {
 
 		},
 
-		closeHandler () {
-			this.$router.go(-1) //push('.')
-		}
 	}
 }
 
