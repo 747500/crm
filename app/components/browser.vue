@@ -30,7 +30,7 @@
 
 		div(class="result")
 			List(
-				class="list"
+				class="list list-unstyled"
 				v-model="result"
 				v-slot:default="data"
 				@open="openDoc"

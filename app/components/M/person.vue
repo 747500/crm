@@ -1,5 +1,4 @@
 <template lang="pug">
-
 	div(class="m-person")
 		div
 			div(class="names")
