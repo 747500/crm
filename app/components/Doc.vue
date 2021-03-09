@@ -27,7 +27,7 @@
 	import TabView from './TabView.vue'
 
 	import DocEdit from './DocEdit.vue'
-	import filesPanel from './files_panel.vue'
+	import filesPanel from './Files/files_panel.vue'
 
 	export default {
 		name: 'Doc',

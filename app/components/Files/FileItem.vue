@@ -37,8 +37,8 @@
 
 <script>
 
-import oidImage from './oidImage.vue'
-import inplaceTextEdit from './inplaceTextEdit.vue'
+import oidImage from '../oidImage.vue'
+import inplaceTextEdit from '../inplaceTextEdit.vue'
 
 export default {
 

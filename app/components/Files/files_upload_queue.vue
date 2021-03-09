@@ -54,7 +54,7 @@
 
 import async from 'async'
 
-import iimg from './iimg.vue'
+import iimg from '../iimg.vue'
 
 export default {
 	name: 'filesUpload',

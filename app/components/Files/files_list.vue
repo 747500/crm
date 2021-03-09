@@ -63,9 +63,9 @@
 
 <script>
 
-import FileRemoveBtn from './FileRemoveBtn.vue'
-import bsButton from './bs/Button.vue'
+import bsButton from '../bs/Button.vue'
 
+import FileRemoveBtn from './FileRemoveBtn.vue'
 import FileData from './FileData.vue'
 
 export default {

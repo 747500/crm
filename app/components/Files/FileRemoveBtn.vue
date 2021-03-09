@@ -10,7 +10,7 @@
 
 <script>
 
-	import bsDropdown from './bs/Dropdown.vue'
+	import bsDropdown from '../bs/Dropdown.vue'
 
 	export default {
 

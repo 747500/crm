@@ -17,7 +17,7 @@ import FileItem from './FileItem.vue'
 
 export default {
 
-	name: 'FileLoader',
+	name: 'FileData',
 
 	components: {
 		FileItem,
