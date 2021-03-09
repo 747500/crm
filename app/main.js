@@ -25,9 +25,6 @@ Vue.http.options.credentials = true
 import VueFormulate from '@braid/vue-formulate'
 Vue.use(VueFormulate)
 
-import SelectOwner from './components/SelectOwner.vue'
-Vue.component('SelectOwner', SelectOwner)
-
 // --------------------------------------------------------------------------
 
 import router from './router.js'
