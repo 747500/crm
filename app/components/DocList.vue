@@ -1,16 +1,17 @@
 <template lang="pug">
 
-	div
+	div(:class="[ 'docs', $route.meta.kind ]")
+		div(class="toolbar")
+			div(class="btn-group btn-group-sm" role="group" aria-label="")
+				button(@mouseup="createDoc" class="btn btn-primary")
+					| +
 
 		List(
 			:key="modelKey"
-			class="list"
+			class="list list-unstyled"
 			v-model="model"
 			v-slot:default="props"
-			@create="createDoc"
-			@open="openDoc"
-			@edit="editDoc"
-			@remove="removeDoc"
+			@open="editDoc"
 		)
 			MDoc(:oid="props.item._id" :key="props.item.key")
 
@@ -20,6 +21,9 @@
 
 <style>
 
+.m-doc {
+	cursor: pointer;
+}
 
 </style>
 
@@ -105,14 +109,6 @@ export default {
 			this.$router.push({
 				path: `${kind}/${item._id}`
 			})
-		},
-
-		removeDoc(item) {
-			console.log('<DocList.vue> on removeDoc', item)
-		},
-
-		openDoc (item) {
-			console.log('<DocList.vue> on openDoc', item)
 		},
 
 		updateModel () {
