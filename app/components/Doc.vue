@@ -1,6 +1,6 @@
 <template lang="pug">
 
-	Modal(@close="closeEdit" :class="this.model.kind")
+	Modal(@close="closeEdit" class="doc" :class="this.model.kind")
 
 		template(v-slot:title)
 			TabView(
@@ -8,14 +8,13 @@
 				@tab="tab => { tabView = tab }"
 			)/
 
-		div(class="doc")
-			component(
-				v-if="tabView"
-				:is="tabView.component"
-				:model="model"
-				:key="model._id + '-' + model.mtime"
-				@update="onUpdate"
-			)/
+		component(
+			v-if="tabView"
+			:is="tabView.component"
+			:model="model"
+			:key="model._id + '-' + model.mtime"
+			@update="onUpdate"
+		)/
 
 </template>
 
@@ -155,18 +154,19 @@
 
 <style>
 
-.crm-modal .crm-modal-dialog {
+.crm-modal.doc > .crm-modal-dialog {
 	max-height: 95vh;
+	max-width: 95vw;
 }
 
-.crm-modal.person .crm-modal-dialog {
+.crm-modal.person > .crm-modal-dialog {
 	width: 55rem;
-	min-height: 75vh;
+	height: 50rem;
 }
 
-.crm-modal.property .crm-modal-dialog {
+.crm-modal.property > .crm-modal-dialog {
 	width: 75rem;
-	height: 75vh;
+	height: 50rem;
 }
 
 
