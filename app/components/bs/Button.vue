@@ -4,6 +4,7 @@
 	button(
 		class="btn"
 		:id="id"
+		@click="event => $emit('click', event)"
 		@mouseup="event => $emit('mouseup', event)"
 		@blur="event => $emit('blur', event)"
 	)
