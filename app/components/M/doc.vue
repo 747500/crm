@@ -1,13 +1,13 @@
 <template lang="pug">
 
-	div(
+	bsCard(
 		:id="model._id"
-		:class="[ 'm-doc', model.kind, 'card', 'mb-3' ]"
+		:class="[ 'm-doc', model.kind, 'mb-3' ]"
 		v-on="$listeners.open ? { click: () => $emit('open', model._id) } : {}"
 		@mouseover="onMouseover"
 		@mouseout="onMouseout"
 	)
-		div(class="card-header") Header
+		bsCardHeader Header
 
 		div(class="row g-0")
 			component(
@@ -22,6 +22,9 @@
 </template>
 
 <script>
+
+import bsCard from '../bs/Card.vue'
+import bsCardHeader from '../bs/CardHeader.vue'
 
 import MPicture from './picture.vue'
 import MPerson from './person.vue'
@@ -80,6 +83,8 @@ export default {
 	name: 'doc',
 
 	components: {
+		bsCard,
+		bsCardHeader,
 		MPicture,
 		MPerson,
 		MProperty,
@@ -118,7 +123,7 @@ export default {
 		kindSchema () {
 			//console.log('kindSchema', KindSchema[this.model.kind])
 			return KindSchema[this.model.kind]
-		}
+		},
 	},
 
 	methods: {
