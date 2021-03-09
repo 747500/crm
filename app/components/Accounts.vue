@@ -32,34 +32,36 @@
 				)
 					| {{ u.name }}
 
-			form(
-				v-if="createUserShow"
-				@submit.prevent="onUserCreate"
-				class="input-group me-2"
-				role="group"
-			)
-				label(
-					class="input-group-text"
-					id="basic-addon2"
-					for="input-new-user-name"
-				) Имя
-				input(
-					id="input-new-user-name"
-					type="text"
-					class="form-control"
-					aria-describedby="basic-addon2"
-					@input="onCreateUserChange"
-				)/
-				button(
-					class="btn btn-primary"
-					type="submit"
-					:disabled="createUserOk"
-				) Ok
-				button(
-					class="btn btn-outline-primary"
-					type="button"
-					@click="onCreateUserCancel"
-				) Cancel
+			Modal(v-if="createUserShow")
+				template(slot="title")
+					h4 Новый пользователь
+				form(
+					@submit.prevent="onUserCreate"
+					class="input-group me-2"
+					role="group"
+				)
+					label(
+						class="input-group-text"
+						id="basic-addon2"
+						for="input-new-user-name"
+					) Имя
+					input(
+						id="input-new-user-name"
+						type="text"
+						class="form-control"
+						aria-describedby="basic-addon2"
+						@input="onCreateUserInput"
+					)/
+					button(
+						class="btn btn-primary"
+						type="submit"
+						:disabled="createUserOk"
+					) Ok
+					button(
+						class="btn btn-outline-primary"
+						type="button"
+						@click="onCreateUserCancel"
+					) Cancel
 
 		//div(class="hr")
 
@@ -67,11 +69,14 @@
 
 <script>
 
+	import Modal from './Modal.vue'
+
 	export default {
 
 		name: 'Accounts',
 
 		components: {
+			Modal,
 		},
 
 		data () {
@@ -154,13 +159,14 @@
 				.catch(err => console.error(err))
 			},
 
-			onCreateUserChange (event) {
+			onCreateUserInput (event) {
 				const username = event.target.value
 
 				this.createUserOk = username ? false : true
 			},
 
 			onCreateUserCancel () {
+				this.createUserOk = false
 				this.createUserShow = false
 				this.selectUserKey = Date.now()
 			}
