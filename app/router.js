@@ -48,6 +48,7 @@ const routes = [
 				meta: {
 					title: 'Заявки',
 					icon: '📋',
+					kind: 'enquiry',
 				},
 				/*
 				children: [
