@@ -68,7 +68,6 @@
 	border: 1px solid var(--border-color);
 	display: inline-block;
 	width: 12em;
-	overflow: hidden;
 	position: relative;
 }
 
@@ -111,12 +110,6 @@
 	top: 0px;
 	left: 0px;
 	right: 0px;
-	overflow: hidden;
-}
-
-.files-list .item .tools > *{
-	display: block;
-	margin: 0.25em;
 }
 
 .files-list .item .toolbar:hover {
@@ -124,11 +117,15 @@
 }
 
 .files-list .item .toolbar .tools {
-	text-align: center;
 	margin: 0.33em;
 	text-shadow: 1px 0px 3px #fff, -1px 0px 3px #fff, 0px 1px 3px #fff, 0px -1px 3px #fff;
 	visibility: hidden;
 	display: flex;
+}
+
+.files-list .item .toolbar .tools > *{
+	display: block;
+	margin: 0.25em;
 }
 
 .files-list .item .toolbar:hover .tools {

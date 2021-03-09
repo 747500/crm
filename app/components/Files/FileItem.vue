@@ -18,19 +18,11 @@
 				div(class="lamp") 💡
 
 			div(class="text")
-
-				// div(class="oid") {{ file._id }}
-				// div(style="width: 95%; overflow: hidden;") {{ file.name }}
-				// div {{ new Date(file.lastModified).toLocaleString() }}
-				// div {{ file.size }}
-
 				inplaceTextEdit(
 					@savetext="text => $emit('caption', text)"
 					v-model="model.caption"
 					label="🖉"
 				)/
-
-		slot(name="toolbar")
 
 </template>
 

@@ -1,12 +1,8 @@
 <template lang="pug">
 
-	FileItem(
-		v-if="null !== model"
-		:model="model"
-		@caption="onCaption"
-	)
-		template(slot="toolbar")
-			slot(name="toolbar")
+	div
+		slot(v-bind:file="model")
+			pre {{ model }}
 
 </template>
 
@@ -43,31 +39,6 @@ export default {
 
 	methods: {
 
-		onCaption (text) {
-			console.log('* <FileData.vue> onCaption', text)
-
-			this.$http.post(
-				`f/meta/${this.model._id}`,
-				{
-					caption: text
-				},
-				{
-					headers: {
-						'Content-Type': 'application/json'
-					}
-				}
-			).then(result => {
-				const key = Date.now()
-
-				console.log('saveCaption http result', result)
-
-				this.model.caption = text
-				this.model.lastModified = new Date()
-
-			}).catch(console.error)
-
-		},
-
 	},
 
 	created () {
@@ -85,6 +56,7 @@ export default {
 
 			file.size = response.data.length
 			file.contentType = response.data.contentType
+			file.ctime = response.data.ctime
 			file.mtime = response.data.mtime
 			file.name = response.data.filename
 			file.caption = response.data.meta.caption
