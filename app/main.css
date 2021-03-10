@@ -74,16 +74,6 @@ pre {
 	margin: 0;
 }
 
-.oid {
-	color: gray;
-	font-size: smaller;
-}
-
-.oid input {
-	border: none;
-	color: gray;
-}
-
 .sidebar {
     position: fixed;
     top: 0;
