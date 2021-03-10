@@ -1,5 +1,5 @@
 <template lang="pug">
-	div(class="card")
+	div(class="card" v-on="$listeners")
 		slot
 </template>
 
@@ -8,6 +8,7 @@
 export default {
 
 	name: 'bsCard',
+
 }
 
 </script>
