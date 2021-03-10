@@ -16,18 +16,18 @@
 			role="group"
 			aria-label="Toolbar"
 		)
-			button(
-				class="btn btn-secondary"
+			bsButton(
+				class="btn-secondary"
 				type="file"
 				name="upload"
 				multiple
-				@click="event => this.$refs.addFile.click(event)"
+				@mouseup="event => this.$refs.addFile.click(event)"
 			)
 				| Выбрать
 
-			button(
-				class="btn btn-primary"
-				@click="upload"
+			bsButton(
+				class="btn-primary"
+				@mouseup="upload"
 				:disabled="!queue.length"
 			)
 				| Загрузить
@@ -55,11 +55,13 @@
 import async from 'async'
 
 import iimg from '../iimg.vue'
+import bsButton from '../bs/Button.vue'
 
 export default {
 	name: 'filesUpload',
 	components: {
-		iimg
+		iimg,
+		bsButton,
 	},
 	model: {
 		prop: 'oid',
