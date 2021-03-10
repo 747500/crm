@@ -19,7 +19,7 @@
 
 			div(class="text")
 				inplaceTextEdit(
-					@savetext="text => $emit('caption', text)"
+					@savetext="text => $emit('caption', { _id: model._id, caption: text })"
 					v-model="model.caption"
 					label="🖉"
 				)/

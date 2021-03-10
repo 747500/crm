@@ -87,13 +87,13 @@ export default {
 
 	methods: {
 
-		onCaption (text) {
-			console.log('* <FileData.vue> onCaption', text)
+		onCaption (item) {
+			console.log('* <FileData.vue> onCaption', item)
 
 			this.$http.post(
-				`f/meta/${this.model._id}`,
+				`f/meta/${item._id}`,
 				{
-					caption: text
+					caption: item.caption
 				},
 				{
 					headers: {
@@ -101,12 +101,8 @@ export default {
 					}
 				}
 			).then(result => {
-				const key = Date.now()
 
 				console.log('saveCaption http result', result)
-
-				this.model.caption = text
-				this.model.lastModified = new Date()
 
 			}).catch(console.error)
 
