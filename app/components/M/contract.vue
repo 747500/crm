@@ -1,39 +1,36 @@
-<template>
+<template lang="pug">
 
-	<div class="m-contract">
-		<div class="data">
+	bsCard(
+		class="m-contract"
+		v-on="$listeners"
+	)
+		bsCardBody
 			<pre>{{ $props.model }}</pre>
-		</div>
-	</div>
 
 </template>
 
 <script>
 
-	export default {
+import bsCard from '../bs/Card.vue'
+import bsCardBody from '../bs/CardBody.vue'
 
-		name: 'MContract',
+export default {
 
-		props: {
-			model: Object,
-		},
+	name: 'MContract',
 
-	}
+	components: {
+		bsCard,
+		bsCardBody,
+	},
+
+	props: {
+		model: Object,
+	},
+
+}
 
 </script>
 
 <style>
-
-.m-contract {
-	display: flex;
-}
-
-.m-contract .icon {
-	flex: 1;
-}
-
-.m-contract .data {
-	flex: 20;
-}
 
 </style>

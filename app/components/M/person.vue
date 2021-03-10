@@ -1,71 +1,54 @@
 <template lang="pug">
-	div(class="m-person")
-		div
-			div(class="names")
-				| {{ person.lastName }}
-				| {{ person.firstName }}
-				| {{ person.middleName }}
 
-			ul(class="contacts")
-				li(v-for="c in person.contact" :key="c._id")
-					span {{ c.data }}
-					span(v-if="c.description") ({{ c.description }})
-		div
-			span {{ person.comments }}
+	bsCard(
+		v-if="model"
+		v-on="$listeners"
+		class="m-person"
+	)
+		bsCardHeader
+				| {{ model.person.lastName }}
+				| {{ model.person.firstName }}
+				| {{ model.person.middleName }}
+
+		div(class="row g-0")
+			div(class="col-md-3")
+				bsCardImage(class="m-picture")
+					oidImage(:oid="model.mainPicture")/
+
+			div(class="col-md-9")
+				bsCardBody
+					ul(class="contacts")
+						li(v-for="c in model.person.contact" :key="c._id")
+							span {{ c.data }}
+							span(v-if="c.description") ({{ c.description }})
+					div
+						span {{ model.person.comments }}
 
 </template>
 
 <script>
 
-	const schema = {
-		person: {
-			template: 'MPerson'
-		}
-	}
+	import bsCard from '../bs/Card.vue'
+	import bsCardHeader from '../bs/CardHeader.vue'
+	import bsCardImage from '../bs/CardImage.vue'
+	import bsCardBody from '../bs/CardBody.vue'
 
 	import oidImage from '../oidImage.vue'
 
 	export default {
+
 		name: 'MPerson',
 
 		components: {
+			oidImage,
+			bsCardBody,
+			bsCardImage,
+			bsCardHeader,
+			bsCard,
 		},
 
 		props: {
-			model: [ Object, String ],
-		},
-
-		data () {
-			return {
-				key: null,
-				person: {},
-			}
-		},
-
-		mounted () {
-
-			//console.log('<M/person.vue> mounted', this.$props)
-
-			if ('string' === typeof this.$props.model) {
-
-				this.$http.get(`doc/${this.$props.model}`)
-				.then(response => {
-					//console.log('<M/person.vue>', response)
-					this.person = response.body.person
-
-					//this.key = '' + this.person._id + '-' + this.person.mtime.getTime()
-				})
-				.catch(console.error)
-
-			}
-
-			if ('object' === typeof this.$props.model) {
-				this.person = this.$props.model
-			}
-
-		},
-
-		computed: {
+			model: Object,
 		},
 
 	}

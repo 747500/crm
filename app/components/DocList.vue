@@ -2,7 +2,6 @@
 
 	div(:class="[ 'docs', $route.meta.kind ]")
 		div(class="toolbar py-3")
-			//btn-group-sm
 			div(class="btn-group" role="group" aria-label="")
 				button(@mouseup="createDoc" class="btn btn-primary")
 					| +
@@ -12,9 +11,14 @@
 			class="list list-unstyled"
 			v-model="model"
 			v-slot:default="props"
-			@open="editDoc"
 		)
-			MDoc(:oid="props.item._id" :key="props.item.key")
+			MDoc(
+				:oid="props.item._id"
+				:key="props.item.key"
+				@open="editDoc"
+				@mouseover="onMouseover"
+				@mouseout="onMouseout"
+			)
 
 		router-view(:key="$route.fullPath" @update="updateDoc")/
 
@@ -71,6 +75,14 @@ export default {
 	},
 
 	methods: {
+
+		onMouseover (event) {
+			event.target.classList.add('border-primary')
+		},
+
+		onMouseout (event) {
+			event.target.classList.remove('border-primary')
+		},
 
 		updateDoc(doc) {
 			var flag = true

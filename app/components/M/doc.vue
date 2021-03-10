@@ -1,23 +1,13 @@
 <template lang="pug">
 
-	bsCard(
+	component(
+		:is="kindSchema"
+		:model="model"
 		:id="model._id"
 		:class="[ 'm-doc', model.kind, 'mb-3' ]"
-		v-on="$listeners.open ? { click: () => $emit('open', model._id) } : {}"
-		@mouseover="onMouseover"
-		@mouseout="onMouseout"
-	)
-		bsCardHeader Header
-
-		div(class="row g-0")
-			component(
-				v-for="(s) in kindSchema"
-				:key="s.model"
-				:class="s.class"
-				:is="s.component"
-				:model="'contract' == s.model ? model : model[s.model]"
-				:placeholder="s.placeholder"
-			)/
+		@click="() => $emit('open', model)"
+		v-on="$listeners"
+	)/
 
 </template>
 
@@ -26,57 +16,18 @@
 import bsCard from '../bs/Card.vue'
 import bsCardHeader from '../bs/CardHeader.vue'
 
-import MPicture from './picture.vue'
 import MPerson from './person.vue'
 import MProperty from './property.vue'
 import MContract from './contract.vue'
+
 import SPerson from '../S/person.vue'
 
+
 const KindSchema = {
-	person: [
-		{
-			model: 'mainPicture',
-			component: 'MPicture',
-			class: 'col-md-3',
-		},
-		{
-			model: 'person',
-			component: 'MPerson',
-			class: 'col-md-9',
-		},
-	],
-	property: [
-		{
-			model: 'mainPicture',
-			component: 'MPicture',
-			class: 'col-md-3',
-		},
-		{
-			model: 'property',
-			component: 'MProperty',
-			class: 'col-md-4',
-		},
-		{
-			model: 'owner',
-			component: 'SPerson',
-			class: 'col-md-5',
-		},
-	],
-	contract: [
-		{
-			model: 'contract',
-			component: 'MContract',
-			icon: '📄',
-			class: 'col-md-12',
-		}
-	],
+	person: 'MPerson',
+	property: 'MProperty',
+	contract: 'MContract',
 }
-
-import async from 'async'
-
-import Person from './person.vue'
-import Property from './property.vue'
-import Contract from './contract.vue'
 
 export default {
 
@@ -85,7 +36,6 @@ export default {
 	components: {
 		bsCard,
 		bsCardHeader,
-		MPicture,
 		MPerson,
 		MProperty,
 		MContract,
@@ -103,6 +53,7 @@ export default {
 	},
 
 	created () {
+
 		const docId = this.$props.oid
 
 		if (!docId) {
@@ -128,13 +79,6 @@ export default {
 
 	methods: {
 
-		onMouseover (event) {
-			event.target.classList.add('border-primary')
-		},
-
-		onMouseout (event) {
-			event.target.classList.remove('border-primary')
-		},
 	}
 }
 </script>
