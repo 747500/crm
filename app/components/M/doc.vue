@@ -20,8 +20,6 @@ import MPerson from './person.vue'
 import MProperty from './property.vue'
 import MContract from './contract.vue'
 
-import SPerson from '../S/person.vue'
-
 
 const KindSchema = {
 	person: 'MPerson',
@@ -39,7 +37,6 @@ export default {
 		MPerson,
 		MProperty,
 		MContract,
-		SPerson,
 	},
 
 	props: {
