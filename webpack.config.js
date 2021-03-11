@@ -28,17 +28,17 @@ module.exports = {
 			{
 				test: /\.css$/i,
 				use: [
-					'vue-style-loader',
+					// 'vue-style-loader',
 					{
 						loader: MiniCssExtractPlugin.loader,
 						options: {
 							publicPath: 'public',
 						},
 					},
-					//'style-loader',
+					// 'style-loader',
 					'css-loader'
 				],
-			}
+			},
 			/*{
 				test: /\.css$/,
 				//loader: 'style!css',

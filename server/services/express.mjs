@@ -30,8 +30,7 @@ import bodyParser from 'body-parser'
 import cookieParser from 'cookie-parser'
 
 // https://github.com/jdesboeufs/connect-mongo
-import connectMongo from 'connect-mongo'
-const MongoStore = connectMongo.default
+import MongoStore from 'connect-mongo'
 
 import CONFIG from '../config.js'
 
