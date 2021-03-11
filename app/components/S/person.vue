@@ -39,7 +39,7 @@
 
 		mounted () {
 
-			//console.log('<M/person.vue> mounted', this.$props)
+			//console.log('<S/person.vue> mounted', this.$props)
 
 			if ('string' === typeof this.$props.model) {
 
