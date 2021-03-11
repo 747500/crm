@@ -66,7 +66,7 @@ const routes = [
 			},
 
 			{
-				name: 'contract',
+				name: 'contractList',
 				path: '/contract',
 				component: DocList,
 				props: true,
@@ -77,20 +77,19 @@ const routes = [
 				},
 				children: [
 					{
-						name: 'contract_edit',
+						name: 'contract', // kind
 						path: ':id',
 						component: Doc,
 						props: true,
 						meta: {
 							title: '📄 Сделка',
-							kind: 'contract',
 						},
 					}
 				]
 			},
 
 			{
-				name: 'property',
+				name: 'propertyList',
 				path: '/property',
 				props: true,
 				component: DocList,
@@ -101,13 +100,12 @@ const routes = [
 				},
 				children: [
 					{
-						name: 'property_edit',
+						name: 'property', // kind
 						path: ':id',
 						component: Doc,
 						props: true,
 						meta: {
 							title: '🏠 Объект',
-							kind: 'property',
 						},
 					}
 				]
@@ -115,7 +113,7 @@ const routes = [
 
 			{
 				title: 'Контакты',
-				name: 'person',
+				name: 'personList',
 				path: '/person',
 				component: DocList,
 				props: true,
@@ -126,13 +124,12 @@ const routes = [
 				},
 				children: [
 					{
-						name: 'person_edit',
+						name: 'person', // kind
 						path: ':id',
 						component: Doc,
 						props: true,
 						meta: {
 							title: '👤 Контакт',
-							kind: 'person',
 						},
 					}
 				]

@@ -47,7 +47,6 @@
 		},
 
 		props: {
-			kind: String
 		},
 
 		computed: {
@@ -85,18 +84,20 @@
 		mounted () {
 			//console.log('<Doc.vue> mounted', this.$route.params, this.$props)
 
-			if ('new' === this.$route.params.id) {
-				this.model = {
-					_id: null,
-					kind: this.$route.meta.kind,
-				}
+			if (this.$route.params.id) {
+
+				this.$http.get(`doc/${this.$route.params.id}`)
+				.then(response => this.setDocData(response.body))
+				.catch(console.error)
+
 				return
 			}
 
-			this.$http
-			.get(`doc/${this.$route.params.id}`)
-			.then(response => this.setDocData(response.body))
-			.catch(console.error)
+			// new
+			this.model = {
+				_id: null,
+				kind: this.$route.name,
+			}
 
 		},
 

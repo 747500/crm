@@ -7,7 +7,6 @@
 					| +
 
 		List(
-			:key="modelKey"
 			class="list list-unstyled"
 			v-model="model"
 			v-slot:default="props"
@@ -20,7 +19,7 @@
 				@mouseout="onMouseout"
 			)
 
-		router-view(:key="$route.fullPath" @update="updateDoc")/
+		router-view(:key="$route.fullPath" @update="updateModel")/
 
 </template>
 
@@ -48,19 +47,12 @@ export default {
 	data () {
 		return  {
 			model: [],
-			modelKey: null,
 		}
-	},
-
-	on: {
-		listChange (event) {
-			console.log('<DocList.vue> on listChange', event)
-		},
 	},
 
 	beforeRouteEnter (to, from, next) {
 		next(vm => {
-			vm.updateModel(to, from)
+			vm.initModel(to, from)
 		})
 	},
 
@@ -84,34 +76,34 @@ export default {
 			event.target.classList.remove('border-primary')
 		},
 
-		updateDoc(doc) {
+		itemKey (item) {
+			const ts = new Date(item.mtime).getTime()
+			return `${item._id}-${ts}`
+		},
+
+		updateModel(doc) {
 			var flag = true
 
 			//console.log('* <DocList.vue> on updateDoc', doc)
 
 			this.model.forEach(item => {
 				if (item._id === doc._id) {
-					const ts = new Date(doc.mtime).getTime()
-					const key = `${doc._id}-${ts}`
 					flag = false
-					item.key = key
-					//console.log('* <DocList.vue>', item.key, '>', key)
+					item.key = this.itemKey(doc)
 				}
 			})
 
-			if (flag) { // update whole list only when new items appear
-				this.updateModel()
+			if (flag) { // append if not updated
+				this.model.unshift({
+					_id: doc._id,
+					key: this.itemKey(doc),
+				})
 			}
 		},
 
 		createDoc() {
-			const kind = this.$route.meta.kind
-			//console.log('<DocList.vue> on createDoc')
 			this.$router.push({
-				path: `${kind}/new`,
-				props: {
-					model: kind
-				}
+				name: this.$route.meta.kind
 			})
 		},
 
@@ -124,18 +116,16 @@ export default {
 			})
 		},
 
-		updateModel () {
+		initModel () {
 			const kind = this.$route.meta.kind
 
 			this.$http
 			.get(`doc/list/${kind}`)
 			.then(response => {
-				this.modelKey = Date.now()
 				this.model = response.body.map(item => {
-					const ts = new Date(item.mtime).getTime()
 					return {
 						_id: item._id,
-						key: `${item._id}-${ts}`,
+						key: this.itemKey(item),
 					}
 				})
 			})
