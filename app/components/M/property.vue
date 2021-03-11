@@ -14,8 +14,10 @@
 
 			div(class="col-md-9")
 				bsCardBody
-					| {{ model.property.price | currency('₽', 2) }}
+					div
+						| {{ model.property.price | currency('₽', 2) }}
 
+					SPerson(:model="model.owner")/
 </template>
 
 <script>
@@ -27,6 +29,8 @@ import bsCardBody from '../bs/CardBody.vue'
 
 import oidImage from '../oidImage.vue'
 
+import SPerson from '../S/person.vue'
+
 export default {
 
 	name: 'MProperty',
@@ -37,6 +41,7 @@ export default {
 			bsCardImage,
 			bsCardHeader,
 			bsCard,
+			SPerson,
 	},
 
 	props: {
