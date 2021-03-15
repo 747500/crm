@@ -20,7 +20,7 @@
 <script>
 
 /*
-	[
+	schema: [
 		{
 			component: 'name',
 			title: 'Text',
