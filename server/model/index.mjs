@@ -10,7 +10,7 @@ import * as virtuals from './virtuals/index.mjs'
 //
 //  Types
 //
-mongoose.Schema.Types.Text = types.Text;
+mongoose.Schema.Types.Text = types.Text
 
 
 //
