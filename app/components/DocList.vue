@@ -25,6 +25,10 @@
 
 <style>
 
+.docs {
+	max-width: 800px;
+}
+
 .m-doc {
 	cursor: pointer;
 }
