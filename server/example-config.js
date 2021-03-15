@@ -1,6 +1,10 @@
 
 module.exports = {
 
+	AMQP: {
+		url: 'amqp://127.0.0.1'
+	},
+
 	SphinxQL: {
 		address: '127.0.0.1',
 		port: '9306',
