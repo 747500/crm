@@ -15,7 +15,10 @@ const ResolveSchema = (req, res, next) => {
 	res.locals.kind = sName
 
 	if (! res.locals.Schema ) {
-		next(Error(`Undefined Schema: ${sName}`))
+		res.status(400).send({
+			status: 400,
+			message: `Unknown Schema: "${sName}"`
+		})
 		return
 	}
 
