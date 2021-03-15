@@ -1,5 +1,6 @@
 
 
+import rabbitmq from './rabbitmq.mjs'
 import sphinx from './sphinx.mjs'
 import mongodb from './mongodb.mjs'
 import gridfs from './gridfs.mjs'
@@ -7,6 +8,7 @@ import express from './express.mjs'
 import events from './events.mjs'
 
 const Services = [
+	rabbitmq,
 	sphinx,
 	mongodb,
 	gridfs,
