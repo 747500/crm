@@ -1,6 +1,7 @@
 <template lang="pug">
 
 	div(
+		ref="rootEl"
 		:id="model._id"
 		:key="model._id"
 		:class="[ 's-doc', model.kind, { 'clickable': $listeners.open } ]"
@@ -79,13 +80,11 @@ export default {
 
 	props: {
 		oid: String,
-		schema: Object,
 	},
 
 	data () {
 		return {
 			model: {},
-			options: this.$props.schema
 		}
 	},
 
@@ -102,7 +101,14 @@ export default {
 			//console.log(response.body)
 			this.model = response.body
 		})
-		.catch(console.error)
+		.catch(err => {
+			if (404 === err.status) {
+				this.$refs.rootEl.classList.add('d-none')
+			}
+			else {
+				console.error('SDoc', err)
+			}
+		})
 
 	},
 
