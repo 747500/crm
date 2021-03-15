@@ -44,7 +44,7 @@
 				class="fileinfo"
 			)
 				pre {{ fi }}
-				div(style="text-align: right;")
+				div
 					bsButton(class="btn-primary" @click="() => { file.showInfo = false }")
 						| Закрыть
 </template>
@@ -171,6 +171,20 @@ export default {
 .crm-modal.fileinfo > .crm-modal-dialog {
 	width: 32rem;
 	height: 24rem;
+}
+
+.crm-modal.fileinfo .crm-modal-body {
+	display: flex;
+	flex-direction: column;
+}
+
+.crm-modal.fileinfo .crm-modal-body > pre {
+	flex: auto;
+}
+
+.crm-modal.fileinfo .crm-modal-body > div {
+	flex: initial;
+	text-align: right;
 }
 
 .dropdown-menu {
