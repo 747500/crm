@@ -3,7 +3,9 @@ import mongoose from 'mongoose'
 
 const schema = new mongoose.Schema(
 	{
-		name: String
+		name: String,
+		notifyBirthdayAt: String,
+		notifyTelegramId: String,
 	},
 	{
 		discriminatorKey: 'kind',

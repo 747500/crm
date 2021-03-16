@@ -13,14 +13,23 @@ Users.get('/list',
 	mw.user.List
 )
 
+Users.put('/',
+	mw.user.Create
+)
+
+Users.post('/',
+	mw.user.Load,
+	mw.user.Update,
+	mw.user.Save,
+	mw.user.AsResult,
+	mw.sendResultJSON
+)
+
 Users.get('/info',
 	mw.user.Load,
 	mw.user.AsResult,
 	mw.sendResultJSON
 )
 
-Users.put('/',
-	mw.user.Create
-)
 
 export default Users
