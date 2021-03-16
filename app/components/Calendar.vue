@@ -11,7 +11,7 @@
                     :key="week.start + ' ' + d.num"
                     :class="[ 'day', { 'holiday': d.holiday }, { 'disabled': d.disabled }, { 'selected': d.selected } ]"
                     @click="() => onDayClick(d)"
-                    )
+                )
                     div(class="num") {{ d.num }}
                     div(class="events") {{ d.events.birthday ? '🎁' : '' }}
 
@@ -150,6 +150,7 @@
     line-height: 1.5em;
     height: 2em;
     text-align: center;
+    margin: 0 3px;
 }
 
 .calendar > .page > .week {
@@ -162,8 +163,8 @@
     flex: 1;
     line-height: 1.5em;
     height: 3.5em;
-    border: 1px solid #ddd;
-    margin: 1px;
+    border-top: 2px solid #ddd;
+    margin: 0 3px;
     padding: 0.25em;
     cursor: pointer;
 }
