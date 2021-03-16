@@ -13,6 +13,12 @@ Users.get('/list',
 	mw.user.List
 )
 
+Users.get('/info',
+	mw.user.Load,
+	mw.user.AsResult,
+	mw.sendResultJSON
+)
+
 Users.put('/',
 	mw.user.Create
 )

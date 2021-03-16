@@ -15,6 +15,8 @@ import Events from './components/Events.vue'
 import DocList from './components/DocList.vue'
 import Doc from './components/Doc.vue'
 
+import Settings from './components/Settings.vue'
+
 // --------------------------------------------------------------------------
 
 Vue.use(VueRouter)
@@ -134,6 +136,18 @@ const routes = [
 					}
 				]
 			},
+
+			{
+				name: 'settings',
+				path: '/settings',
+				component: Settings,
+				props: true,
+				meta: {
+					title: 'Настройки',
+					icon: '⚙️',
+					section: true
+				},
+			}
 
 		]
 	}

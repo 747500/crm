@@ -25,14 +25,13 @@
 					div(class="position-sticky pt-3")
 						ul(class="nav flex-column")
 							li(
-								class="mb-1 nav-item"
 								v-for="r in $router.options.routes[0].children"
 								:key="r.name"
+								:class="[ 'nav-item', 'mb1', { 'mt-4': r.meta.section } ]"
 							)
 								router-link(class="nav-link" :to="r.path")
 									span(class="nav-icon") {{ r.meta.icon }}
 									span  {{ r.meta.title }}
-
 
 				main(class="col-md-9 ms-sm-auto col-lg-10 px-md-4")
 					router-view()/
