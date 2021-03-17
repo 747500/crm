@@ -14,7 +14,7 @@
 					div(class="mb-3")
 						div(class="from-text" v-if="!userinfo.notifyTelegramId")
 							div(class="text-muted my-2")
-								a(href="tg://resolve?domain=crm_bot" class="ext-link") Бот
+								a(href="tg://resolve?domain=crm_untyped_net_bot" class="ext-link") Бот
 								span не привязан. Для привязки:
 								div
 									code /auth {{ userinfo._id }}
