@@ -3,6 +3,7 @@
 Prereq:
 
 - server/config.js (from server/example-config.js)
+- https://github.com/747500/crm-telegram-bot
 - RabbitMQ
 - MongoDB
 - Sphinx with rtindex:
