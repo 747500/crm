@@ -21,7 +21,9 @@ const service = {
 		).then(mongodb => {
 
 			return {
-				connection: mongodb.connection,
+
+				connection: mongodb.connection, // for services.gridfs
+
 				authTelegramBot (userId, telegramId, callback) {
 
 					console.log('* onBotAuth:', userId, telegramId)

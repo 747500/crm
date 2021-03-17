@@ -16,10 +16,7 @@ AMQPService.prototype.onBotAuth = function (callback) {
 		message => {
 
 			callback(
-				{
-					cookie: message.content.toString(),
-					telegramId: message.properties.correlationId,
-				},
+				message,
 				(err) => {
 					var replyMessage = 'Ok'
 

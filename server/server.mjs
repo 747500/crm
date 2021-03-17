@@ -12,8 +12,14 @@ Services.Run()
 	services.express.use(express.static('public'))
 	services.express.use('/api/v0', api)
 
-	services.amqp.onBotAuth((req, next) => {
-		services.mongodb.authTelegramBot(req.cookie, req.telegramId, next)
+	services.amqp.onBotAuth((message, next) => {
+		// TODO to refactor to middleware?
+
+		services.mongodb.authTelegramBot(
+			message.content.toString(), // mongodb user _id
+			message.properties.correlationId, // telegram user id
+			next
+		)
 	})
 
 })
