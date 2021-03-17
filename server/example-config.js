@@ -2,7 +2,16 @@
 module.exports = {
 
 	AMQP: {
-		url: 'amqp://127.0.0.1'
+		url: 'amqp://127.0.0.1',
+
+		// to receive auth requests
+		// queue to reply to comes from message.preferences.replyTo
+		authQueue: {
+			name: 'crm_bot_auth',
+			properties: {
+				durable: true,
+			},
+		}
 	},
 
 	SphinxQL: {
@@ -23,7 +32,7 @@ module.exports = {
 		port: 3000,
 		Session: {
 			secret: '!!! CHANGE ME !!!',
-			maxAge: 60000
+			maxAge: 60 * 1000
 		}
 	},
 

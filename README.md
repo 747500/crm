@@ -2,7 +2,8 @@
 
 Prereq:
 
-- server/config.js (from server/config.js.example)
+- server/config.js (from server/example-config.js)
+- RabbitMQ
 - MongoDB
 - Sphinx with rtindex:
 ```
