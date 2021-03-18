@@ -4,14 +4,16 @@ module.exports = {
 	AMQP: {
 		url: 'amqp://127.0.0.1',
 
-		// to receive auth requests
-		// queue to reply to comes from message.preferences.replyTo
+		// Queue to receive auth requests from bot users
 		authQueue: {
 			name: 'crm_bot_auth',
 			properties: {
 				durable: true,
 			},
-		}
+		},
+		// Queue to send message to Telegram users,
+		// created by crm-telegram-bot
+		botQueue: 'crm_bot_messages',
 	},
 
 	SphinxQL: {
