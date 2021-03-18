@@ -1,5 +1,9 @@
 # crm
 
+The project is under development.
+
+Interface is in Russian and there is no translation and i18n yet.
+
 Prereq:
 
 - server/config.js (from server/example-config.js)
