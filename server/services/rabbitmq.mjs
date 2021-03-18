@@ -21,6 +21,7 @@ AMQPService.prototype.onBotAuth = function (callback) {
 					var replyMessage = 'Ok'
 
 					if (err) {
+						console.error('! onBotAuth:', err)
 						replyMessage = 'Failed'
 					}
 

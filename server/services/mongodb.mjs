@@ -25,11 +25,20 @@ const service = {
 				connection: mongodb.connection, // for services.gridfs
 
 				authTelegramBot (userId, telegramId, callback) {
+					var oid
 
 					console.log('* onBotAuth:', userId, telegramId)
 
+					try {
+						oid = mongoose.Types.ObjectId(userId)
+					}
+					catch (err) {
+						callback(err)
+						return
+					}
+
 					User.findOne({
-						_id: mongoose.Types.ObjectId(userId)
+						_id: oid
 					})
 					.then(user => {
 						if (null === user) {
