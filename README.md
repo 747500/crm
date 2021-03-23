@@ -7,6 +7,7 @@ Interface is in Russian and there is no translation and i18n yet.
 Prereq:
 
 - server/config.js (from server/example-config.js)
+- https://github.com/747500/crm-backend-rabbitmq-graphql-mongodb
 - https://github.com/747500/crm-backend-rabbitmq-telegram
 - RabbitMQ
 - MongoDB
