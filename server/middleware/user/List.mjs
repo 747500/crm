@@ -1,20 +1,34 @@
 
-import { User } from '../../model/index.mjs'
+import Services from '../../services/index.mjs'
+
+const queryUsers = `{
+	users {
+		id
+		name
+	}
+}
+`
 
 const List = (req, res, next) => {
 
-	User.find()
-	.then(result => {
-		res.send(result.map(user => {
-			const userId = user._id.toString()
-			return {
-				_id: userId,
-				name: user.name,
-				current: userId === req.session.user,
-			}
-		}))
+	Services.Run().then(({ amqp }) => {
+
+		amqp.graphql(queryUsers, result => {
+
+			const users = result.data.users
+			//console.log(result.data)
+
+			res.send(users.map(user => {
+				return {
+					_id: user.id,
+					name: user.name,
+					current: user.id === req.session.user,
+				}
+			}))
+
+		})
+
 	})
-	.catch(next)
 
 }
 

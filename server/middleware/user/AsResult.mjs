@@ -3,7 +3,12 @@
 const AsResult = (req, res, next) => {
 	var user = req.User
 
-	res.locals.Result = user.toObject()
+	if ('function' === typeof user.toObject) {
+		res.locals.Result = user.toObject()
+	}
+	else {
+		res.locals.Result = user
+	}
 
 	// delete res.locals.Result.__v
 
