@@ -1,6 +1,6 @@
 # crm
 
-The project is under development.
+The project is under development - arbitrary commit may not work.
 
 Interface is in Russian and there is no translation and i18n yet.
 
@@ -16,15 +16,15 @@ Prereq:
 # ...
 index testrt
 {
-    type            = rt
-    rt_mem_limit        = 128M
+    type = rt
+    rt_mem_limit = 128M
 
-    path            = /var/lib/sphinx/testrt
+    path = /var/lib/sphinx/testrt
 
-    rt_field        = content
-    rt_attr_string      = user
-    rt_attr_string      = oid
-    rt_attr_string      = kind
+    rt_field = content
+    rt_attr_string = user
+    rt_attr_string = oid
+    rt_attr_string = kind
 
     min_infix_len = 2
 
