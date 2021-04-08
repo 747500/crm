@@ -13,6 +13,7 @@ const Load = (req, res, next) => {
 `
 {
 	user(id: "${userId}") {
+		id
 		name
 		notifyBirthdayAt
 		notifyTelegramId

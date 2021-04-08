@@ -17,7 +17,7 @@
 								a(href="tg://resolve?domain=crm_untyped_net_bot" class="ext-link") Бот
 								span не привязан. Для привязки:
 								div
-									code /auth {{ userinfo._id }}
+									code /auth {{ userinfo.id }}
 									//⎘
 						label(class="form-label") Аккаунт
 						div(class="input-group")

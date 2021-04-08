@@ -15,6 +15,6 @@ apiRouter.use('/u', Users)
 apiRouter.use(mw.user.Load) // AUTHENICATED ZONE BELOW
 apiRouter.use('/f', Files)
 apiRouter.use('/doc', Docs)
-
+apiRouter.use('/graphql', mw.graphql)
 
 export default apiRouter

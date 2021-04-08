@@ -6,6 +6,7 @@ import mongodb from './mongodb.mjs'
 import gridfs from './gridfs.mjs'
 import express from './express.mjs'
 import events from './events.mjs'
+import graphql from './graphql.mjs'
 
 const Services = [
 	rabbitmq,
@@ -14,6 +15,7 @@ const Services = [
 	gridfs,
 	events,
 	express,
+	graphql,
 ]
 
 function run (service) {
