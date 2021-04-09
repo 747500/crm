@@ -1,7 +1,7 @@
 # crm
 
 - This project is under development - arbitrary commit may not work;
-- the goal is backend, frontend on the second place;
+- the goal is backend. Frontend on the second place;
 - code in all branches of this repo is experimental, not testing/stable/etc;
 - frontend/interface is in Russian and there is no translation and i18n yet.
 
