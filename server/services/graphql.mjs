@@ -22,7 +22,8 @@ const Users = {}
 
 process.nextTick(() => {
 
-	Services.Run().then(services => {
+	Services.Run()
+	.then(services => {
 
 		return services.amqp.graphql(queryUsers, reply => {
 
