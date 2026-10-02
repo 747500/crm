@@ -1,8 +1,8 @@
 
 import { fieldsList } from 'graphql-fields-list'
 
-import { Doc } from '../../model/index.mjs'
-import { serializeDoc } from '../serialize.mjs'
+import { Doc } from '../../model/index.ts'
+import { serializeDoc } from '../serialize.ts'
 
 function doc ({ id }, context, info) {
 	const fields = fieldsList(info, {

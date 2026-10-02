@@ -4,7 +4,7 @@ import util from 'util'
 import { graphql, getIntrospectionQuery, buildClientSchema } from 'graphql'
 
 import amqplib from 'amqplib'
-import CONFIG from './config.mjs'
+import CONFIG from './config.ts'
 
 amqplib.connect(CONFIG.RabbitMQ.url)
 .then(connection => {
@@ -83,9 +83,9 @@ amqplib.connect(CONFIG.RabbitMQ.url)
 				channel.consume(
 					q.queue,
 					message => {
-						const { content, ...header } = message
+						const { content, ...header } = message!
 
-						const result = JSON.parse(content)
+						const result = JSON.parse(content.toString())
 						//console.log(header)
 						//console.dir(result.data || result.errors, { depth: 7 })
 
@@ -101,7 +101,7 @@ amqplib.connect(CONFIG.RabbitMQ.url)
 
 							function graphqlProxyMethod () {}
 
-							const resolversRoot = result.data.__schema.queryType.fields
+							const resolversRoot = result.data!.__schema.queryType.fields
 									.map(field => field.name)
 									.reduce(
 										(accum, item) => {
@@ -140,7 +140,7 @@ amqplib.connect(CONFIG.RabbitMQ.url)
 
 				)
 
-			].reduce((accum, ok) => accum.then(ok), Promise.resolve())
+			].reduce((accum: Promise<unknown>, step: any) => accum.then(() => step), Promise.resolve())
 
 		})
 	})

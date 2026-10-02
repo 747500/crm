@@ -1,7 +1,7 @@
 
 import mongoose from 'mongoose'
 
-import Contact from './Contact.mjs'
+import Contact from './Contact.ts'
 
 
 const schema = new mongoose.Schema(

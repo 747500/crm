@@ -1,8 +1,8 @@
 
 import { fieldsList } from 'graphql-fields-list'
 
-import model from '../../model/index.mjs'
-import { serializeUser } from '../serialize.mjs'
+import model from '../../model/index.ts'
+import { serializeUser } from '../serialize.ts'
 
 export function users ({ notified }, context, info) {
 	const fields = fieldsList(info, {

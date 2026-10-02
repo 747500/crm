@@ -286,3 +286,23 @@ Playwright happy-path (UI + AMQP). Согласовать объём.
 
 - unit: **12 passed**; e2e: **4 passed**; `@crm/web` build: **OK**; legacy SPA build: **OK**.
 - Стек: `mongod`, `rabbitmq-server`, GraphQL-бэкенд, BFF, `searchd` — на реальных данных.
+
+## TS-пилот (рекомендация A→B): packages/graphql-mongodb
+
+Решили переводить бэк на TypeScript по схеме «`.ts` + нативный запуск Node + отдельный `tsc --noEmit`»
+(без шага сборки). Пилот — на листовом пакете.
+
+- Все `.mjs` → `.ts`, импорты `./x.ts`, пакет `"type": "module"`, `main: index.ts`.
+- **Нативный запуск**: `node index.ts` (Node 22.22 — type stripping включён по умолчанию, без флагов).
+- **Типы отдельно**: `npm run typecheck` = `tsc --noEmit` → **зелёно**.
+- `tsconfig`: `strict: true`, но на старте `noImplicitAny/noImplicitThis: false` (легаси без аннотаций —
+  включаем постепенно, файл за файлом).
+- Типы зависимостей: mongoose 5 и graphql — bundled; `@types/amqplib`; шим для `graphql-fields-list`
+  (`types/shims.d.ts`).
+- Дополнительно типизированы: реестр сервисов (`services/index.ts`), non-null на границах парсинга в
+  `test.ts`, `JSON.parse(content.toString())`.
+- Проверено: бэкенд стартует из `.ts`, unit **12**, e2e **4** — зелёные.
+
+Замечания по нативному TS (проверено на 22.22.2): strip-only не поддерживает `enum`/`namespace`/
+параметр-свойства (в нашем коде их нет); расширения в импортах обязательны и «как в файле»;
+`./x.js` НЕ резолвится в `x.ts`; `tsconfig.paths` не работает. Node 24 LTS — станет ещё лучше.

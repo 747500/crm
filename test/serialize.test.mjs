@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 
-import { serializeDoc, serializeUser, capitalize } from '../packages/graphql-mongodb/graphql/serialize.mjs'
+import { serializeDoc, serializeUser, capitalize } from '../packages/graphql-mongodb/graphql/serialize.ts'
 
 describe('serialize (graphql resolvers)', () => {
 	it('capitalize', () => {

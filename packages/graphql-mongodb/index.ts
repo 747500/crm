@@ -1,6 +1,6 @@
 
-import graphql from './graphql/index.mjs'
-import Services from './services/index.mjs'
+import graphql from './graphql/index.ts'
+import Services from './services/index.ts'
 
 Services.Run()
 .then(services => {

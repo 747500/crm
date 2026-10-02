@@ -1,9 +1,9 @@
 
 import mongoose from 'mongoose'
 
-import * as model from '../../model/index.mjs'
+import * as model from '../../model/index.ts'
 
-import CONFIG from '../../config.mjs'
+import CONFIG from '../../config.ts'
 
 const service = {
 
