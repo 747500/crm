@@ -26,7 +26,6 @@ morgan.token('user', req => {
 	return '-'
 })
 
-import bodyParser from 'body-parser'
 import cookieParser from 'cookie-parser'
 
 // https://github.com/jdesboeufs/connect-mongo
@@ -46,9 +45,11 @@ const service = {
 			app.use(cookieParser(CONFIG.Express.Session.secret))
 			//app.use(morgan('dev'))
 			app.use(morgan('[:session :user] :method :url :status :response-time ms - :res[content-length]'))
-			app.use(bodyParser.text())
-			app.use(express.json())
-			app.use(bodyParser.json())
+			// загрузки файлов читаем как raw (req.pipe), body-parser их не трогает
+			const skipBodyParser = req => req.path.indexOf('/upload/') !== -1
+
+			app.use((req, res, next) => skipBodyParser(req) ? next() : express.text()(req, res, next))
+			app.use((req, res, next) => skipBodyParser(req) ? next() : express.json()(req, res, next))
 
 			const sessionStore = MongoStore.create({
 				mongoUrl: CONFIG.MongoDB.URI,
@@ -96,7 +97,10 @@ const service = {
 				process.on('SIGTERM', () => {
 					server.close(() => {
 						console.log('Express terminated')
+						process.exit(0)
 					})
+					// страховка от зависших keep-alive соединений
+					setTimeout(() => process.exit(0), 2000)
 				})
 			})
 			.on('error', reject)

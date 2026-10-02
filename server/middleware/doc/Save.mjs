@@ -1,6 +1,6 @@
 
 
-const docSave = (req, res, next) => {
+const docSave = (_req, res, next) => {
 
 	const doc = res.locals.Doc
 

@@ -3,53 +3,30 @@ import mongoose from 'mongoose'
 
 import { User } from '../../model/index.mjs'
 
-import Services from '../../services/index.mjs'
-
-
+// Загружаем собственный mongoose-документ пользователя (и для auth, и для Update/Save).
+// Раньше здесь был plain-объект из GraphQL, из-за чего POST /u (настройки) падал на req.User.schema.tree.
 const Load = (req, res, next) => {
-	const userId = mongoose.Types.ObjectId(req.session.user).toString()
+	let userId
 
-	const query =
-`
-{
-	user(id: "${userId}") {
-		id
-		name
-		notifyBirthdayAt
-		notifyTelegramId
-		ctime
-		mtime
+	try {
+		userId = mongoose.Types.ObjectId(req.session.user)
 	}
-}
-`
-	Services.Run().then(({ amqp }) => {
+	catch (err) {
+		res.status(401).send('Access Denied')
+		return
+	}
 
-		amqp.graphql(query, result => {
+	User.findOne({ _id: userId })
+	.then(user => {
+		if (null === user) {
+			res.status(401).send('Access Denied')
+			return
+		}
 
-			//const user = result.data.users
-			console.log(result.data || result.errors)
-
-			if (!result.data.user) {
-				res.status(401).send('Access Denied')
-				return
-			}
-
-			req.User = result.data.user
-			next()
-
-			//res.send(users.map(user => {
-			//	return {
-			//		_id: user.id,
-			//		name: user.name,
-			//		current: user.id === req.session.user,
-			//	}
-			//}))
-
-		})
-		.catch(err => next(err))
-
+		req.User = user
+		next()
 	})
-
+	.catch(next)
 }
 
 export default Load

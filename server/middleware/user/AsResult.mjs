@@ -10,6 +10,10 @@ const AsResult = (req, res, next) => {
 		res.locals.Result = user
 	}
 
+	if (res.locals.Result && res.locals.Result._id && !res.locals.Result.id) {
+		res.locals.Result.id = String(res.locals.Result._id)
+	}
+
 	// delete res.locals.Result.__v
 
 	next()

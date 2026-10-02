@@ -1,0 +1,18 @@
+{
+  "name": "@crm/telegram-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.mjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "NTBA_FIX_319=1 node --env-file-if-exists=.env index.mjs"
+  },
+  "author": "Serge R",
+  "license": "WTFPL",
+  "dependencies": {
+    "amqplib": "^0.10.4",
+    "async": "^3.2.0",
+    "moment": "^2.29.1",
+    "node-telegram-bot-api": "^0.52.0"
+  }
+}

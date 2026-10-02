@@ -1,0 +1,20 @@
+{
+  "name": "@crm/graphql-mongodb",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.mjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "node --env-file-if-exists=.env --env-file-if-exists=../../.env index.mjs"
+  },
+  "keywords": [],
+  "author": "Serge R",
+  "license": "WTFPL",
+  "dependencies": {
+    "amqplib": "^0.10.4",
+    "graphql": "^15.5.0",
+    "graphql-fields-list": "^2.2.3",
+    "moment": "^2.29.1",
+    "mongoose": "^5.12.3"
+  }
+}

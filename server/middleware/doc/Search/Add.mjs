@@ -6,9 +6,11 @@ import Services from '../../../services/index.mjs'
 import CONFIG from '../../../config.js'
 
 
+import { sphinxId } from '../../../lib/sphinx-id.mjs'
+
 const docSearchAdd = (req, res, next) => {
 	const doc = res.locals.Doc
-	const id = doc.ctime.getTime()
+	const id = sphinxId(doc)
 	const docFts = doc.fts
 
 	console.log('* mw.doc.Search.Add:', docFts)
@@ -35,7 +37,8 @@ const docSearchAdd = (req, res, next) => {
 			],
 			(err, row, fields) => {
 				if (err) {
-					next(err)
+					console.error("* sphinx index skipped (non-fatal):", err.message)
+					next()
 					return
 				}
 

@@ -1,0 +1,84 @@
+# Локальный стек для разработки (docker compose v2+).
+#   docker compose up -d                  # RabbitMQ + MongoDB
+#   docker compose --profile ch up -d     # + ClickHouse (dual-write, ужат по CPU/RAM)
+#   docker compose --profile sphinx up -d # + Sphinx (полнотекстовый поиск)
+name: crm
+
+services:
+
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: crm-rabbitmq
+    ports:
+      - "5672:5672"     # AMQP
+      - "15672:15672"   # management UI (crm/crm)
+    environment:
+      RABBITMQ_DEFAULT_USER: crm
+      RABBITMQ_DEFAULT_PASS: crm
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    volumes:
+      - rabbit-data:/var/lib/rabbitmq
+
+  mongo:
+    image: mongo:7
+    container_name: crm-mongo
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.runCommand({ping:1}).ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    volumes:
+      - mongo-data:/data/db
+
+  # ClickHouse — эксперимент (dual-write). Ужат по CPU/RAM под слабые dev-машины.
+  clickhouse:
+    image: clickhouse/clickhouse-server:25.8
+    container_name: crm-clickhouse
+    profiles: ["ch"]
+    ports:
+      - "8123:8123"   # HTTP
+      - "9000:9000"   # native
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    cpus: "2.0"
+    mem_limit: 2g
+    environment:
+      CLICKHOUSE_DB: crm
+      CLICKHOUSE_USER: crm
+      CLICKHOUSE_PASSWORD: crm
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: "1"
+    volumes:
+      - ch-data:/var/lib/clickhouse
+      - ./docker/clickhouse/limits.xml:/etc/clickhouse-server/config.d/limits.xml:ro
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:8123/ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  # Sphinx (rt-индекс). Образ неофициальный; если недоступен — запускать
+  # searchd нативно (бинарники searchd/indexer есть в системе, конфиг тот же).
+  sphinx:
+    image: macbre/sphinxsearch:3.4.1
+    container_name: crm-sphinx
+    profiles: ["sphinx"]
+    ports:
+      - "9306:9306"   # SphinxQL
+      - "9312:9312"   # API
+    volumes:
+      - ./docker/sphinx/sphinx.conf:/etc/sphinxsearch/sphinx.conf:ro
+      - sphinx-data:/var/lib/sphinxsearch/data
+
+volumes:
+  rabbit-data:
+  mongo-data:
+  ch-data:
+  sphinx-data:

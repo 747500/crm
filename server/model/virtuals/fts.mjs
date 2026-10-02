@@ -1,44 +1,62 @@
 
-function fts (a) {
-    const fts = []
+// Собираем индексируемый текст из документа рекурсивно.
+// Учитываем вложенные объекты и массивы (например, contact[]); элементы массивов
+// могут быть mongoose-документами (их поля лежат в _doc). Пропускаем служебные
+// поля, BSON-типы (ObjectId), Date и внутренности mongoose ($__*).
 
-    //console.log('* FTS Doc:', this._doc)
+const SKIP_KEYS = { kind: true, fts: true, _id: true, __v: true, _doc: true }
 
-    const walk = (o) => {
+function collect (value, out, seen) {
+	if (value === null || value === undefined) {
+		return
+	}
 
-        Object.keys(o).map(k => {
-            //console.log('>', k, typeof o[k])
+	if (typeof value === 'string') {
+		if (value.length) {
+			out.push(value)
+		}
+		return
+	}
 
-            if ('kind' === k) {
-                return
-            }
+	if (typeof value !== 'object') {
+		return
+	}
 
-            if ('fts' === k) {
-                return
-            }
+	// Date и BSON (ObjectId и пр. — у них есть _bsontype)
+	if (value instanceof Date || value._bsontype) {
+		return
+	}
 
-            if ('string' === typeof o[k]) {
-                fts.push(o[k])
-                return
-            }
+	// защита от циклических ссылок (mongoose-поддокументы ссылаются на родителя)
+	if (seen.has(value)) {
+		return
+	}
+	seen.add(value)
 
-            if ('object' !== typeof o[k]) {
-                return
-            }
+	if (Array.isArray(value)) {
+		value.forEach(item => collect(item, out, seen))
+		return
+	}
 
-            if (k === this._doc.kind) {
-                walk(o[k])
-                return
-            }
-        })
+	// mongoose Document/Subdocument хранит значения в _doc
+	const target = (value._doc && 'object' === typeof value._doc) ? value._doc : value
 
-    }
+	Object.keys(target).forEach(key => {
+		// служебные поля и внутренности mongoose ($__, $isNew, $__parent, ...)
+		if (SKIP_KEYS[key] || key.charCodeAt(0) === 36) {
+			return
+		}
 
-    walk(this._doc)
+		collect(target[key], out, seen)
+	})
+}
 
-    //console.log('* fts:', fts)
+function fts () {
+	const out = []
 
-    return fts
+	collect(this._doc, out, new WeakSet())
+
+	return out
 }
 
 export default fts

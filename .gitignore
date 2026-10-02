@@ -4,3 +4,4 @@ public
 tmp
 
 server/config.js
+.env

@@ -13,6 +13,7 @@ const service = {
 		process.on('SIGTERM', () => {
 			mongoose.disconnect()
 			console.log('MongoDB disconnected')
+			process.exit(0)
 		})
 
 		return mongoose.connect(
@@ -49,9 +50,8 @@ const service = {
 
 						return user.save()
 					})
+					.then(() => callback())
 					.catch(err => callback(err))
-
-					callback()
 				}
 			}
 		})

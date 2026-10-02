@@ -1,0 +1,13 @@
+{
+  "name": "@crm/e2e",
+  "version": "1.0.0",
+  "private": true,
+  "description": "End-to-end tests (Playwright)",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.0"
+  }
+}

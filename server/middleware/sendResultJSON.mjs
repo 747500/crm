@@ -1,7 +1,14 @@
 
 
-const sendResultJSON = (req, res) => {
-	res.send(res.locals.Result)
+const sendResultJSON = (req, res, next) => {
+	const result = res.locals.Result
+
+	if ('undefined' === typeof result) {
+		res.status(204).end()
+		return
+	}
+
+	res.send(result)
 }
 
 

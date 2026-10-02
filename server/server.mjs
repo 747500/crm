@@ -12,6 +12,20 @@ Services.Run()
 	services.express.use(express.static('public'))
 	services.express.use('/api/v0', api)
 
+	// eslint-disable-next-line no-unused-vars
+	services.express.use((err, req, res, next) => {
+		console.error('! express error:', err)
+
+		if (res.headersSent) {
+			return next(err)
+		}
+
+		res.status(err.status || 500).json({
+			error: err.name || 'Error',
+			message: err.message || String(err),
+		})
+	})
+
 	services.amqp.onBotAuth((message, next) => {
 		// TODO to refactor to middleware?
 

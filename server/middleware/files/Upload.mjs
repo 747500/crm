@@ -12,7 +12,7 @@ const Upload = (req, res, next) => {
 	const doc = res.locals.Doc
 	const filename = req.params.filename
 	const mimetype = req.headers['content-type']
-	const caption = req.headers['x-meta-caption']
+	const caption = req.headers['x-meta-caption'] || ''
 
 	Services.Run()
 	.then(services => {
@@ -24,7 +24,7 @@ const Upload = (req, res, next) => {
 				metadata: {
 					user: userId,
 					docId: mongoose.Types.ObjectId(doc.id),
-					lastModified: new Date(req.headers['last-modified']),
+					lastModified: (req.headers['last-modified'] ? new Date(req.headers['last-modified']) : new Date()),
 					caption: querystring.unescape(caption)
 				}
 			}

@@ -1,41 +1,49 @@
 
+// Значения берутся из окружения (.env), см. .env.example
 module.exports = {
 
 	AMQP: {
-		url: 'amqp://127.0.0.1',
+		url: process.env.AMQP_URL || 'amqp://127.0.0.1',
+		replyTimeoutMs: parseInt(process.env.AMQP_REPLY_TIMEOUT_MS || '15000', 10),
 
-		// Queue to receive auth requests from bot users
+		// Очередь приёма auth-запросов от бота
 		authQueue: {
-			name: 'crm_bot_auth',
+			name: process.env.AMQP_AUTH_QUEUE || 'crm_bot_auth',
 			properties: {
 				durable: true,
 			},
 		},
-		// Queue to send message to Telegram users,
-		// created by crm-telegram-bot
-		botQueue: 'crm_bot_messages',
+
+		// Очередь сообщений Telegram-пользователям
+		botQueue: process.env.AMQP_BOT_QUEUE || 'crm_untyped_net_bot',
+
+		queues: {
+			graphql: {
+				name: process.env.AMQP_GRAPHQL_QUEUE || 'crm-graphql',
+			},
+		},
 	},
 
 	SphinxQL: {
-		address: '127.0.0.1',
-		port: '9306',
-		indexName: 'testrt',
+		address: process.env.SPHINX_HOST || '127.0.0.1',
+		port: process.env.SPHINX_PORT || '9306',
+		indexName: process.env.SPHINX_INDEX || 'testrt',
 	},
 
 	MongoDB: {
-		URI: 'mongodb://127.0.0.1:27017/crm',
+		URI: process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/crm',
 		options: {
 			useNewUrlParser: true,
-			useUnifiedTopology: true
+			useUnifiedTopology: true,
 		},
 	},
 
 	Express: {
-		port: 3000,
+		port: parseInt(process.env.PORT || '3000', 10),
 		Session: {
-			secret: '!!! CHANGE ME !!!',
-			maxAge: 60 * 1000
-		}
+			secret: process.env.SESSION_SECRET || 'dev-secret-change-me',
+			maxAge: parseInt(process.env.SESSION_MAX_AGE || '2592000000', 10),
+		},
 	},
 
 }

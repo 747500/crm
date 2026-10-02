@@ -1,0 +1,8 @@
+<clickhouse>
+    <!-- ужимаем ClickHouse под слабые dev-машины (см. docker-compose.yml) -->
+    <max_threads>4</max_threads>
+    <max_server_memory_usage>1500000000</max_server_memory_usage>
+    <max_concurrent_queries>32</max_concurrent_queries>
+    <mark_cache_size>268435456</mark_cache_size>
+    <uncompressed_cache_size>134217728</uncompressed_cache_size>
+</clickhouse>

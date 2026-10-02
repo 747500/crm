@@ -14,7 +14,7 @@ const service = {
 
 			var pool = mysql.createPool({
 				connectionLimit: 1,
-				localAddress: CONFIG.SphinxQL.address,
+				host: CONFIG.SphinxQL.address,
 				port: CONFIG.SphinxQL.port,
 			})
 
@@ -23,6 +23,7 @@ const service = {
 			process.on('SIGTERM', () => {
 				pool.end()
 				console.log('Sphinx disconnected')
+				process.exit(0)
 			})
 
 			resolve(pool)

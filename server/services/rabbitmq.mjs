@@ -103,6 +103,24 @@ AMQPService.prototype = {
 
 			this.graphqlCorrelation[correlationId] = item
 
+			const timeoutMs = CONFIG.AMQP.replyTimeoutMs || 15000
+
+			setTimeout(() => {
+				const pending = this.graphqlCorrelation[correlationId]
+
+				if (!pending) {
+					return
+				}
+
+				delete this.graphqlCorrelation[correlationId]
+
+				console.error(`* graphql reply timeout (${timeoutMs}ms):`, correlationId)
+
+				pending.callback({
+					errors: [ { message: 'AMQP reply timeout' } ]
+				})
+			}, timeoutMs)
+
 		})
 	},
 
