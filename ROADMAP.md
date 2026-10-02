@@ -306,3 +306,16 @@ Playwright happy-path (UI + AMQP). Согласовать объём.
 Замечания по нативному TS (проверено на 22.22.2): strip-only не поддерживает `enum`/`namespace`/
 параметр-свойства (в нашем коде их нет); расширения в импортах обязательны и «как в файле»;
 `./x.js` НЕ резолвится в `x.ts`; `tsconfig.paths` не работает. Node 24 LTS — станет ещё лучше.
+
+## Фаза 4 — packages/web: CRUD + файлы (паритет)
+
+- `api.ts`: добавлены `getDoc/createDoc/updateDoc`, `listFiles/fileMeta/fileUrl`,
+  `saveCaption/deleteFile/uploadFile`.
+- `schema.ts`: описания видов (person/property — поля, `listKeys`, special contact/owner).
+- Экраны: `DocList.vue` (список + «+ Новый»), `DocEdit.vue` (создание/правка; контакты строками
+  `значение | описание`; выбор собственника), `FilesPanel.vue` (загрузка/список/подпись/удаление).
+- Роуты: `/:kind(person|property)`, `/:kind/new`, `/:kind/:id`.
+- Vite: `server.host = '127.0.0.1'` (иначе слушает только `[::1]`), `preview` с прокси.
+- Smoke-тест нового SPA `tests/web.spec.js` (список → создание → загрузка) — итого e2e **5 passed**.
+- **Осталось**: заменить legacy SPA новым (BFF отдаёт корневой `public/`) и перенести legacy-тесты
+  на новый UI (сейчас 4 legacy-спеки целятся в старый интерфейс на `:3000`).
