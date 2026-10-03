@@ -1,9 +1,4 @@
+import { Errors } from './Errors.mjs';
+import { Messages } from './Messages.mjs';
 
-import { Errors } from './Errors.mjs'
-import { Messages} from './Messages.mjs'
-
-
-export {
-	Errors,
-	Messages,
-}
+export { Errors, Messages };

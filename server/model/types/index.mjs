@@ -1,7 +1,3 @@
+import Text from './Text.mjs';
 
-import Text from './Text.mjs'
-
-
-export {
-	Text,
-}
+export { Text };

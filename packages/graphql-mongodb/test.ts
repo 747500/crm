@@ -1,15 +1,14 @@
-
-import util from 'util'
+import util from 'util';
 //import { IntrospectionQuery, buildClientSchema } from 'graphql/utilities'
-import { graphql, getIntrospectionQuery, buildClientSchema } from 'graphql'
+import { graphql, getIntrospectionQuery, buildClientSchema } from 'graphql';
 
-import amqplib from 'amqplib'
-import CONFIG from './config.ts'
+import amqplib from 'amqplib';
+import CONFIG from './config.ts';
 
-amqplib.connect(CONFIG.RabbitMQ.url)
-.then(connection => {
-
-	/*
+amqplib
+  .connect(CONFIG.RabbitMQ.url)
+  .then((connection) => {
+    /*
 	const query = {
 		model: 'User',
 		method: 'findOne',
@@ -20,12 +19,12 @@ amqplib.connect(CONFIG.RabbitMQ.url)
 		]
 	}
 	*/
-		// 601cbe60139b35accc3d039f
+    // 601cbe60139b35accc3d039f
 
-	const query = [
-		getIntrospectionQuery(),
+    const query = [
+      getIntrospectionQuery(),
 
-/*
+      /*
 `
 { doc(id: "600f186fb11e3e5eae96e9df") {
 	__typename
@@ -52,7 +51,7 @@ amqplib.connect(CONFIG.RabbitMQ.url)
 `,
 */
 
-		/*
+      /*
 		`{ user(id: "603d231a9a7451fe5bbc49b7") {
 			id
 			name
@@ -64,7 +63,7 @@ amqplib.connect(CONFIG.RabbitMQ.url)
 		} }`,
 		*/
 
-		/*
+      /*
 		`{ users(notified: true) {
 			id
 			mtime
@@ -72,81 +71,77 @@ amqplib.connect(CONFIG.RabbitMQ.url)
 			notifyBirthdayAt
 		} }`
 		*/
-	]
+    ];
 
-	return connection.createChannel().then(channel => {
+    return connection.createChannel().then((channel) => {
+      return channel.assertQueue('', { exclusive: true }).then((q) => {
+        return [
+          channel.consume(
+            q.queue,
+            (message) => {
+              const { content, ...header } = message!;
 
-		return channel.assertQueue('', { exclusive: true }).then(q => {
+              const result = JSON.parse(content.toString());
+              //console.log(header)
+              //console.dir(result.data || result.errors, { depth: 7 })
 
-			return [
+              const schema = buildClientSchema(result.data);
 
-				channel.consume(
-					q.queue,
-					message => {
-						const { content, ...header } = message!
+              graphql(
+                schema,
+                '{ __schema { queryType { fields { name } } } }',
+                {},
+              )
+                .then((result) => {
+                  console.log(
+                    util.inspect(result.data || result.errors, { depth: 5 }),
+                  );
 
-						const result = JSON.parse(content.toString())
-						//console.log(header)
-						//console.dir(result.data || result.errors, { depth: 7 })
+                  function graphqlProxyMethod() {}
 
-						const schema = buildClientSchema(result.data)
+                  const resolversRoot = result
+                    .data!.__schema.queryType.fields.map(
+                      (field) => field.name,
+                    )
+                    .reduce((accum, item) => {
+                      accum[item] = graphqlProxyMethod;
+                      return accum;
+                    }, {});
 
-						graphql(
-							schema,
-							'{ __schema { queryType { fields { name } } } }',
-							{}
-						)
-						.then(result => {
-							console.log(util.inspect(result.data || result.errors, { depth: 5 }))
+                  console.log(resolversRoot);
+                })
+                .catch((err) => console.error(err));
 
-							function graphqlProxyMethod () {}
+              return;
 
-							const resolversRoot = result.data!.__schema.queryType.fields
-									.map(field => field.name)
-									.reduce(
-										(accum, item) => {
-											accum[item] = graphqlProxyMethod
-											return accum
-										},
-										{}
-									)
+              //connection.close()
+            },
+            {
+              noAck: true,
+            },
+          ),
 
-							console.log(resolversRoot)
-						})
-						.catch(err => console.error(err))
-
-
-						return
-
-						//connection.close()
-
-					},
-					{
-						noAck: true
-					}
-				),
-
-				...query.map(query => channel.sendToQueue(
-						CONFIG.RabbitMQ.queues['graphql'].name,
-						Buffer.from(query),
-						{
-							contentType: 'text/plain',
-							contentEncoding: 'utf8',
-							timestamp: Date.now(),
-							replyTo: q.queue,
-							correlationId: Date.now().toString(),
-						}
-					),
-
-				)
-
-			].reduce((accum: Promise<unknown>, step: any) => accum.then(() => step), Promise.resolve())
-
-		})
-	})
-
-})
-.catch(err => {
-	console.error('fatal:', err)
-	process.exit(1)
-})
+          ...query.map((query) =>
+            channel.sendToQueue(
+              CONFIG.RabbitMQ.queues['graphql'].name,
+              Buffer.from(query),
+              {
+                contentType: 'text/plain',
+                contentEncoding: 'utf8',
+                timestamp: Date.now(),
+                replyTo: q.queue,
+                correlationId: Date.now().toString(),
+              },
+            ),
+          ),
+        ].reduce(
+          (accum: Promise<unknown>, step: any) => accum.then(() => step),
+          Promise.resolve(),
+        );
+      });
+    });
+  })
+  .catch((err) => {
+    console.error('fatal:', err);
+    process.exit(1);
+  });

@@ -1,189 +1,167 @@
+import amqp from 'amqplib';
+import mongoose from 'mongoose';
 
-import amqp from 'amqplib'
-import mongoose from 'mongoose'
+import CONFIG from '../config.js';
 
-import CONFIG from '../config.js'
+function AMQPService({ connection, channel }) {
+  this.connection = connection;
+  this.channel = channel;
 
+  this.graphqlCorrelation = {};
 
-function AMQPService ({ connection, channel }) {
-	this.connection = connection
-	this.channel = channel
+  this.graphqlEndpoint = connection.createChannel().then((channel) => {
+    channel.prefetch(1);
+    return channel
+      .assertQueue('', {
+        exclusive: true,
+      })
+      .then((q) => {
+        return channel
+          .consume(
+            q.queue,
+            (message) => {
+              const { content, ...header } = message;
 
-	this.graphqlCorrelation = {}
+              console.log('* consumed header', header);
+              //console.dir(result, { depth: 3 })
 
-	this.graphqlEndpoint = connection.createChannel().then(channel => {
-		channel.prefetch(1)
-		return channel.assertQueue(
-			'',
-			{
-				exclusive: true
-			}
-		)
-		.then(q => {
+              try {
+                const correlationId = header.properties.correlationId;
 
-			return channel.consume(
-				q.queue,
-				message => {
-					const { content, ...header } = message
+                if (!correlationId) {
+                  throw new Error(`Bad correlationId: '${correlationId}'`);
+                }
 
-					console.log('* consumed header', header)
-					//console.dir(result, { depth: 3 })
+                const item = this.graphqlCorrelation[correlationId];
 
-					try {
-						const correlationId = header.properties.correlationId
+                if (!item) {
+                  throw new Error(
+                    `correlationId ' ${correlationId}' is not found`,
+                  );
+                }
 
-						if (!correlationId) {
-							throw new Error(`Bad correlationId: '${correlationId}'`)
-						}
+                delete this.graphqlCorrelation[correlationId];
 
-						const item = this.graphqlCorrelation[correlationId]
+                const result = JSON.parse(content);
 
-						if (!item) {
-							throw new Error(`correlationId ' ${correlationId}' is not found`)
-						}
-
-						delete this.graphqlCorrelation[correlationId]
-
-						const result = JSON.parse(content)
-
-						item.callback(result)
-
-					}
-					catch (ex) {
-						console.error('* message error:\n', ex)
-					}
-
-				},
-				{
-					noAck: true
-				}
-			)
-			.then(() => {
-				return {
-					channel,
-					queue: q.queue
-				}
-			})
-		})
-	})
-
+                item.callback(result);
+              } catch (ex) {
+                console.error('* message error:\n', ex);
+              }
+            },
+            {
+              noAck: true,
+            },
+          )
+          .then(() => {
+            return {
+              channel,
+              queue: q.queue,
+            };
+          });
+      });
+  });
 }
 
 AMQPService.prototype = {
+  graphql(query, callback) {
+    query = query.replace(/\s+/g, ' ');
+    query = query.replace(/^\s+/, '');
+    query = query.replace(/\s+$/, '');
 
-	graphql (query, callback) {
+    const item = {
+      ts: new Date(),
+      query,
+      callback,
+    };
 
-		query = query.replace(/\s+/g, ' ')
-		query = query.replace(/^\s+/, '')
-		query = query.replace(/\s+$/, '')
+    const correlationId = mongoose.Types.ObjectId().toString();
 
-		const item = {
-			ts: new Date(),
-			query,
-			callback,
-		}
+    console.log('* new correlationId:', correlationId);
 
-		const correlationId = mongoose.Types.ObjectId().toString()
+    return this.graphqlEndpoint.then((ep) => {
+      ep.channel.sendToQueue(
+        CONFIG.AMQP.queues['graphql'].name,
+        Buffer.from(query),
+        {
+          contentType: 'text/plain',
+          contentEncoding: 'utf8',
+          timestamp: Date.now(),
+          replyTo: ep.queue,
+          correlationId: correlationId,
+        },
+      );
 
-		console.log('* new correlationId:', correlationId)
+      this.graphqlCorrelation[correlationId] = item;
 
-		return this.graphqlEndpoint.then(ep => {
+      const timeoutMs = CONFIG.AMQP.replyTimeoutMs || 15000;
 
-			ep.channel.sendToQueue(
-				CONFIG.AMQP.queues['graphql'].name,
-				Buffer.from(query),
-				{
-					contentType: 'text/plain',
-					contentEncoding: 'utf8',
-					timestamp: Date.now(),
-					replyTo: ep.queue,
-					correlationId: correlationId,
-				}
-			)
+      setTimeout(() => {
+        const pending = this.graphqlCorrelation[correlationId];
 
-			this.graphqlCorrelation[correlationId] = item
+        if (!pending) {
+          return;
+        }
 
-			const timeoutMs = CONFIG.AMQP.replyTimeoutMs || 15000
+        delete this.graphqlCorrelation[correlationId];
 
-			setTimeout(() => {
-				const pending = this.graphqlCorrelation[correlationId]
+        console.error(
+          `* graphql reply timeout (${timeoutMs}ms):`,
+          correlationId,
+        );
 
-				if (!pending) {
-					return
-				}
+        pending.callback({
+          errors: [{ message: 'AMQP reply timeout' }],
+        });
+      }, timeoutMs);
+    });
+  },
 
-				delete this.graphqlCorrelation[correlationId]
+  onBotAuth(callback) {
+    this.channel.prefetch(1);
 
-				console.error(`* graphql reply timeout (${timeoutMs}ms):`, correlationId)
+    this.channel.consume(CONFIG.AMQP.authQueue.name, (message) => {
+      callback(message, (err) => {
+        var replyMessage = 'Ok';
 
-				pending.callback({
-					errors: [ { message: 'AMQP reply timeout' } ]
-				})
-			}, timeoutMs)
+        if (err) {
+          console.error('! onBotAuth:', err);
+          replyMessage = 'Failed';
+        }
 
-		})
-	},
+        this.channel.ack(message);
 
- 	onBotAuth (callback) {
-
-		this.channel.prefetch(1)
-
-		this.channel.consume(
-			CONFIG.AMQP.authQueue.name,
-			message => {
-
-				callback(
-					message,
-					(err) => {
-						var replyMessage = 'Ok'
-
-						if (err) {
-							console.error('! onBotAuth:', err)
-							replyMessage = 'Failed'
-						}
-
-						this.channel.ack(message)
-
-						this.channel.sendToQueue(
-							message.properties.replyTo,
-							Buffer.from(replyMessage),
-							{
-								persistent: true,
-								contentType: 'text/plain',
-								correlationId: message.properties.correlationId,
-							}
-						)
-					}
-				)
-			}
-		)
-	},
-
-
-}
+        this.channel.sendToQueue(
+          message.properties.replyTo,
+          Buffer.from(replyMessage),
+          {
+            persistent: true,
+            contentType: 'text/plain',
+            correlationId: message.properties.correlationId,
+          },
+        );
+      });
+    });
+  },
+};
 
 const service = {
+  name: 'amqp',
 
-	name: 'amqp',
+  init() {
+    return amqp.connect(CONFIG.AMQP.url).then((connection) => {
+      return connection.createChannel().then((channel) => {
+        channel.assertQueue(
+          CONFIG.AMQP.authQueue.name,
+          CONFIG.AMQP.authQueue.properties,
+        );
 
-	init () {
-		return amqp.connect(CONFIG.AMQP.url)
-			.then(connection => {
-				return connection.createChannel()
-				.then(channel => {
+        console.log(`\tRabbitMQ connected at ${CONFIG.AMQP.url}`);
 
-					channel.assertQueue(
-						CONFIG.AMQP.authQueue.name,
-						CONFIG.AMQP.authQueue.properties,
-					)
+        return new AMQPService({ connection, channel });
+      });
+    });
+  },
+};
 
-					console.log(`\tRabbitMQ connected at ${CONFIG.AMQP.url}`)
-
-					return new AMQPService({ connection, channel })
-				})
-			})
-
-	}
-}
-
-export default service
+export default service;

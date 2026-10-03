@@ -1,73 +1,50 @@
-
-import graphql from './graphql/index.ts'
-import Services from './services/index.ts'
+import graphql from './graphql/index.ts';
+import Services from './services/index.ts';
 
 Services.Run()
-.then(services => {
+  .then((services) => {
+    return [
+      services.amqp.onMessage('graphql', (message, ack) => {
+        const { content, ...header } = message;
+        const query = content.toString().replace(/\s+/g, ' ');
 
-	return [
+        console.log('* graphql query:', query);
 
-		services.amqp.onMessage('graphql',
-			(message, ack) => {
-				const { content, ...header } = message
-				const query = content.toString().replace(/\s+/g, ' ')
+        graphql(query)
+          .then((result) => {
+            console.log('* graphql result:', result.data || result.errors);
 
-				console.log('* graphql query:', query)
+            return services.amqp.replyOn(message, JSON.stringify(result));
+          })
+          .catch((err) => {
+            console.error('! error:', err);
+          })
+          .finally(() => {
+            ack();
+          });
+      }),
 
-				graphql(query).then(result => {
+      services.amqp.onMessage('query', (message, ack) => {
+        //console.log('*', message)
 
-					console.log('* graphql result:', result.data || result.errors)
+        services.mongodb
+          .query(JSON.parse(message.content))
+          .then((result) => {
+            //console.log(result)
 
-					return services.amqp.replyOn(
-						message,
-						JSON.stringify(result)
-					)
-
-				})
-				.catch(err => {
-					console.error('! error:', err)
-				})
-				.finally(() => {
-					ack()
-				})
-
-			}
-		),
-
-		services.amqp.onMessage('query',
-			(message, ack) => {
-
-				//console.log('*', message)
-
-				services.mongodb.query(
-					JSON.parse(message.content)
-				)
-				.then(result => {
-
-					//console.log(result)
-
-					return services.amqp.replyOn(
-						message,
-						JSON.stringify(result)
-					)
-				})
-				.catch(err => {
-					console.error(err)
-				})
-				.finally(() => {
-					ack()
-				})
-
-			}
-		),
-
-	].reduce((accum, next) => accum.then(next), Promise.resolve())
-
-
-
-})
-.catch(err => {
-	console.error('FATAL:', err)
-	process.kill(process.pid, 'SIGTERM')
-	setTimeout(() => process.kill(process.pid, 'SIGKILL'), 3000)
-})
+            return services.amqp.replyOn(message, JSON.stringify(result));
+          })
+          .catch((err) => {
+            console.error(err);
+          })
+          .finally(() => {
+            ack();
+          });
+      }),
+    ].reduce((accum, next) => accum.then(next), Promise.resolve());
+  })
+  .catch((err) => {
+    console.error('FATAL:', err);
+    process.kill(process.pid, 'SIGTERM');
+    setTimeout(() => process.kill(process.pid, 'SIGKILL'), 3000);
+  });

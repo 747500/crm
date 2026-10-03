@@ -1,13 +1,11 @@
-
-
 const docAsResult = (req, res, next) => {
-	var doc = res.locals.Doc
+  var doc = res.locals.Doc;
 
-	res.locals.Result = doc.toObject()
+  res.locals.Result = doc.toObject();
 
-	// delete res.locals.Result.__v
+  // delete res.locals.Result.__v
 
-	next()
-}
+  next();
+};
 
-export default docAsResult
+export default docAsResult;

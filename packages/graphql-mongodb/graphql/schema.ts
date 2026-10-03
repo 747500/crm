@@ -1,5 +1,3 @@
-
-
 export default `
 
 	type User {
@@ -83,4 +81,4 @@ export default `
 
 	}
 
-`
+`;

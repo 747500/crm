@@ -20,7 +20,11 @@
     "test": "vitest run",
     "test:unit": "vitest run",
     "test:e2e": "npm run test -w @crm/e2e",
-    "ws:list": "npm ls --workspaces --depth=0"
+    "ws:list": "npm ls --workspaces --depth=0",
+    "lint": "eslint 'server/**/*.{js,mjs,ts}' 'packages/**/*.{js,mjs,ts,vue}'",
+    "lint:fix": "eslint 'server/**/*.{js,mjs,ts}' 'packages/**/*.{js,mjs,ts,vue}' --fix",
+    "format": "prettier --write 'server/**/*.{js,mjs,ts}' 'packages/**/*.{js,mjs,ts,vue,css,json,md}'",
+    "format:check": "prettier --check 'server/**/*.{js,mjs,ts}' 'packages/**/*.{js,mjs,ts,vue,css,json,md}'"
   },
   "dependencies": {
     "amqplib": "^0.10.4",
@@ -39,8 +43,16 @@
     "sphinxapi": "1"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.65.0",
+    "@typescript-eslint/parser": "^8.65.0",
+    "eslint": "^9.39.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.6",
+    "eslint-plugin-vue": "^10.10.0",
+    "prettier": "^3.9.6",
     "vitest": "^2.1.8",
-    "vue": "^3.5.13"
+    "vue": "^3.5.13",
+    "vue-eslint-parser": "^10.4.1"
   },
   "keywords": [
     "crm"

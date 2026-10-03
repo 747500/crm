@@ -1,15 +1,14 @@
-
-import mongoose from 'mongoose'
+import mongoose from 'mongoose';
 
 const Session = (req, res, next) => {
-	const userId = mongoose.Types.ObjectId(req.body._id).toString()
+  const userId = mongoose.Types.ObjectId(req.body._id).toString();
 
-	if (userId !== req.session.user) {
-		req.session.user = userId
-		console.log('* user/Session', req.session.user)
-	}
+  if (userId !== req.session.user) {
+    req.session.user = userId;
+    console.log('* user/Session', req.session.user);
+  }
 
-	res.send('Ok')
-}
+  res.send('Ok');
+};
 
-export default Session
+export default Session;

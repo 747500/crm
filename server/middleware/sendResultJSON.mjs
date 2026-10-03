@@ -1,15 +1,12 @@
-
-
 const sendResultJSON = (req, res, next) => {
-	const result = res.locals.Result
+  const result = res.locals.Result;
 
-	if ('undefined' === typeof result) {
-		res.status(204).end()
-		return
-	}
+  if ('undefined' === typeof result) {
+    res.status(204).end();
+    return;
+  }
 
-	res.send(result)
-}
+  res.send(result);
+};
 
-
-export default sendResultJSON
+export default sendResultJSON;

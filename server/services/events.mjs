@@ -1,11 +1,10 @@
+import util from 'util';
 
-import util from 'util'
+import moment from 'moment';
 
-import moment from 'moment'
+import CONFIG from '../config.js';
 
-import CONFIG from '../config.js'
-
-import Services from './index.mjs'
+import Services from './index.mjs';
 
 const queryUsers = `{
 	users(notified: true) {
@@ -14,47 +13,36 @@ const queryUsers = `{
 		notifyTelegramId
 		notifyBirthdayAt
 	}
-}`
+}`;
 
-const Users = {}
+const Users = {};
 
 process.nextTick(() => {
-
-	Services.Run().then(services => {
-
-		return services.amqp.graphql(queryUsers, reply => {
-
-			console.log('* graphql reply:', util.inspect(reply, { depth: 5 }))
-
-		})
-
-	})
-	.catch(err => console.error)
-
-})
-
+  Services.Run()
+    .then((services) => {
+      return services.amqp.graphql(queryUsers, (reply) => {
+        console.log('* graphql reply:', util.inspect(reply, { depth: 5 }));
+      });
+    })
+    .catch((err) => console.error);
+});
 
 setInterval(() => {
+  Services.Run().then((services) => {
+    // services.mongodb.Users.List().then()
 
-	Services.Run().then(services => {
-
-		// services.mongodb.Users.List().then()
-
-		const ts = new Date()
-		console.log('! events check @ ', ts)
-
-	})
-
-}, 1000 * 60)
+    const ts = new Date();
+    console.log('! events check @ ', ts);
+  });
+}, 1000 * 60);
 
 const service = {
+  name: 'events',
 
-	name: 'events',
+  init() {
+    // no-op
+    return Promise.resolve();
+  },
+};
 
-	init () {
-		// no-op
-		return Promise.resolve()
-	},
-}
-
-export default service
+export default service;

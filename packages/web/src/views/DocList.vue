@@ -1,46 +1,60 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { computed, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
-import { api, type DocModel } from '../api'
-import { KINDS } from '../schema'
-import DocCard from '../components/DocCard.vue'
+import { api, type DocModel } from '../api';
+import { KINDS } from '../schema';
+import DocCard from '../components/DocCard.vue';
 
-const route = useRoute()
-const router = useRouter()
+const route = useRoute();
+const router = useRouter();
 
-const kind = computed(() => String(route.params.kind))
-const def = computed(() => KINDS[kind.value])
-const docs = ref<DocModel[]>([])
-const loading = ref(false)
-const error = ref('')
+const kind = computed(() => String(route.params.kind));
+const def = computed(() => KINDS[kind.value]);
+const docs = ref<DocModel[]>([]);
+const loading = ref(false);
+const error = ref('');
 
-async function load () {
-	loading.value = true
-	error.value = ''
-	try { docs.value = await api.listDocs(kind.value) }
-	catch (e) { error.value = String(e) }
-	finally { loading.value = false }
+async function load() {
+  loading.value = true;
+  error.value = '';
+  try {
+    docs.value = await api.listDocs(kind.value);
+  } catch (e) {
+    error.value = String(e);
+  } finally {
+    loading.value = false;
+  }
 }
 
-watch(kind, load, { immediate: true })
+watch(kind, load, { immediate: true });
 </script>
 
 <template>
-	<h1>{{ def?.title }}</h1>
-	<button class="btn" @click="router.push(`/${kind}/new`)">+ Новый</button>
+  <h1>{{ def?.title }}</h1>
+  <button class="btn" @click="router.push(`/${kind}/new`)">+ Новый</button>
 
-	<p v-if="loading">Загрузка…</p>
-	<p v-else-if="error" class="error">{{ error }}</p>
-	<ul v-else class="list">
-		<li v-for="d in docs" :key="d._id!">
-			<DocCard :doc="d" @open="doc => router.push(`/${kind}/${doc._id}`)" />
-		</li>
-	</ul>
+  <p v-if="loading">Загрузка…</p>
+  <p v-else-if="error" class="error">{{ error }}</p>
+  <ul v-else class="list">
+    <li v-for="d in docs" :key="d._id!">
+      <DocCard :doc="d" @open="(doc) => router.push(`/${kind}/${doc._id}`)" />
+    </li>
+  </ul>
 </template>
 
 <style scoped>
-.list { list-style: none; padding: 0; max-width: 40rem; }
-.list li { padding: .5rem .75rem; border-bottom: 1px solid #eee; cursor: pointer; }
-.list li:hover { background: #f6f6f6; }
+.list {
+  list-style: none;
+  padding: 0;
+  max-width: 40rem;
+}
+.list li {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+}
+.list li:hover {
+  background: #f6f6f6;
+}
 </style>

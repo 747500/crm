@@ -1,0 +1,7 @@
+node_modules/
+dist/
+public/
+package-lock.json
+tmp/
+# legacy-web использует pug-шаблоны — prettier их не парсит
+packages/legacy-web/

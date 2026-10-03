@@ -1,5 +1,4 @@
-
-import Services from '../../services/index.mjs'
+import Services from '../../services/index.mjs';
 
 const queryUsers = `{
 	users {
@@ -7,29 +6,25 @@ const queryUsers = `{
 		name
 	}
 }
-`
+`;
 
 const List = (req, res, next) => {
+  Services.Run().then(({ amqp }) => {
+    amqp.graphql(queryUsers, (result) => {
+      const users = result.data.users;
+      //console.log(result.data)
 
-	Services.Run().then(({ amqp }) => {
+      res.send(
+        users.map((user) => {
+          return {
+            _id: user.id,
+            name: user.name,
+            current: user.id === req.session.user,
+          };
+        }),
+      );
+    });
+  });
+};
 
-		amqp.graphql(queryUsers, result => {
-
-			const users = result.data.users
-			//console.log(result.data)
-
-			res.send(users.map(user => {
-				return {
-					_id: user.id,
-					name: user.name,
-					current: user.id === req.session.user,
-				}
-			}))
-
-		})
-
-	})
-
-}
-
-export default List
+export default List;

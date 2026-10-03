@@ -1,34 +1,30 @@
-
-
 //import SphinxClient from 'sphinxapi'
 
-import mysql from 'mysql'
-import CONFIG from '../config.js'
+import mysql from 'mysql';
+import CONFIG from '../config.js';
 
 const service = {
+  name: 'sphinxql',
 
-	name: 'sphinxql',
+  init() {
+    return new Promise((resolve, reject) => {
+      var pool = mysql.createPool({
+        connectionLimit: 1,
+        host: CONFIG.SphinxQL.address,
+        port: CONFIG.SphinxQL.port,
+      });
 
-	init () {
-		return new Promise((resolve, reject) => {
+      pool.on('error', (err) => reject(err));
 
-			var pool = mysql.createPool({
-				connectionLimit: 1,
-				host: CONFIG.SphinxQL.address,
-				port: CONFIG.SphinxQL.port,
-			})
+      process.on('SIGTERM', () => {
+        pool.end();
+        console.log('Sphinx disconnected');
+        process.exit(0);
+      });
 
-			pool.on('error', err => reject(err))
+      resolve(pool);
+    });
+  },
+};
 
-			process.on('SIGTERM', () => {
-				pool.end()
-				console.log('Sphinx disconnected')
-				process.exit(0)
-			})
-
-			resolve(pool)
-		})
-	}
-}
-
-export default service
+export default service;

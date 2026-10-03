@@ -1,62 +1,55 @@
+import mongoose from 'mongoose';
 
-import mongoose from 'mongoose'
+import { User } from '../model/index.mjs';
 
-import { User } from '../model/index.mjs'
-
-import CONFIG from '../config.js'
+import CONFIG from '../config.js';
 
 const service = {
+  name: 'mongodb',
 
-	name: 'mongodb',
+  init() {
+    process.on('SIGTERM', () => {
+      mongoose.disconnect();
+      console.log('MongoDB disconnected');
+      process.exit(0);
+    });
 
-	init () {
-		process.on('SIGTERM', () => {
-			mongoose.disconnect()
-			console.log('MongoDB disconnected')
-			process.exit(0)
-		})
+    return mongoose
+      .connect(CONFIG.MongoDB.URI, CONFIG.MongoDB.options)
+      .then((mongodb) => {
+        return {
+          connection: mongodb.connection, // for services.gridfs
 
-		return mongoose.connect(
-			CONFIG.MongoDB.URI,
-			CONFIG.MongoDB.options
-		).then(mongodb => {
+          authTelegramBot(userId, telegramId, callback) {
+            var oid;
 
-			return {
+            console.log('* onBotAuth:', userId, telegramId);
 
-				connection: mongodb.connection, // for services.gridfs
+            try {
+              oid = mongoose.Types.ObjectId(userId);
+            } catch (err) {
+              callback(err);
+              return;
+            }
 
-				authTelegramBot (userId, telegramId, callback) {
-					var oid
+            User.findOne({
+              _id: oid,
+            })
+              .then((user) => {
+                if (null === user) {
+                  throw new Error('User Not Found');
+                }
 
-					console.log('* onBotAuth:', userId, telegramId)
+                user.notifyTelegramId = telegramId;
 
-					try {
-						oid = mongoose.Types.ObjectId(userId)
-					}
-					catch (err) {
-						callback(err)
-						return
-					}
+                return user.save();
+              })
+              .then(() => callback())
+              .catch((err) => callback(err));
+          },
+        };
+      });
+  },
+};
 
-					User.findOne({
-						_id: oid
-					})
-					.then(user => {
-						if (null === user) {
-							throw new Error('User Not Found')
-						}
-
-						user.notifyTelegramId = telegramId
-
-						return user.save()
-					})
-					.then(() => callback())
-					.catch(err => callback(err))
-				}
-			}
-		})
-	}
-
-}
-
-export default service
+export default service;

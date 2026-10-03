@@ -1,9 +1,4 @@
+import { Start } from './Start.mjs';
+import { Auth } from './Auth.mjs';
 
-import { Start } from './Start.mjs'
-import { Auth } from './Auth.mjs'
-
-
-export {
-	Start,
-	Auth
-}
+export { Start, Auth };

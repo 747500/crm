@@ -1,20 +1,15 @@
-
-
 const docSave = (_req, res, next) => {
+  const doc = res.locals.Doc;
 
-	const doc = res.locals.Doc
+  //console.log('* docSave input\n', doc.toObject())
 
-	//console.log('* docSave input\n', doc.toObject())
+  doc
+    .save()
+    .then((result) => {
+      //console.log('* docSave result\n', result)
+      next();
+    })
+    .catch(next);
+};
 
-	doc.save()
-	.then((result) => {
-		//console.log('* docSave result\n', result)
-		next()
-	})
-	.catch(next)
-
-}
-
-
-
-export default docSave
+export default docSave;

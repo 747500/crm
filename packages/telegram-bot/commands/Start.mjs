@@ -1,12 +1,5 @@
-
-
-
-function Start (message, match) {
-
-	console.log('* commands/Start:', message)
-
+function Start(message, match) {
+  console.log('* commands/Start:', message);
 }
 
-export {
-	Start,
-}
+export { Start };

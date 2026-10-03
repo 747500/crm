@@ -1,54 +1,38 @@
+import express from 'express';
 
-import express from 'express'
+import mw from '../middleware/index.mjs';
 
-import mw from '../middleware/index.mjs'
+const docs = express.Router();
 
+docs.post('/s', mw.doc.Search.Query);
 
-const docs = express.Router()
+docs.get('/events/:schema', mw.doc.ResolveSchema, mw.doc.Events);
 
-docs.post('/s',
-	mw.doc.Search.Query
-)
+docs.get('/list/:schema', mw.doc.ResolveSchema, mw.doc.List);
 
-docs.get('/events/:schema',
-	mw.doc.ResolveSchema,
-	mw.doc.Events
-)
+docs.get('/:id', mw.doc.Load, mw.doc.AsResult);
 
-docs.get('/list/:schema',
-	mw.doc.ResolveSchema,
-	mw.doc.List
-)
+docs.get('/:id/files', mw.doc.Load, mw.files.List);
 
-docs.get('/:id',
-	mw.doc.Load,
-	mw.doc.AsResult
-)
+docs.post(
+  '/:id',
+  mw.doc.Load,
+  mw.doc.Update,
+  mw.doc.Save,
+  mw.doc.AsResult,
+  mw.doc.Search.Update,
+);
 
-docs.get('/:id/files',
-	mw.doc.Load,
-	mw.files.List
-)
+docs.put(
+  '/',
+  mw.doc.ResolveSchema,
+  mw.doc.New,
+  mw.doc.Update,
+  mw.doc.Save,
+  mw.doc.AsResult,
+  mw.doc.Search.Add,
+);
 
-docs.post('/:id',
-	mw.doc.Load,
-	mw.doc.Update,
-	mw.doc.Save,
-	mw.doc.AsResult,
-	mw.doc.Search.Update
-)
+docs.use(mw.sendResultJSON);
 
-docs.put('/',
-	mw.doc.ResolveSchema,
-	mw.doc.New,
-	mw.doc.Update,
-	mw.doc.Save,
-	mw.doc.AsResult,
-	mw.doc.Search.Add
-)
-
-docs.use(
-	mw.sendResultJSON
-)
-
-export default docs
+export default docs;

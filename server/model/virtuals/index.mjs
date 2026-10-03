@@ -1,6 +1,3 @@
+import fts from './fts.mjs';
 
-import fts from './fts.mjs'
-
-export {
-	fts,
-}
+export { fts };

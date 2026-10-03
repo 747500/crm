@@ -1,7 +1,6 @@
+import util from 'util';
 
-import util from 'util'
-
-import Services from './index.mjs'
+import Services from './index.mjs';
 
 // Пунктирно реализованная reflection-обёртка:
 // на старте спрашиваем у бэкенда поля Query (introspection) и
@@ -14,41 +13,36 @@ const querySchema = `{
       }
     }
   }
-}`
+}`;
 
 const service = {
+  name: 'graphql',
 
-	name: 'graphql',
+  init() {
+    return new Promise((resolve, reject) => {
+      this.amqp.graphql(querySchema, (reply) => {
+        if (reply.errors) {
+          reject(reply.errors);
+          return;
+        }
 
-	init () {
+        console.log(
+          '* graphql schema reply:',
+          util.inspect(reply, { depth: 5 }),
+        );
 
-		return new Promise((resolve, reject) => {
-			this.amqp.graphql(querySchema, reply => {
+        resolve(
+          reply.data.__schema.queryType.fields.map((item) => item.name),
+        );
+      });
+    }).then((fields) => {
+      console.log('* schema fields:', fields);
 
-				if (reply.errors) {
-					reject(reply.errors)
-					return
-				}
+      return (query, callback) => {
+        return this.amqp.graphql(query, callback);
+      };
+    });
+  },
+};
 
-				console.log('* graphql schema reply:', util.inspect(reply, { depth: 5 }))
-
-				resolve(
-					reply.data.__schema.queryType.fields.map(item => item.name)
-				)
-
-			})
-		})
-		.then(fields => {
-
-			console.log('* schema fields:', fields)
-
-			return (query, callback) => {
-				return this.amqp.graphql(query, callback)
-			}
-
-		})
-
-	},
-}
-
-export default service
+export default service;

@@ -1,6 +1,5 @@
-
-import StreamContent from './StreamContent.mjs'
+import StreamContent from './StreamContent.mjs';
 
 export default {
-	StreamContent
-}
+  StreamContent,
+};
