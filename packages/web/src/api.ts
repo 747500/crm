@@ -18,7 +18,9 @@ function json (body: unknown): RequestInit {
 export const api = {
 	listUsers: () => req<User[]>('/u/list'),
 	setUser: (id: string) => req<string>('/u/set', json({ _id: id })),
+	createUser: (name: string) => req<User>('/u', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name }) }),
 	userInfo: () => req<Record<string, unknown>>('/u/info'),
+	updateUser: (payload: Record<string, unknown>) => req<Record<string, unknown>>('/u', json(payload)),
 
 	listDocs: (kind: string) => req<DocModel[]>(`/doc/list/${kind}`),
 	getDoc: (id: string) => req<DocModel>(`/doc/${id}`),
@@ -31,6 +33,10 @@ export const api = {
 
 	saveCaption: (id: string, caption: string) => req<FileMeta>(`/f/meta/${id}`, json({ caption })),
 	deleteFile: (id: string) => req<unknown>(`/f/${id}`, { method: 'DELETE' }),
+
+	searchDocs: (q: string, kind?: string[]) => req<{ total_found: number; result: Array<{ id: number; oid: string; kind: string; content?: string }> }>('/doc/s', json({ q, ...(kind?.length ? { kind } : {}) })),
+
+	docEvents: (schema: string, yearmonth: string) => req<Array<{ eventAt: string; eventTitle: string; subjectId: string }>>(`/doc/events/${schema}?yearmonth=${encodeURIComponent(yearmonth)}`),
 
 	uploadFile (docId: string, file: File, caption = '') {
 		return fetch(`${BASE}/f/${docId}/upload/${encodeURIComponent(file.name)}`, {

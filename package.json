@@ -12,10 +12,11 @@
   },
   "main": "server/server.mjs",
   "scripts": {
-    "build": "npm run build -w @crm/legacy-web",
+    "build": "npm run build -w @crm/web",
     "serve": "node --env-file-if-exists=.env server/server.mjs",
     "serve:graphql": "npm run serve -w @crm/graphql-mongodb",
     "serve:bot": "npm run serve -w @crm/telegram-bot",
+    "serve:external": "npm run serve -w @crm/external",
     "test": "vitest run",
     "test:unit": "vitest run",
     "test:e2e": "npm run test -w @crm/e2e",

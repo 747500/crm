@@ -3,7 +3,8 @@ import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { api, type DocModel } from '../api'
-import { KINDS, docTitle } from '../schema'
+import { KINDS } from '../schema'
+import DocCard from '../components/DocCard.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -32,8 +33,8 @@ watch(kind, load, { immediate: true })
 	<p v-if="loading">Загрузка…</p>
 	<p v-else-if="error" class="error">{{ error }}</p>
 	<ul v-else class="list">
-		<li v-for="d in docs" :key="d._id!" @click="router.push(`/${kind}/${d._id}`)">
-			{{ docTitle(d, def!) }}
+		<li v-for="d in docs" :key="d._id!">
+			<DocCard :doc="d" @open="doc => router.push(`/${kind}/${doc._id}`)" />
 		</li>
 	</ul>
 </template>

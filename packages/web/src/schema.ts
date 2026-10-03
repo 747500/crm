@@ -37,8 +37,22 @@ export const KINDS: Record<string, KindDef> = {
 			{ name: 'price', label: 'Цена', type: 'text' },
 			{ name: 'type', label: 'Тип жилья', type: 'select', options: [ 'new','second','room','part','house','partOfHouse','townhouse','land' ] },
 			{ name: 'area', label: 'Площадь', type: 'text' },
+			{ name: 'balkony', label: 'Балкон/лоджия', type: 'text' },
+			{ name: 'renovation', label: 'Ремонт', type: 'text' },
+			{ name: 'view', label: 'Вид из окон', type: 'text' },
 			{ name: 'roomsCount', label: 'Комнат', type: 'number' },
 			{ name: 'description', label: 'Описание', type: 'textarea' },
+		],
+	},
+	contract: {
+		kind: 'contract',
+		title: 'Сделки',
+		nested: 'contract',
+		listKeys: [ 'title' ],
+		fields: [
+			{ name: 'title', label: 'Суть', type: 'text' },
+			{ name: 'description', label: 'Описание', type: 'textarea' },
+			{ name: 'property', label: 'Объект', type: 'text' },
 		],
 	},
 }

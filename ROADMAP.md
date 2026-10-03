@@ -38,7 +38,9 @@ crm/                      # монорепо (workspaces)
 - [x] **Фаза 2 — Поднять стек.** Локально поднято на реальных данных; поиск/файлы/бот — см. «итог» ниже.
       Docker-образы скачаны, `docker-compose.yml` валиден (переключение — по желанию).
 - [x] **Фаза 3 — Тесты.** ✅ unit (vitest, 12) + ✅ e2e (Playwright, 4: upload, settings, create/edit, search).
-- [~] **Фаза 4 — `packages/web` (Vue 3 + TS).** ✅ каркас на Vite (сборка и `vue-tsc` зелёные). Осталось: CRUD-экраны.
+- [x] **Фаза 4 — `packages/web` (Vue 3 + TS).** ✅ каркас на Vite + CRUD + файлы + поиск + настройки;
+      SPA собирается в корневой `public/` и раздаётся BFF. Legacy-SPA перестал отдаваться
+      (`packages/legacy-web` пока в репо, удаление — после проверки).
 - [ ] **Фаза 5 — `packages/files`.** Выделить файловые операции (upload/meta/thumbnails/GridFS)
       в отдельный сервис; BFF проксирует. Подготовить почву под CH-файлы.
 - [ ] **Фаза 6 — TypeScript** по частям: `model`/`types` → `services` → `middleware`/`routes`,
@@ -317,5 +319,73 @@ Playwright happy-path (UI + AMQP). Согласовать объём.
 - Роуты: `/:kind(person|property)`, `/:kind/new`, `/:kind/:id`.
 - Vite: `server.host = '127.0.0.1'` (иначе слушает только `[::1]`), `preview` с прокси.
 - Smoke-тест нового SPA `tests/web.spec.js` (список → создание → загрузка) — итого e2e **5 passed**.
-- **Осталось**: заменить legacy SPA новым (BFF отдаёт корневой `public/`) и перенести legacy-тесты
-  на новый UI (сейчас 4 legacy-спеки целятся в старый интерфейс на `:3000`).
+- **✅ Фаза 4 завершена.** SPA собирается в корневой `public/` (`vite build.outDir = '../../public'`,
+  `emptyOutDir: true`), BFF раздаёт его через `express.static('public')`; `npm run build` теперь
+  собирает `@crm/web` (legacy-web больше не собирается в `public/`).
+- **Паритет расширен**: добавлены `SearchView.vue` (`#/search?q=`, `POST /api/v0/doc/s`) и
+  `SettingsView.vue` (`#/settings`, `POST /api/v0/u`), в `App.vue` — строка поиска + ссылка «Настройки».
+- **e2e перенесены на новый UI** (все целятся в `:3000`, где BFF отдаёт новый SPA): `create`,
+  `upload`, `search`, `settings` — **4 passed**. `web.spec.js` (vite-dev `:5173`) удалён — покрыт
+  `create`+`upload`.
+- **Открыто на проверку**: удаление `packages/legacy-web` (Vue 2) и его зависимостей — по согласию.
+  Также в новом SPA пока нет экранов `contract` и событий (дней рождения) — возможные следующие шаги.
+
+## Миграция legacy-фронта (Vue2 → Vue3) — фундамент
+
+Решение: перенести legacy-вёрстку/логику «как есть», по шагам/виджетам. Формы — решаем отдельно
+(FormKit vs свой рендерер). Сделано (фундамент):
+
+- **Сайдбар-layout**: `App.vue` перестроен по образцу legacy `nav.vue` — Bootstrap `navbar` +
+  сайдбар (`col-md-3/col-lg-2`, иконки+названия) + `main`. Подключён Bootstrap 5 CSS в `@crm/web`.
+- **Роутер расширен**: `/calendar`, `/enquiries`, `/search`, `/settings` + `/:kind(person|property|contract)`
+  (список/новая/правка). В `schema.ts` добавлен вид `contract` (Сделки).
+- **Календарь**: `CalendarView.vue` (месяц, `<<`/`>>`, список событий) + `Calendar.vue` (сетка, Пн-первый,
+  бизнес-дни/праздники, русские дни недели) + `EventItem.vue` (элемент → переход к контакту).
+  Данные: `api.docEvents('person', yearmonth)` (`GET /api/v0/doc/events/person?yearmonth=`).
+- **Зависимости**: `bootstrap`, `moment`. ⚠️ `moment-business-days` **не используется** — несовместим
+  с Vite/ESM (`typeof require === 'function'` → `moment` undefined). Заменён локальным расчётом
+  рабочих дней + фиксированный набор праздников (уточнить позже).
+- **e2e**: добавлен `calendar.spec.js` — итого **5 passed** (calendar, create, search, settings, upload).
+  unit: **12 passed**.
+
+## Миграция — принцип и следующие шаги (виджеты)
+
+**Принцип:** сначала **функциональный паритет** (не потерять то, что старый умеет, и отображать
+то же в том же объёме; сырой JSON в `<pre>` у файлов — сохранить). Стили/бордеры не важны.
+**Перевёрстка** (лаконично, по-современному) — **низкий приоритет**, отдельно, после переноса функционала.
+`legacy-web` удаляем **после** достижения паритета.
+
+- **[x] Файлы (паритет)**: `FilesPanel.vue` — у каждого файла действия **удалить**, **сделать главной**
+  (💡 `setMain`, `POST /doc/:id {mainPicture}`), **инфо** (🛈, модалка с JSON в `<pre>`), правка **подписи**.
+  Кнопки над картинкой в гриде. e2e `files-actions.spec.js` — **6 passed**.
+  - **Баг «чёрные квадраты»**: e2e-фикстура `e2e-upload.png` была битым чёрным PNG (1×1, CRC error),
+    upload-тесты заливали её в реальный первый документ (23 чёрных файла). **Фикс**: фикстура заменена
+    на видимый градиент (120×90); чёрные файлы удалены; upload-тесты теперь создают **отдельный
+    тестовый контакт** и заливают туда (реальные документы не засоряются).
+- **[x] Формы — свой рендерер** (без FormKit). `DocEdit.vue`: все поля `person`/`property`/`contract`
+  (в `schema.ts` добавлены `balkony`/`renovation`/`view`), **repeatable-группа контактов** (add/remove),
+  **главная картинка**, выбор собственника (select), сохранение (create/update). Проверено: контакты
+  сохраняются массивом. Осталось: **owner typeahead-поиск** и опционально вкладки `Doc`/`Modal`.
+- **[x] Owner typeahead**: `OwnerSelect.vue` — поиск собственника по подсказкам (фильтр по загруженным
+  персонам), выбор/сброс; подключён в `DocEdit.vue`. Проверено в браузере + e2e.
+- **Карточки/список**: `DocList`, `List`, `M/{doc,person,property,contract,picture}`, `S/{doc,person,event,picture}`,
+  `oidImage`/`iimg`, `currency`-хелпер.
+- **Документ**: `Doc` (модалка+вкладки), `TabView`, `Modal`.
+- **[x] Поиск с фильтром по `kind`**: `SearchView.vue` — фильтр person/property/contract (чекбоксы),
+  передаётся в `api.searchDocs(q, kind)`. Проверено на API + e2e.
+- **[x] Аккаунты (создание пользователя)**: в `App.vue` — опция «Создать» в переключателе → модалка
+  (`api.createUser`, `PUT /u`). Проверено в браузере.
+- **Мелочи**: `$listeners` → `$attrs`; убрать неиспользуемое; `EnquiryList` — заглушка (как в legacy).
+- **Мелочи**: `$listeners` → `$attrs`; убрать неиспользуемое; `EnquiryList` — заглушка (как в legacy).
+- **Тесты**: расширить e2e на новые экраны; затем переключение/удаление `legacy-web`.
+
+## Сервис внешних данных (`packages/external`) — сделано
+
+- Получение внешних данных **через RabbitMQ** (RPC по AMQP). Очередь `crm-external`.
+- **RPC-контракт**: `{ action: 'productionCalendar', year }` → `{ year, holidays: ['YYYY-MM-DD', ...] }`.
+- Первый кейс — **производственный календарь** с сайта **КонсультантПлюс**: загрузка страницы
+  `https://www.consultant.ru/law/ref/calendar/proizvodstvennye/{year}/` + парсер
+  (`<table class="cal">` → `<td class="weekend|holiday ...">`). Проверено end-to-end: RPC вернул
+  118 нерабочих дней 2026.
+- **Далее**: подключить как источник праздников в `packages/web/src/components/Calendar.vue`
+  (заменить захардкоженный набор дат) — отдельным шагом.

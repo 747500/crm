@@ -1,0 +1,23 @@
+{
+  "name": "@crm/external",
+  "version": "1.0.0",
+  "description": "External data service (RabbitMQ RPC): production calendar from ConsultantPlus",
+  "main": "index.ts",
+  "scripts": {
+    "start": "node index.ts",
+    "serve": "node --env-file-if-exists=.env --env-file-if-exists=../../.env index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [],
+  "author": "Serge R",
+  "license": "WTFPL",
+  "type": "module",
+  "dependencies": {
+    "amqplib": "^0.10.4"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2",
+    "@types/amqplib": "^0.10.5",
+    "@types/node": "^22.10.2"
+  }
+}

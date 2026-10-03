@@ -5,6 +5,9 @@ import { useRoute, useRouter } from 'vue-router'
 import { api, type DocModel } from '../api'
 import { KINDS } from '../schema'
 import FilesPanel from '../components/FilesPanel.vue'
+import OwnerSelect from '../components/OwnerSelect.vue'
+
+interface Contact { data?: string; description?: string }
 
 const route = useRoute()
 const router = useRouter()
@@ -14,7 +17,7 @@ const def = computed(() => KINDS[kind.value])
 const id = computed(() => (route.params.id ? String(route.params.id) : 'new'))
 
 const model = ref<Record<string, any>>({})
-const contacts = ref('')
+const contacts = ref<Contact[]>([])
 const owner = ref('')
 const persons = ref<DocModel[]>([])
 const saved = ref<DocModel | null>(null)
@@ -31,7 +34,7 @@ async function load () {
 
 	if (id.value === 'new') {
 		model.value = {}
-		contacts.value = ''
+		contacts.value = []
 		owner.value = ''
 		saved.value = null
 		return
@@ -42,27 +45,29 @@ async function load () {
 		saved.value = doc
 		model.value = { ...(doc[def.value!.nested] ?? {}) }
 		owner.value = doc.owner ?? ''
-		const c = (doc[def.value!.nested]?.contact ?? []) as Array<{ data?: string; description?: string }>
-		contacts.value = c.map(x => [ x.data, x.description ].filter(Boolean).join(' | ')).join('\n')
+		contacts.value = ((doc[def.value!.nested]?.contact ?? []) as Contact[]).map(c => ({
+			data: c.data ?? '',
+			description: c.description ?? '',
+		}))
 	}
 	catch (e) { error.value = String(e) }
 }
 
 watch([ kind, id ], load, { immediate: true })
 
-function parseContacts () {
-	return contacts.value.split('\n').map(l => l.trim()).filter(Boolean).map(line => {
-		const [ data, description ] = line.split('|').map(s => s.trim())
-		return { data, description: description ?? '' }
-	})
-}
+function addContact () { contacts.value.push({ data: '', description: '' }) }
+function removeContact (i: number) { contacts.value.splice(i, 1) }
 
 async function save () {
 	error.value = ''
 	status.value = ''
 
 	const nested: Record<string, any> = { ...model.value }
-	if (def.value?.special === 'contact') nested.contact = parseContacts()
+	if (def.value?.special === 'contact') {
+		nested.contact = contacts.value
+			.map(c => ({ data: c.data?.trim() ?? '', description: c.description?.trim() ?? '' }))
+			.filter(c => c.data || c.description)
+	}
 
 	const payload: Record<string, any> = { [def.value!.nested]: nested }
 	if (def.value?.special === 'owner') payload.owner = owner.value
@@ -85,6 +90,10 @@ async function save () {
 	<p v-if="error" class="error">{{ error }}</p>
 	<p v-if="status" class="ok">{{ status }}</p>
 
+	<div v-if="saved?.mainPicture" class="main-picture">
+		<img :src="api.fileUrl(saved.mainPicture, true)" alt="Главная картинка" />
+	</div>
+
 	<form class="grid" @submit.prevent="save">
 		<label v-for="f in def?.fields" :key="f.name" class="field">
 			<span>{{ f.label }}</span>
@@ -96,20 +105,20 @@ async function save () {
 			<input v-else :type="f.type" v-model="model[f.name]" />
 		</label>
 
-		<label v-if="def?.special === 'contact'" class="field">
-			<span>Контакты (строка: значение | описание)</span>
-			<textarea v-model="contacts" rows="4" />
-		</label>
+		<fieldset v-if="def?.special === 'contact'" class="field contacts">
+			<legend>Контакты</legend>
+			<div v-for="(c, i) in contacts" :key="i" class="contact-row">
+				<input v-model="c.data" placeholder="телефон, e-mail" />
+				<input v-model="c.description" placeholder="описание" />
+				<button type="button" class="remove" @click="removeContact(i)">🗑</button>
+			</div>
+			<button type="button" class="add" @click="addContact">+ Контакт</button>
+		</fieldset>
 
-		<label v-if="def?.special === 'owner'" class="field">
+		<div v-if="def?.special === 'owner'" class="field">
 			<span>Собственник</span>
-			<select v-model="owner">
-				<option value=""></option>
-				<option v-for="p in persons" :key="p._id!" :value="p._id">
-					{{ [ p.person?.lastName, p.person?.firstName ].filter(Boolean).join(' ') || p._id }}
-				</option>
-			</select>
-		</label>
+			<OwnerSelect v-model="owner" :persons="persons" />
+		</div>
 
 		<div class="actions"><button class="btn" type="submit">Сохранить</button></div>
 	</form>
@@ -125,4 +134,11 @@ async function save () {
 .actions { grid-column: 1 / -1; }
 .error { color: #b00; }
 .ok { color: #070; }
+.main-picture img { width: 9rem; height: 9rem; object-fit: cover; border-radius: .4rem; margin-bottom: .5rem; }
+.contacts { border: 1px solid #ddd; border-radius: .4rem; padding: .5rem .75rem; }
+.contact-row { display: flex; gap: .5rem; margin-bottom: .5rem; }
+.contact-row input { flex: 1; }
+.contact-row .remove { cursor: pointer; }
+.contacts .add { cursor: pointer; margin-top: .25rem; }
 </style>
+

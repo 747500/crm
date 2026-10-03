@@ -1,21 +1,10 @@
-// Happy-path: сохранение настроек пользователя (POST /api/v0/u).
+// Happy-path (новый SPA, Vue3): сохранение настроек пользователя (POST /api/v0/u).
 const { test, expect } = require('@playwright/test')
 
-test('save user settings', async ({ page }) => {
-	await page.goto('/')
+const { login } = require('./helpers')
 
-	// отладочный вход (сессия)
-	const users = await (await page.request.get('/api/v0/u/list')).json()
-	const setStatus = await page.evaluate(async (id) => {
-		const r = await fetch('/api/v0/u/set', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ _id: id }),
-			credentials: 'include',
-		})
-		return r.status
-	}, users[0]._id)
-	expect(setStatus).toBe(200)
+test('save user settings', async ({ page }) => {
+	await login(page)
 
 	// страница настроек (hash-роут)
 	await page.goto('/#/settings')
