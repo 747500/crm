@@ -379,6 +379,16 @@ Playwright happy-path (UI + AMQP). Согласовать объём.
 - **Мелочи**: `$listeners` → `$attrs`; убрать неиспользуемое; `EnquiryList` — заглушка (как в legacy).
 - **Тесты**: расширить e2e на новые экраны; затем переключение/удаление `legacy-web`.
 
+## Инструменты (prettier + eslint)
+
+Добавлено по образцу `../abook`:
+- `.prettierrc`/`.prettierignore`, `.editorconfig`, `.vscode` (format-on-save, eslint, volar).
+- `eslint.config.mjs` (flat): JS/MJS/CJS + `@typescript-eslint` + `eslint-plugin-vue` + prettier.
+- Скрипты: `npm run lint` / `lint:fix` / `format` / `format:check`.
+- `packages/legacy-web` исключён (pug-шаблоны prettier/eslint-plugin-vue не парсят);
+  `server/config.js` — локальный (не в git).
+- Линт: **0 errors**, 35 warnings (`no-unused-vars` в легаси `.mjs`); format — чисто.
+
 ## Сервис внешних данных (`packages/external`) — сделано
 
 - Получение внешних данных **через RabbitMQ** (RPC по AMQP). Очередь `crm-external`.
