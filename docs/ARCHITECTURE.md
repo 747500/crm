@@ -173,3 +173,59 @@ RabbitMQ → GraphQL**. Каждый шаг — «подключить техн�
 3. BFF: WS-мост `/events` (подписка на `crm.events`).
 4. «Тупой» фронт (пара десятков строк): команда «создать контакт» + рендер по событиям.
 5. (опционально) `file.chunk`-стрим как эксперимент.
+
+---
+
+## 12. Переключаемый storage: Mongo ↔ ClickHouse
+
+> Проверено на `@clickhouse/client@1.23.1` и локальном ClickHouse 26.9.7.9.
+
+### JS-клиент ClickHouse (факты)
+
+- Официальный клиент — **HTTP, не нативный**; два варианта: `@clickhouse/client` (Node, на
+  **Node Stream API**) и `@clickhouse/client-web` (браузер/CF Workers, **Fetch + Web Streams**).
+  TypeScript, zero deps. Нативного (TCP) JS-клиента от ClickHouse нет (нативно — Rust/Go/C++).
+- **Потоковый по-настоящему** (не «pretend-async»): `resultSet.stream()` / `json()`.
+- **Прогресс** (два пути):
+  1. `JSONEachRowWithProgress` — в потоке идут `{ progress }`-строки (`RowOrProgress`, `isProgressRow`);
+  2. `send_progress_in_http_headers` — сервер дописывает `X-ClickHouse-Progress`; в клиенте есть
+     `max_response_headers_size` (иначе Node режет заголовки >16KB → `HPE_HEADER_OVERFLOW`).
+- **Таймауты**: keep-alive (`idle_socket_ttl`, `eagerly_destroy_stale_sockets`), свой `http_agent`;
+  тяжёлые запросы — серверные настройки через `clickhouse_settings`
+  (`max_execution_time`, `send_timeout`, `receive_timeout`) + `query_id`.
+- **`notify`/push как в pg (`LISTEN`/`NOTIFY`) — нет** (HTTP не умеет). Для пушей используем
+  **RabbitMQ-события** (CH — проекция), прогресс — streamed.
+
+### Адаптер `Storage`
+
+Интерфейс: `saveDoc / getDoc / listDocs(kind, cursor) / search / deleteDoc / upsertFileMeta …`.
+Реализации `MongoStorage`, `ClickHouseStorage`; выбор `STORAGE_BACKEND=mongo|clickhouse|dual`.
+- **Dual**: пишем в оба, читаем из основного (Mongo); CH — аналитика/проекция; сверка по
+  `version`/`mtime`, ретраи.
+
+### Таблица CH (документный снимок)
+
+```sql
+CREATE TABLE docs (
+  id String,
+  kind LowCardinality(String),
+  user String,
+  version UInt64,
+  ctime DateTime,
+  mtime DateTime,
+  data JSON
+) ENGINE = ReplacingMergeTree(version)
+ORDER BY (user, kind, id);
+```
+
+- **Upsert / последняя версия**: `LIMIT 1 BY id ORDER BY version DESC` (или `argMax`).
+- **История — в event journal** (не в CH; CH — снимок) — снимает тревогу про «историю со схемой».
+- **Индексы**: `JSON`-колонка гибкая, но произвольные вложенные пути не индексируются как в Mongo;
+  для поиска **материализуем** поля (`lastName`, `firstName`, `address`, `price`) отдельными колонками
+  + skip-индексы (`tokenbf_v1`/`ngrambf_v1`/`text`). Это осознанная цена «схема, если хотим индексы».
+
+### Роль в событийной архитектуре
+
+- CH — **проекция `crm.events`** (консьюмер), а не «второе хранилище в запросном пути»; переключатель
+  меняет только источник снимков.
+- Прогресс/быстрый отклик: `JSONEachRowWithProgress` + **курсор** (`WHERE id > last LIMIT n`).
